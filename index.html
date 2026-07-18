@@ -326,6 +326,8 @@ header{padding-left:110px;padding-right:110px;}
   <div class="login-box" id="registerBox" style="display:none;text-align:left;">
     <h2 style="text-align:center;">ΕΓΓΡΑΦΗ ΝΕΟΥ ΧΡΗΣΤΗ</h2>
     <p style="font-size:13px;color:#666;text-align:center;margin-top:-8px;">Αν ο διαχειριστής σας έχει ήδη προσκαλέσει, η πρόσβαση ενεργοποιείται αμέσως. Διαφορετικά, ο λογαριασμός μένει σε αναμονή έγκρισης.</p>
+    <label class="reg-l">Κωδικός Εγγραφής (δίνεται από τον διαχειριστή)</label>
+    <input type="password" id="regGate" placeholder="Κωδικός εγγραφής" autocomplete="off">
     <label class="reg-l">E-mail</label>
     <input type="email" id="regEmail" placeholder="name@example.com" autocomplete="email">
     <label class="reg-l">Ονοματεπώνυμο</label>
@@ -473,16 +475,31 @@ header{padding-left:110px;padding-right:110px;}
     <div class="card-section" style="border-left-color:var(--secondary-blue);">
       <h3>2. ΠΡΟΕΤΟΙΜΑΣΙΑ 1ΟΥ MEETING</h3>
       <div class="form-row form-row-inline"><label>Στείλαμε προσφορά στον πελάτη;</label><div><select id="pre_q1" class="form-control save-data bg-neutral" onchange="handlePreQ1(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select><input type="text" id="pre_q1_date" class="form-control save-data hidden" placeholder="Ημερομηνία Αποστολής"></div></div>
-      <div class="form-row form-row-inline"><label>Ζητείται προκαταβολή από τον πελάτη;</label><div><select id="pre_q2" class="form-control save-data bg-neutral" onchange="handlePreQ2(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option><option value="ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ">ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ</option></select><input type="text" id="pre_q2_amount" class="form-control save-data hidden" placeholder="Ποσό (€)" onblur="formatField(this,'currency')"><input type="text" id="pre_q2_date" class="form-control save-data hidden" placeholder="Ημερομηνία Κατάθεσης"></div></div>
+      <div class="form-row form-row-inline"><label>Ζητείται προκαταβολή από τον πελάτη;</label><div><select id="pre_q2" class="form-control save-data bg-neutral" onchange="handlePreQ2(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΝΑΙ - ΠΛΗΡΩΘΗΚΕ">ΝΑΙ - ΠΛΗΡΩΘΗΚΕ</option><option value="ΟΧΙ">ΟΧΙ</option><option value="ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ">ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ</option></select><input type="text" id="pre_q2_amount" class="form-control save-data hidden" placeholder="Ποσό προκαταβολής (€)" onblur="formatField(this,'currency')"><input type="text" id="pre_q2_date" class="form-control save-data hidden" placeholder="Ημερομηνία πληρωμής"></div></div>
       <div class="form-row form-row-inline"><label>Επικοινώνησα τηλεφωνικά με τον πελάτη, για να εξακριβώσω τη διαθεσιμότητά του;</label><div><select id="pre_q3" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
-      <div class="form-row form-row-inline"><label>Ορίσαμε ημερομηνία και ώρα meeting;</label><div><select id="pre_q4" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select><input type="text" id="pre_q4_date" class="form-control save-data" placeholder="Ημερομηνία/Ώρα"></div></div>
-      <div class="form-row form-row-inline"><label>Ενημέρωσα με σχετικό email;</label><div><select id="pre_q5" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option><option value="ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ">ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ</option></select></div></div>
+      <div class="form-row form-row-inline"><label>Ορίσαμε ημερομηνία και ώρα meeting;</label><div><select id="pre_q4" class="form-control save-data bg-neutral" onchange="handlePreQ4(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select>
+        <select id="pre_q4_day" class="form-control save-data hidden" style="max-width:130px;"><option value="">Ημέρα</option><option>Δευτέρα</option><option>Τρίτη</option><option>Τετάρτη</option><option>Πέμπτη</option><option>Παρασκευή</option><option>Σάββατο</option><option>Κυριακή</option></select>
+        <input type="text" id="pre_q4_date" class="form-control save-data hidden" placeholder="Ημερομηνία" style="max-width:140px;">
+        <input type="text" id="pre_q4_time" class="form-control save-data hidden" placeholder="Ώρα (π.χ. 11:00)" style="max-width:130px;">
+        <input type="text" id="pre_q4_link" class="form-control save-data hidden" placeholder="Link meeting (προαιρετικό)"></div></div>
+      <div class="form-row form-row-inline"><label>Ενημέρωσα με σχετικό email;</label><div><select id="pre_q5" class="form-control save-data bg-neutral" onchange="handlePreQ5(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΘΑ ΕΝΗΜΕΡΩΣΩ">ΘΑ ΕΝΗΜΕΡΩΣΩ</option><option value="ΟΧΙ">ΟΧΙ</option><option value="ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ">ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ</option></select>
+        <button class="btn btn-blue" style="padding:8px 14px;" onclick="generateMeetingInviteEmail()">📧 Προβολή Email</button></div></div>
     </div>
 
     <div class="card-section" style="border-left-color:var(--primary-blue);">
       <h3>3. ΠΡΟΫΠΟΘΕΣΕΙΣ ΣΥΜΜΕΤΟΧΗΣ &amp; ΕΠΙΛΕΞΙΜΟΤΗΤΑ <span id="lblBizType" style="font-weight:normal;font-size:16px;"></span></h3>
       <div class="form-row form-row-inline"><label>Ποσοστό ενίσχυσης</label><div><input type="text" id="elig_p1" class="form-control save-data" placeholder="αυτόματα από Φάση 1" readonly style="background:#eef2fb;font-weight:bold;"></div></div>
-      <div class="form-row form-row-inline"><label>Κατανοήσαμε επακριβώς το επιχειρηματικό σχέδιο του πελάτη;</label><div><select id="elig_s1" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
+      <div class="form-row" style="display:block;">
+        <div class="form-row-inline" style="display:flex;align-items:center;gap:12px;margin-bottom:10px;"><label style="flex:1;">Κατανοήσαμε επακριβώς το επιχειρηματικό σχέδιο του πελάτη;</label><div><select id="elig_s1" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <textarea id="elig_s1_desc" class="form-control save-data" rows="5" placeholder="Περιγραφή επενδυτικού σχεδίου (προαιρετικό) — μπορείτε να γράψετε ή να υπαγορεύσετε..." style="flex:1;resize:vertical;line-height:1.45;"></textarea>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <button class="btn" id="dictBtn" style="background:#4b2e6b;color:#fff;white-space:nowrap;padding:9px 14px;" onclick="toggleDictation('elig_s1_desc')">🎤 Υπαγόρευση</button>
+            <button class="btn" style="background:#eee;color:#555;font-size:12px;padding:6px 10px;" onclick="document.getElementById('elig_s1_desc').value='';scheduleAutoSave();">Καθαρισμός</button>
+            <span id="dictStatus" style="font-size:11.5px;color:#777;text-align:center;"></span>
+          </div>
+        </div>
+      </div>
       <div class="form-row form-row-inline"><label>Μπορεί να επιχορηγηθεί από επενδυτικό πρόγραμμα;</label><div><select id="elig_s2" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
       <div class="form-row form-row-inline"><label>Θα μεριμνήσει για προσβασιμότητα ΑμεΑ;</label><div><select id="elig_s3" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option><option value="ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ">ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ</option></select></div></div>
       <div class="form-row form-row-inline"><label>Ο/Οι ΚΑΔ επένδυσης, είναι επιλέξιμος/οι;</label><div><select id="elig_s4" class="form-control save-data bg-neutral" onchange="handleKadList(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
@@ -895,8 +912,40 @@ function colorStandard(el){
   else el.classList.add('bg-neutral');
 }
 function updateDynamicHeaders(){document.getElementById('lblBizType').innerText=document.getElementById('gen_type').value?`- ${document.getElementById('gen_type').value}`:"";}
-function handlePreQ1(el){colorStandard(el);document.getElementById('pre_q1_date').classList.toggle('hidden',el.value!=='ΝΑΙ');}
-function handlePreQ2(el){colorStandard(el);const y=el.value==='ΝΑΙ';document.getElementById('pre_q2_amount').classList.toggle('hidden',!y);document.getElementById('pre_q2_date').classList.toggle('hidden',!y);}
+function handlePreQ1(el){
+  el.classList.remove('bg-green','bg-red','bg-yellow','bg-light-green','bg-neutral');
+  if(el.value==='ΝΑΙ')el.classList.add('bg-green');
+  else if(el.value==='ΟΧΙ')el.classList.add('bg-yellow');
+  else el.classList.add('bg-neutral');
+  document.getElementById('pre_q1_date').classList.toggle('hidden',el.value!=='ΝΑΙ');
+}
+function handlePreQ4(el){
+  colorStandard(el);
+  const y=(el.value==='ΝΑΙ');
+  ['pre_q4_day','pre_q4_date','pre_q4_time','pre_q4_link'].forEach(id=>{
+    const e=document.getElementById(id);if(e)e.classList.toggle('hidden',!y);
+  });
+}
+function handlePreQ5(el){
+  el.classList.remove('bg-green','bg-red','bg-yellow','bg-light-green','bg-neutral');
+  if(el.value==='ΝΑΙ')el.classList.add('bg-green');
+  else if(el.value==='ΘΑ ΕΝΗΜΕΡΩΣΩ')el.classList.add('bg-light-green');
+  else if(el.value==='ΟΧΙ')el.classList.add('bg-red');
+  else if(el.value==='ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ')el.classList.add('bg-yellow');
+  else el.classList.add('bg-neutral');
+}
+function handlePreQ2(el){
+  const v=el.value;
+  el.classList.remove('bg-green','bg-red','bg-yellow','bg-light-green','bg-neutral');
+  if(v==='ΝΑΙ'||v==='ΝΑΙ - ΠΛΗΡΩΘΗΚΕ')el.classList.add('bg-green');
+  else if(v==='ΟΧΙ')el.classList.add('bg-red');
+  else if(v==='ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ')el.classList.add('bg-yellow');
+  else el.classList.add('bg-neutral');
+  const showAmount=(v==='ΝΑΙ'||v==='ΝΑΙ - ΠΛΗΡΩΘΗΚΕ');
+  const showDate=(v==='ΝΑΙ - ΠΛΗΡΩΘΗΚΕ');
+  document.getElementById('pre_q2_amount').classList.toggle('hidden',!showAmount);
+  document.getElementById('pre_q2_date').classList.toggle('hidden',!showDate);
+}
 function handleKAD(el){colorStandard(el);document.getElementById('row_elig_s6').classList.toggle('hidden',el.value!=='ΝΑΙ');}
 function handleBP(el){colorStandard(el);document.getElementById('bp_section').classList.toggle('hidden',el.value!=='ΝΑΙ');}
 function handleReminder(el,t){colorStandard(el);document.getElementById(t).classList.toggle('hidden',el.value!=='ΝΑΙ');}
@@ -1364,9 +1413,24 @@ function generateMeetingReport(type){
   const kad=getKadSummary();
   const dLinks=getDocLinks();
   const expTable=expensesToHtmlTable();
+  /* --- ΚΑΔ επένδυσης --- */
+  const kadInv=(typeof getKadSummary==='function')?getKadSummary():[];
+  /* --- Υποχρεώσεις ΑμεΑ & δημοσιότητας --- */
+  const amEaHtml='<p style="background:#fff8e6;border-left:4px solid #f1c232;padding:12px;">'+
+    '<strong><u>Σημαντικές υποχρεώσεις του δικαιούχου:</u></strong><br>'+
+    '<strong><u>Προσβασιμότητα ΑμεΑ:</u></strong> η επιχείρηση υποχρεούται να μεριμνήσει για την προσβασιμότητα ατόμων με αναπηρία, τόσο στον τόπο υλοποίησης της επένδυσης όσο και ηλεκτρονικά (ιστοσελίδα / e-shop).<br>'+
+    '<strong><u>Δημοσιότητα του έργου:</u></strong> απαιτείται ανάρτηση της προβλεπόμενης αφίσας, όπως ορίζει ο οδηγός του προγράμματος, σε εμφανές σημείο στον τόπο υλοποίησης της επένδυσης, στην ιστοσελίδα της επιχείρησης και στα μέσα κοινωνικής δικτύωσης.</p>';
+  /* --- Επισήμανση για τρίτους ΚΑΔ --- */
+  const wantsThird=(document.getElementById('elig_s5')||{}).value;
+  const thirdAllowed=(document.getElementById('elig_s6')||{}).value;
+  let kadWarnHtml='';
+  if(wantsThird==='ΝΑΙ'&&thirdAllowed==='ΟΧΙ'){
+    kadWarnHtml='<p style="background:#fdeaea;border-left:4px solid #b02a37;padding:12px;">'+
+      '<strong>Υπενθύμιση (όπως συζητήθηκε):</strong> το συγκεκριμένο πρόγραμμα <strong>δεν επιτρέπει</strong> την ένταξη δραστηριοτήτων (ΚΑΔ) που δεν περιλαμβάνονται στη λίστα επιλέξιμων ΚΑΔ του οδηγού. Συνεπώς, οι επιπλέον κωδικοί δραστηριότητας που επιθυμείτε δεν μπορούν να ενταχθούν στο παρόν επενδυτικό σχέδιο.</p>';
+  }
   let linksHtml="";
   if(dLinks.length){
-    linksHtml='<p><strong>Χρήσιμοι σύνδεσμοι δικαιολογητικών</strong> <span style="font-size:12px;color:#666;">(επισυνάπτεται και η προθεσμία αποστολής'+(deadline?': '+deadline:'')+')</span></p><ul>';
+    linksHtml='<p><strong>Στους παρακάτω συνδέσμους θα βρείτε τα απαιτούμενα δικαιολογητικά</strong> <span style="font-size:12px;color:#666;">(ισχύει η ανωτέρω προθεσμία αποστολής'+(deadline?': '+deadline:'')+')</span></p><ul>';
     dLinks.forEach(l=>{linksHtml+='<li>'+l.label+': <a href="'+l.url+'">'+l.url+'</a></li>';});
     linksHtml+='</ul>';
   }
@@ -1398,8 +1462,9 @@ function generateMeetingReport(type){
     html=`<p><strong>Θέμα: Σύνοψη 1ου Meeting, Εκτίμηση Βαθμολογίας & Απαιτούμενα Δικαιολογητικά - ${ben}</strong></p>`+
     `<p>Αξιότιμε/η <strong>${ben}</strong>,</p>`+
     `<p>Θα θέλαμε να σας ευχαριστήσουμε για την εποικοδομητική μας συνάντηση αναφορικά με το επιχειρηματικό σας σχέδιο για το πρόγραμμα <strong>${prog}</strong>.</p>`+
-    `<p>Σύμφωνα με τα στοιχεία που συλλέξαμε, η <strong>εκτιμώμενη συνολική βαθμολογία</strong> του επενδυτικού σας σχεδίου ανέρχεται σε: <strong style="font-size:18px;color:#003366;">${score}</strong>.</p>`+
-    kadHtml+
+    `<p>Με βάση όσα μας αναφέρατε κατά τη συνάντησή μας, η <strong>εκτιμώμενη συνολική βαθμολογία</strong> του επενδυτικού σας σχεδίου διαμορφώνεται σε: <strong style="font-size:18px;color:#003366;">${score}</strong>.</p>`+
+    `<p style="font-size:13px;color:#555;font-style:italic;">Επισημαίνεται ότι η ανωτέρω βαθμολογία είναι <strong>ενδεικτική</strong> και βασίζεται αποκλειστικά στα στοιχεία που μας δηλώσατε. Η οριστική της διαμόρφωση θα προκύψει μετά τον έλεγχο των δικαιολογητικών που θα προσκομιστούν.</p>`+
+    kadHtml+amEaHtml+kadWarnHtml+
     `<p>Προκειμένου να προχωρήσουμε στο επόμενο στάδιο της υποβολής, παρακαλούμε όπως μεριμνήσετε για την αποστολή των παρακάτω δικαιολογητικών:</p>`+
     docsHtml+linksHtml+dlHtml+
     (expTable?`<p><strong>Ανάλυση δαπανών επενδυτικού σχεδίου:</strong></p>`+expTable:'')+
@@ -1850,6 +1915,8 @@ function applyData(data){
         }
       }
 
+      ['pre_q1','pre_q2','pre_q4','pre_q5'].forEach(id=>{const e=document.getElementById(id);if(!e)return;
+        if(id==='pre_q1')handlePreQ1(e);else if(id==='pre_q2')handlePreQ2(e);else if(id==='pre_q4')handlePreQ4(e);else handlePreQ5(e);});
       evaluateProgress(0);calculateTotalScore();evaluateAllExpenses();updateDynamicHeaders();calcFees();syncPhoneAutoFields();handlePhase3Gate();
     }
 }
@@ -2109,6 +2176,96 @@ const LOGO_PARTS=[
 'gg==',
 ];
 function initLogo(){var el=document.getElementById('brandLogo');if(el)el.src='data:image/png;base64,'+LOGO_PARTS.join('');}
+/* =================== ΥΠΑΓΟΡΕΥΣΗ (v17) =================== */
+let _rec=null,_recTarget=null,_recBase='';
+function toggleDictation(targetId){
+  const st=document.getElementById('dictStatus');
+  const btn=document.getElementById('dictBtn');
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){st.innerText='Δεν υποστηρίζεται σε αυτόν τον browser.';alert('Η υπαγόρευση υποστηρίζεται σε Google Chrome ή Microsoft Edge.');return;}
+  if(_rec){stopDictation();return;}
+  const el=document.getElementById(targetId);if(!el)return;
+  _recTarget=el;_recBase=el.value?(el.value.replace(/\s+$/,'')+' '):'';
+  _rec=new SR();
+  _rec.lang='el-GR';_rec.continuous=true;_rec.interimResults=true;
+  _rec.onstart=()=>{btn.innerText='⏹ Διακοπή';btn.style.background='#b02a37';st.innerText='🔴 Ακούω...';};
+  _rec.onresult=(ev)=>{
+    let fin='',interim='';
+    for(let i=ev.resultIndex;i<ev.results.length;i++){
+      const t=ev.results[i][0].transcript;
+      if(ev.results[i].isFinal)fin+=t+' ';else interim+=t;
+    }
+    if(fin)_recBase+=fin;
+    _recTarget.value=_recBase+interim;      /* γράφεται σε πραγματικό χρόνο */
+    _recTarget.scrollTop=_recTarget.scrollHeight;
+  };
+  _rec.onerror=(e)=>{st.innerText='⚠ '+(e.error==='not-allowed'?'Δεν δόθηκε άδεια μικροφώνου.':e.error);stopDictation();};
+  _rec.onend=()=>{if(_rec)stopDictation();};
+  try{_rec.start();}catch(e){st.innerText='⚠ '+e.message;}
+}
+function stopDictation(){
+  const st=document.getElementById('dictStatus');
+  const btn=document.getElementById('dictBtn');
+  if(_rec){try{_rec.onend=null;_rec.stop();}catch(e){}_rec=null;}
+  if(_recTarget){_recTarget.value=_recBase.replace(/\s+$/,'');scheduleAutoSave();}
+  if(btn){btn.innerText='🎤 Υπαγόρευση';btn.style.background='#4b2e6b';}
+  if(st)st.innerText='✔ Καταγράφηκε';
+  _recTarget=null;
+}
+
+/* =================== EMAIL ΠΡΟΣΚΛΗΣΗΣ MEETING (v17) =================== */
+function generateMeetingInviteEmail(){
+  const g=id=>{const e=document.getElementById(id);return e?e.value.trim():'';};
+  const ben=g('gen_beneficiary')||'[Επωνυμία Δικαιούχου]';
+  const prog=g('gen_program')||'[Πρόγραμμα]';
+  const btype=g('gen_type');
+  const budget=g('gen_budget');
+  const feeT=g('gen_fee_total');
+  const feeS=g('gen_fee_submit');
+  const offerSent=g('pre_q1'), offerDate=g('pre_q1_date');
+  const adv=g('pre_q2'), advAmt=g('pre_q2_amount'), advDate=g('pre_q2_date');
+  const called=g('pre_q3');
+  const setDate=g('pre_q4'), mDay=g('pre_q4_day'), mDate=g('pre_q4_date'), mTime=g('pre_q4_time'), mLink=g('pre_q4_link');
+
+  let h=`<p><strong>Θέμα: Προγραμματισμός συνάντησης για το επενδυτικό σας σχέδιο — ${prog}</strong></p>`+
+  `<p>Αξιότιμε/η <strong>${ben}</strong>,</p>`+
+  `<p>Σε συνέχεια της τηλεφωνικής μας επικοινωνίας, σας παραθέτουμε συγκεντρωτικά τα στοιχεία του φακέλου σας:</p><ul>`+
+  `<li><strong>Επωνυμία δικαιούχου:</strong> ${ben}</li>`+
+  `<li><strong>Πρόγραμμα:</strong> ${prog}</li>`+
+  (btype?`<li><strong>Καθεστώς επιχείρησης:</strong> ${btype}</li>`:'')+
+  (budget?`<li><strong>Συνολικός προϋπολογισμός επενδυτικού σχεδίου:</strong> ${budget}</li>`:'')+
+  (feeT?`<li><strong>Συνολική αμοιβή συμβούλου:</strong> ${feeT}</li>`:'')+
+  (feeS?`<li><strong>Αμοιβή για την υποβολή:</strong> ${feeS}</li>`:'')+
+  `</ul>`;
+
+  if(offerSent==='ΝΑΙ'){
+    h+=`<p>Σας έχει ήδη αποσταλεί η σχετική <strong>οικονομική προσφορά</strong>${offerDate?(' στις <strong>'+offerDate+'</strong>'):''}. Παρακαλούμε να τη μελετήσετε και να μας ενημερώσετε για τυχόν απορίες σας.</p>`;
+  }
+  if(adv==='ΝΑΙ'){
+    h+=`<p>Για την έναρξη των εργασιών προβλέπεται <strong>προκαταβολή${advAmt?(' ύψους '+advAmt):''}</strong>, η οποία εκκρεμεί.</p>`;
+  }else if(adv==='ΝΑΙ - ΠΛΗΡΩΘΗΚΕ'){
+    h+=`<p>Επιβεβαιώνουμε την <strong>καταβολή της προκαταβολής${advAmt?(' ύψους '+advAmt):''}</strong>${advDate?(' την '+advDate):''}. Σας ευχαριστούμε.</p>`;
+  }
+  if(called==='ΝΑΙ'){
+    h+=`<p>Επικοινωνήσαμε μαζί σας τηλεφωνικά και μας ενημερώσατε ότι είστε διαθέσιμος/η για την προγραμματισμένη ημερομηνία της συνάντησης.</p>`;
+  }
+  if(setDate==='ΝΑΙ'&&(mDay||mDate||mTime)){
+    h+=`<p style="background:#eef5ff;border-left:4px solid #1a56b0;padding:12px;">`+
+       `<strong>Ημερομηνία συνάντησης:</strong> ${[mDay,mDate].filter(Boolean).join(', ')}`+
+       (mTime?` &nbsp;|&nbsp; <strong>Ώρα:</strong> ${mTime}`:'')+
+       (mLink?`<br><strong>Σύνδεσμος συμμετοχής:</strong> <a href="${mLink}">${mLink}</a>`:'')+
+       `</p>`;
+  }
+  h+=`<p>Η πρώτη φάση της τηλεφωνικής επικοινωνίας έχει ολοκληρωθεί. Στη συνάντηση που ακολουθεί θα εξετάσουμε αναλυτικά τις προϋποθέσεις επιλεξιμότητας, τα βαθμολογούμενα κριτήρια, θα καταγράψουμε τις δαπάνες που επιθυμείτε να υλοποιήσετε και —εφόσον απαιτείται— θα προχωρήσουμε σε στοχευμένες ερωτήσεις για τη σύνταξη του επιχειρηματικού σχεδίου.</p>`+
+  `<p><strong>Παρακαλούμε απαντήστε στο παρόν email με «ΝΑΙ» ή «ΟΧΙ», επιβεβαιώνοντας αν θα παρευρεθείτε στη συνάντηση.</strong></p>`+
+  `<p>Παραμένουμε στη διάθεσή σας για οποιαδήποτε διευκρίνιση.</p>`;
+
+  document.getElementById('reportOutput').innerHTML=h;
+  const xb=document.getElementById('reportExcelBtn');if(xb)xb.style.display='none';
+  document.getElementById('modalTitle').innerText='EMAIL ΠΡΟΣΚΛΗΣΗΣ ΣΕ MEETING';
+  document.getElementById('reportModal').style.display='block';
+}
+
 /* =================== ΦΑΣΗ 3 GATE (v13) =================== */
 function handlePhase3Gate(){
   const ap=document.getElementById('ph3_approved');
@@ -3183,8 +3340,11 @@ window.onload=function(){
    Οι παρακάτω συναρτήσεις υπερισχύουν των τοπικών εκδόσεων.
    ============================================================ */
 /*__SUPA_CONFIG_START__*/
-const SUPA_URL = 'https://xkwscqnfsdvqyeoxkwdh.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhrd3NjcW5mc2R2cXllb3hrd2RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzNDk5OTcsImV4cCI6MjA5OTkyNTk5N30.BRzhJK1jap0X3JvykF6lhTUgHubUkRGXMr6CLxVxZ8I';
+const SUPA_URL = 'ΒΑΛΤΕ_ΕΔΩ_ΤΟ_PROJECT_URL';
+const SUPA_KEY = 'ΒΑΛΤΕ_ΕΔΩ_ΤΟ_ANON_PUBLIC_KEY';
+/* Κωδικός που απαιτείται για να μπορεί κάποιος να κάνει εγγραφή.
+   Αλλάξτε τον εδώ όποτε θέλετε. */
+const SIGNUP_GATE_CODE = 'bcsa1234';
 /*__SUPA_CONFIG_END__*/
 
 let SB=null, CLOUD=false, MY_PROFILE=null;
@@ -3269,6 +3429,8 @@ async function doRegister(){
   msg.style.display='block';
   const bad=(t)=>{msg.style.color='var(--red)';msg.innerText=t;};
   if(!cloudReady()){bad('Το σύστημα δεν είναι συνδεδεμένο με την κεντρική βάση.');return;}
+  const gate=document.getElementById('regGate').value;
+  if(gate!==SIGNUP_GATE_CODE){bad('Λανθασμένος κωδικός εγγραφής. Ζητήστε τον από τον διαχειριστή.');return;}
   if(!email||!name||!p1){bad('Συμπληρώστε e-mail, ονοματεπώνυμο και κωδικό.');return;}
   if(p1.length<6){bad('Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες.');return;}
   if(p1!==p2){bad('Οι δύο κωδικοί δεν ταιριάζουν.');return;}
@@ -3277,7 +3439,7 @@ async function doRegister(){
   if(error){bad(error.message);return;}
   msg.style.color='var(--green)';
   msg.innerText='✔ Η εγγραφή ολοκληρώθηκε. Αν χρειάζεται επιβεβαίωση e-mail, ελέγξτε το γραμματοκιβώτιό σας. Εφόσον δεν είχατε πρόσκληση, ο λογαριασμός αναμένει έγκριση από τον διαχειριστή.';
-  document.getElementById('regPass').value='';document.getElementById('regPass2').value='';
+  document.getElementById('regPass').value='';document.getElementById('regPass2').value='';document.getElementById('regGate').value='';
 }
 async function resetPasswordPrompt(){
   if(!cloudReady()){alert('Δεν υπάρχει σύνδεση με την κεντρική βάση.');return;}
