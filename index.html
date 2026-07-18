@@ -388,10 +388,12 @@ header{padding-left:110px;padding-right:110px;}
         </select>
       </div>
       <div><label class="question-label">Είδος Δράσης</label>
-        <select id="genActionType" class="form-control">
+        <select id="genActionType" class="form-control" onchange="applyPhase3Mode()">
           <option value="">Επιλέξτε</option><option value="Επενδυτικό Πρόγραμμα">Επενδυτικό Πρόγραμμα</option>
           <option value="Κεφαλαίου κίνησης ή Απλοποιημένο κόστους">Κεφαλαίου κίνησης ή Απλοποιημένο κόστους</option>
           <option value="Επιδότηση τόκων Δανείου">Επιδότηση τόκων Δανείου</option><option value="Voucher">Voucher</option>
+          <option value="Επιδότηση Προσωπικού (ΔΥΠΑ)">Επιδότηση Προσωπικού (ΔΥΠΑ)</option>
+          <option value="Επιδότηση Προσωπικού 100% (ΔΥΠΑ)">Επιδότηση Προσωπικού 100% (ΔΥΠΑ)</option>
         </select>
       </div>
       <div><label class="question-label">Τρόπος Αξιολόγησης</label>
@@ -592,6 +594,14 @@ header{padding-left:110px;padding-right:110px;}
         <input type="text" id="ph3_approved_date" class="form-control save-data hidden" placeholder="Ημερομηνία έγκρισης (π.χ. 15/09/2026)" onblur="handlePhase3Gate()"></div>
       </div>
       <div id="ph3_step2" class="hidden">
+        <div class="form-row form-row-inline"><label>Σε ποιο στάδιο υλοποίησης βρίσκεται το έργο;</label>
+          <div><select id="ph3_stage" class="form-control save-data bg-neutral" onchange="colorStandard(this);renderPhase3Docs();">
+            <option value="">Επιλέξτε</option>
+            <option value="1η Ενδιάμεση">1η Ενδιάμεση Δόση</option>
+            <option value="2η Ενδιάμεση">2η Ενδιάμεση Δόση</option>
+            <option value="Τελική">Τελική Δόση</option>
+          </select></div>
+        </div>
         <div class="form-row form-row-inline"><label>Στείλατε στον πελάτη τις κατευθυντήριες γραμμές (email) που αφορούν την υλοποίηση του επενδυτικού σχεδίου;</label>
           <div><select id="ph3_guidelines" class="form-control save-data bg-neutral" onchange="handlePhase3Gate()">
             <option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="Θα σταλεί σύντομα">ΘΑ ΤΟ ΣΤΕΙΛΩ ΣΥΝΤΟΜΑ</option><option value="ΟΧΙ">ΟΧΙ</option></select>
@@ -602,11 +612,21 @@ header{padding-left:110px;padding-right:110px;}
       <p id="ph3_blocked" class="hidden" style="color:var(--red);font-weight:bold;margin:10px 0 0 0;">⛔ Δεν είναι δυνατή η συνέχεια στην καταχώρηση παραστατικών μέχρι να αποσταλούν οι κατευθυντήριες γραμμές στον πελάτη.</p>
     </div>
     <div id="ph3_work" class="hidden">
+    <div id="ph3_docsMode" class="hidden">
+      <div class="card-section" style="border-left-color:#b58900;">
+        <h3>ΔΙΚΑΙΟΛΟΓΗΤΙΚΑ ΔΟΣΗΣ <span id="ph3_stageLbl" style="font-weight:normal;font-size:15px;color:#666;"></span></h3>
+        <p style="font-size:12.5px;color:#666;margin-top:-6px;">Η λίστα ορίζεται ανά πρόγραμμα και ανά δόση από τον διαχειριστή (🛠️ Διαχείριση Προτύπων → Φάση 3).</p>
+        <div id="ph3_docsList"></div>
+        <button class="btn-add" style="color:#b58900;border-color:#b58900;background:#fdf9eb;" onclick="addPh3DocRow()">+ Προσθήκη δικαιολογητικού</button>
+      </div>
+    </div>
+    <div id="ph3_invoiceMode">
     <div class="forms-grid" id="formsContainer"></div>
     <div class="bottom-actions">
       <button class="btn" onclick="openReportModal()">📧 Δημιουργία Αναφοράς Ελλείψεων</button>
     </div>
     <div class="checklists-container" id="checklistsContainer"></div>
+    </div>
     </div>
   </div>
 
@@ -710,6 +730,24 @@ header{padding-left:110px;padding-right:110px;}
 
     <div class="adm-sec" id="admSecDocs"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 2 · Απαιτούμενα δικαιολογητικά (ενότητα 6)</span><span>▾</span></h4>
       <div class="adm-body"><div id="admDocs"></div><button class="adm-addbtn" onclick="admAddLine('admDocs')">+ Προσθήκη</button></div></div>
+
+    <div class="adm-sec" id="admSecP3"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 3 · Δικαιολογητικά ανά δόση (για προγράμματα χωρίς παραστατικά)</span><span>▾</span></h4>
+      <div class="adm-body">
+        <p class="adm-hint">Ισχύει για Voucher, Κεφάλαιο Κίνησης και Επιδότηση Προσωπικού 100% (ΔΥΠΑ), όπου δεν συλλέγονται τιμολόγια αλλά συγκεκριμένα δικαιολογητικά ανά δόση.</p>
+        <strong style="font-size:13px;color:#4b2e6b;">1η Ενδιάμεση Δόση</strong>
+        <div id="admP3S1"></div><button class="adm-addbtn" onclick="admAddLine('admP3S1')">+ Προσθήκη</button>
+        <strong style="font-size:13px;color:#4b2e6b;display:block;margin-top:12px;">2η Ενδιάμεση Δόση</strong>
+        <div id="admP3S2"></div><button class="adm-addbtn" onclick="admAddLine('admP3S2')">+ Προσθήκη</button>
+        <strong style="font-size:13px;color:#4b2e6b;display:block;margin-top:12px;">Τελική Δόση</strong>
+        <div id="admP3F"></div><button class="adm-addbtn" onclick="admAddLine('admP3F')">+ Προσθήκη</button>
+      </div></div>
+
+    <div class="adm-sec" id="admSecP3Proc"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 3 · Έλεγχοι διαδικασίας (εμφανίζονται στην αναφορά ελλείψεων)</span><span>▾</span></h4>
+      <div class="adm-body">
+        <p class="adm-hint">Αυτά τα σημεία θεωρούνται «διαδικασίες» και διαχωρίζονται στην αναφορά. Μπορείτε να προσθέσετε ή να διαγράψετε.</p>
+        <div id="admP3Proc"></div><button class="adm-addbtn" onclick="admAddLine('admP3Proc')">+ Προσθήκη ελέγχου</button>
+        <button class="adm-addbtn" style="margin-left:8px;background:#eee;color:#555;border-style:solid;" onclick="admResetProc()">↻ Επαναφορά προεπιλογών</button>
+      </div></div>
 
     <div class="adm-sec" id="admSecExp"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 2 · Δαπάνες επενδυτικού σχεδίου (ενότητα 7)</span><span>▾</span></h4>
       <div class="adm-body"><div id="admExp"></div><button class="adm-addbtn" onclick="admAddExp()">+ Προσθήκη δαπάνης</button></div></div>
@@ -1507,7 +1545,8 @@ const optionsData={
   leasing:["","Ναι","Όχι"],
   dapani:["","Κτίρια","Εξοπλισμός","Εξοπλισμός Green","Ιστοσελίδα","Νέος Υπάλληλος","Μεταφορικά Μέσα"]
 };
-const processChecks=[
+const BANK_INSTRUMENTS=['Έμβασμα','Πληρωμή με χρεωστική κάρτα','Πληρωμή με πιστωτική κάρτα','Πληρωμή με κωδικό RF','Τραπεζική επιταγή','Επιταγή επιχείρησης'];
+let processChecks=[
   "Έχει εκδοθεί το Τιμολόγιο σε επιλέξιμη ημερομηνία έκδοσης;",
   "Τα μηχανήματα ή τα υλικά μεταφέρονται στον τόπο υλοποίησης της επένδυσης;",
   "Πληρωμή με μετρητά επιτρέπεται μόνο για καθαρά ποσά τιμολογίων μέχρι 500€.",
@@ -1524,6 +1563,7 @@ const processChecks=[
   "Γνωστοποίηση, του εργοδότη προς τον εργαζόμενο, ότι το μισθολογικό κόστος του νεοπροσλαμβανόμενου προσωπικού συγχρηματοδοτείται από το ΕΚΤ/ΕΤΠΑ",
   "Αν είναι έμβασμα εμφανίζονται και οι δύο λογαριασμοί Χρέωσης και Πίστωσης με αναφορά σε ποιον ανήκουν;"
 ];
+const DEFAULT_PROCESS_CHECKS=processChecks.slice();
 function initPhase3(){
   const fc=document.getElementById('formsContainer');
   const cc=document.getElementById('checklistsContainer');
@@ -1561,6 +1601,10 @@ function updateChecklist(index){
     if(!items||items.length===0)return;
     html+=`<div class="checklist-section-title">${title}</div>`;
     items.forEach(item=>{
+      if(item==='__BANK_INSTRUMENT__'){
+        html+=`<div class="checklist-item ${typeClass}" data-category="${categoryId}"><div class="checklist-text">Έγγραφο / Παραστατικό πληρωμής — επιλέξτε τύπο</div><select class="status-select" style="min-width:210px;" onchange="updateSelectColor(this)"><option value="">Επιλογή...</option>${BANK_INSTRUMENTS.map(o=>`<option value="${o}">${o}</option>`).join('')}<option value="Δεν απαιτείται">Δεν απαιτείται</option></select></div>`;
+        return;
+      }
       html+=`<div class="checklist-item ${typeClass}" data-category="${categoryId}"><div class="checklist-text">${item}</div><select class="status-select" onchange="updateSelectColor(this)"><option value="">Επιλογή...</option><option value="Ναι">Ναι</option><option value="Όχι">Όχι</option><option value="Δεν απαιτείται">Δεν απαιτείται</option></select></div>`;
     });
   }
@@ -1581,7 +1625,7 @@ function updateChecklist(index){
   let exItems=[];
   if(exoflisi==="Με μετρητά"){exItems=["Πληρωμή με μετρητά επιτρέπεται μόνο για καθαρά ποσά τιμολογίων μέχρι 500€.","Απαιτείται σφραγίδα και υπογραφή προμηθευτή.Στην υπογραφή της βεβαίωσης Εξόφλησης ή Απόδειξη είσπραξης ανήκει στον νόμιμο εκπρόσωπο του προμηθευτή;","Είναι επιλέξιμη η ημερομηνία της πληρωμής;"];}
   else if(exoflisi==="Με κατάθεση"){exItems=["Καταθετήριο όπου ο λογαριασμός που κατατίθενται τα χρήματα ανήκουν στον προμηθευτή και αποτελούν εταιρικό λογαριασμό.","Στο καταθετήριο αυτός που υπογράφει είναι ο νόμιμος εκπρόσωπος της επιχείρησης;","Είναι επιλέξιμη η ημερομηνία της πληρωμής;"];}
-  else if(exoflisi==="Με τραπεζικό μέσο"){exItems=["Έγγραφο/Παραστατικό πληρωμής","Extrait","Μεταφέρονται από τον εταιρικό λογαριασμό του δικαιούχου στον εταιρικό λογαριασμό του προμηθευτή;","Αν είναι έμβασμα εμφανίζονται και οι δύο λογαριασμοί Χρέωσης και Πίστωσης με αναφορά σε ποιον ανήκουν;"];
+  else if(exoflisi==="Με τραπεζικό μέσο"){exItems=["__BANK_INSTRUMENT__","Extrait","Μεταφέρονται από τον εταιρικό λογαριασμό του δικαιούχου στον εταιρικό λογαριασμό του προμηθευτή;","Αν είναι έμβασμα εμφανίζονται και οι δύο λογαριασμοί Χρέωσης και Πίστωσης με αναφορά σε ποιον ανήκουν;"];
     if(dapani==="Νέος Υπάλληλος"){exItems=exItems.map(i=>i.replace("στον εταιρικό λογαριασμό του προμηθευτή","στον λογαριασμό του υπαλλήλου"));}
   }
   addSection("ΔΙΚΑΙΟΛΟΓΗΤΙΚΑ ΑΠΟ ΤΡΑΠΕΖΑ / ΠΡΟΜΗΘΕΥΤΗ",exItems,"bank","bank");
@@ -1675,6 +1719,19 @@ function openReportModal(){
     }
   }
   if(!hasContent){reportHTML+="<p>Δεν βρέθηκαν εκκρεμότητες/ελλείψεις (επιλογές 'Όχι') στα καταχωρημένα παραστατικά.</p>";}
+  if(phase3Mode()==='documents'){
+    const stage=(document.getElementById('ph3_stage')||{}).value||'';
+    const docs=getPh3Docs();
+    const missing=docs.filter(d=>d.v!=='ΝΑΙ'&&d.v!=='ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ');
+    reportHTML='<p><strong>ΑΝΑΦΟΡΑ ΕΛΛΕΙΨΕΩΝ — '+(stage||'Δόση')+'</strong></p>';
+    if(!docs.length)reportHTML+='<p>Δεν έχουν καταχωρηθεί δικαιολογητικά.</p>';
+    else if(!missing.length)reportHTML+='<p style="color:#1e7e46;font-weight:bold;">Δεν εντοπίστηκαν ελλείψεις. Όλα τα δικαιολογητικά έχουν παραληφθεί.</p>';
+    else{
+      reportHTML+='<p>Εκκρεμούν <strong>'+missing.length+'</strong> από <strong>'+docs.length+'</strong> δικαιολογητικά:</p><ul>';
+      missing.forEach(d=>{reportHTML+='<li>'+d.k+(d.v?(' <em style="color:#b02a37;">('+d.v+')</em>'):'')+'</li>';});
+      reportHTML+='</ul>';
+    }
+  }
   document.getElementById('reportOutput').innerHTML=reportHTML;
   {const _xb=document.getElementById('reportExcelBtn');if(_xb)_xb.style.display='none';}
   document.getElementById('modalTitle').innerText="ΑΝΑΦΟΡΑ ΕΛΛΕΙΨΕΩΝ ΔΙΚΑΙΟΛΟΓΗΤΙΚΩΝ";
@@ -1710,6 +1767,7 @@ function collectData(){
   ['gen_beneficiary','gen_projectCode','gen_program','gen_type','genActionType','genEvalType','gen_budget','gen_fee_total','gen_fee_submit','fee_pct_total','fee_pct_sub'].forEach(id=>data.general[id]=document.getElementById(id).value);
   data.general.fee_manual={total:document.getElementById('gen_fee_total').dataset.manual||'0',submit:document.getElementById('gen_fee_submit').dataset.manual||'0'};
   data.phase2_dyn.kad=getKadSummary();
+  data.phase3_docs=(typeof getPh3Docs==='function')?getPh3Docs():[];
   data.phase2_dyn.indirect={active:document.getElementById('ind_active')?document.getElementById('ind_active').checked:false,
     pct:document.getElementById('ind_pct')?document.getElementById('ind_pct').value:'7',
     desc:document.getElementById('ind_desc')?document.getElementById('ind_desc').value:'',
@@ -1917,7 +1975,11 @@ function applyData(data){
 
       ['pre_q1','pre_q2','pre_q4','pre_q5'].forEach(id=>{const e=document.getElementById(id);if(!e)return;
         if(id==='pre_q1')handlePreQ1(e);else if(id==='pre_q2')handlePreQ2(e);else if(id==='pre_q4')handlePreQ4(e);else handlePreQ5(e);});
-      evaluateProgress(0);calculateTotalScore();evaluateAllExpenses();updateDynamicHeaders();calcFees();syncPhoneAutoFields();handlePhase3Gate();
+      if(data.phase3_docs&&document.getElementById('ph3_docsList')){
+        const c=document.getElementById('ph3_docsList');c.innerHTML='';
+        data.phase3_docs.forEach(d=>addPh3DocRow(d.k,d.v));
+      }
+      evaluateProgress(0);calculateTotalScore();evaluateAllExpenses();updateDynamicHeaders();calcFees();syncPhoneAutoFields();handlePhase3Gate();applyPhase3Mode();
     }
 }
 
@@ -2176,6 +2238,53 @@ const LOGO_PARTS=[
 'gg==',
 ];
 function initLogo(){var el=document.getElementById('brandLogo');if(el)el.src='data:image/png;base64,'+LOGO_PARTS.join('');}
+/* =================== ΦΑΣΗ 3: ΤΡΟΠΟΣ ΛΕΙΤΟΥΡΓΙΑΣ (v18) =================== */
+/* Είδη δράσης που απαιτούν συλλογή παραστατικών (τιμολόγια/εξοφλήσεις). */
+const INVOICE_ACTIONS=['Επενδυτικό Πρόγραμμα','Επιδότηση τόκων Δανείου','Επιδότηση Προσωπικού (ΔΥΠΑ)'];
+function phase3Mode(){
+  const a=(document.getElementById('genActionType')||{}).value||'';
+  if(!a)return 'invoices';
+  return INVOICE_ACTIONS.includes(a)?'invoices':'documents';
+}
+function applyPhase3Mode(){
+  const m=phase3Mode();
+  const inv=document.getElementById('ph3_invoiceMode');
+  const doc=document.getElementById('ph3_docsMode');
+  if(inv)inv.classList.toggle('hidden',m!=='invoices');
+  if(doc)doc.classList.toggle('hidden',m!=='documents');
+  if(m==='documents')renderPhase3Docs();
+}
+function currentProgramCfg(){
+  const p=(document.getElementById('gen_program')||{}).value||'';
+  return (typeof PROGRAMS!=='undefined'&&PROGRAMS[p])?PROGRAMS[p]:{};
+}
+function addPh3DocRow(text,val){
+  const c=document.getElementById('ph3_docsList');if(!c)return;
+  const d=document.createElement('div');d.className='dynamic-row';
+  d.innerHTML='<input type="text" class="form-control p3-key" placeholder="Δικαιολογητικό..." value="'+String(text||'').replace(/"/g,'&quot;')+'" style="flex:3;">'+
+    '<select class="form-control p3-val bg-neutral" onchange="colorStandard(this)" style="flex:1;"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option><option value="ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ">ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ</option></select>'+
+    '<button class="btn-remove" onclick="this.parentElement.remove();scheduleAutoSave();">×</button>';
+  c.appendChild(d);
+  if(val){const s=d.querySelector('.p3-val');s.value=val;colorStandard(s);}
+}
+function renderPhase3Docs(){
+  const c=document.getElementById('ph3_docsList');if(!c)return;
+  const stage=(document.getElementById('ph3_stage')||{}).value||'';
+  document.getElementById('ph3_stageLbl').innerText=stage?('· '+stage):'';
+  if(!stage){c.innerHTML='<p style="color:#888;font-size:13px;">Επιλέξτε πρώτα στάδιο υλοποίησης.</p>';return;}
+  const cfg=currentProgramCfg();
+  const key={'1η Ενδιάμεση':'p3_stage1','2η Ενδιάμεση':'p3_stage2','Τελική':'p3_final'}[stage];
+  const list=(cfg[key]||[]);
+  c.innerHTML='';
+  if(!list.length){c.innerHTML='<p style="color:#888;font-size:13px;">Δεν έχουν οριστεί δικαιολογητικά για αυτή τη δόση στο πρότυπο του προγράμματος. Προσθέστε χειροκίνητα ή ορίστε τα ως διαχειριστής.</p>';}
+  list.forEach(t=>addPh3DocRow(typeof t==='string'?t:t.k,''));
+}
+function getPh3Docs(){
+  return [...document.querySelectorAll('#ph3_docsList .dynamic-row')].map(r=>({
+    k:r.querySelector('.p3-key').value.trim(),v:r.querySelector('.p3-val').value
+  })).filter(x=>x.k);
+}
+
 /* =================== ΥΠΑΓΟΡΕΥΣΗ (v17) =================== */
 let _rec=null,_recTarget=null,_recBase='';
 function toggleDictation(targetId){
@@ -2282,6 +2391,7 @@ function handlePhase3Gate(){
   apd.classList.toggle('hidden',!approved);
   s2.classList.toggle('hidden',!approved);
   if(!approved){work.classList.add('hidden');blocked.classList.add('hidden');return;}
+  applyPhase3Mode();
   colorStandard(gl);
   const ok=(gl.value==='ΝΑΙ'||gl.value==='Θα σταλεί σύντομα');
   gld.classList.toggle('hidden',gl.value!=='ΝΑΙ');
@@ -2362,7 +2472,7 @@ function resetForm(){
   document.getElementById('gen_fee_total').dataset.manual='0';
   document.getElementById('gen_fee_submit').dataset.manual='0';
   ['eligibilityContainer','bpContainer','scoringContainer','docsContainer','expensesContainer','kadContainer'].forEach(id=>{const c=document.getElementById(id);if(c)c.innerHTML='';});
-  initPhoneForm();initPhase3();initIndirect();handlePhase3Gate();if(document.getElementById('ind_active'))document.getElementById('ind_active').checked=false;calcIndirect();
+  initPhoneForm();initPhase3();initIndirect();handlePhase3Gate();applyPhase3Mode();if(document.getElementById('ind_active'))document.getElementById('ind_active').checked=false;calcIndirect();
   if(typeof refreshProgramDropdown==='function')refreshProgramDropdown();
   calcFees();evaluateProgress(0);calculateTotalScore();updateDynamicHeaders();
 }
@@ -2725,6 +2835,9 @@ function applyProgramTemplate(t){
     subs.slice(0,4).forEach((s,si)=>{if(!subEls[si])return;subEls[si].querySelector('.sub-desc').value=s.desc||'';subEls[si].querySelector('.sub-net').value=s.net||'';subEls[si].querySelector('.sub-ltype').value=s.ltype||'%';subEls[si].querySelector('.sub-lval').value=s.lval||'';});
   });
   evaluateAllExpenses();
+  if(t.p3_process&&t.p3_process.length)processChecks=t.p3_process.slice();
+  else processChecks=DEFAULT_PROCESS_CHECKS.slice();
+  if(typeof applyPhase3Mode==='function')applyPhase3Mode();
   setSaveStatus('Εφαρμόστηκε το πρότυπο «'+(document.getElementById('gen_program').value)+'».');
 }
 
@@ -2753,6 +2866,10 @@ function admAddScore(){document.getElementById('admScore').insertAdjacentHTML('b
 function admExpHtml(o){o=o||{};return '<div class="adm-row"><input type="text" class="grow adm-ed" value="'+String(o.desc||'').replace(/"/g,'&quot;')+'" placeholder="Περιγραφή δαπάνης"><input type="text" class="grow adm-ej" value="'+String(o.just||'').replace(/"/g,'&quot;')+'" placeholder="Τεκμηρίωση"><select class="adm-et" style="width:60px;"><option value="%"'+(o.ltype==='%'?' selected':'')+'>%</option><option value="€"'+(o.ltype==='€'?' selected':'')+'>€</option></select><input type="text" class="w80 adm-ev" value="'+String(o.lval||'').replace(/"/g,'&quot;')+'" placeholder="Όριο"><button class="adm-xbtn" onclick="this.parentElement.remove()">×</button></div>';}
 function admAddExp(){document.getElementById('admExp').insertAdjacentHTML('beforeend',admExpHtml({}));}
 
+function admResetProc(){
+  admFillLines('admP3Proc',DEFAULT_PROCESS_CHECKS,'Έλεγχος διαδικασίας');
+  admStatus('Επαναφέρθηκαν οι προεπιλεγμένοι έλεγχοι διαδικασίας.');
+}
 function admLoadIntoForm(name){
   const t=PROGRAMS[name]||{};
   document.getElementById('admName').value=name||'';
@@ -2762,6 +2879,10 @@ function admLoadIntoForm(name){
   admFillLines('admBp',t.p2_bp,'Ερώτηση BP');
   const sc=document.getElementById('admScore');sc.innerHTML='';(t.p2_score||[]).forEach(o=>sc.insertAdjacentHTML('beforeend',admScoreHtml(o)));
   admFillLines('admDocs',t.p2_docs,'Δικαιολογητικό');
+  admFillLines('admP3S1',t.p3_stage1,'Δικαιολογητικό 1ης δόσης');
+  admFillLines('admP3S2',t.p3_stage2,'Δικαιολογητικό 2ης δόσης');
+  admFillLines('admP3F',t.p3_final,'Δικαιολογητικό τελικής δόσης');
+  admFillLines('admP3Proc',(t.p3_process&&t.p3_process.length)?t.p3_process:DEFAULT_PROCESS_CHECKS,'Έλεγχος διαδικασίας');
   const xc=document.getElementById('admExp');xc.innerHTML='';(t.p2_exp||[]).forEach(o=>xc.insertAdjacentHTML('beforeend',admExpHtml(o)));
 }
 function admSelectProgram(){const n=document.getElementById('admProgList').value;admCurrent=n;admLoadIntoForm(n);}
@@ -2777,6 +2898,10 @@ function admCollect(){
     p2_bp:admReadLines('admBp'),
     p2_score:[...document.querySelectorAll('#admScore .adm-row')].map(r=>({k:r.querySelector('.adm-sk').value.trim(),cw:r.querySelector('.adm-scw').value.trim(),gw:r.querySelector('.adm-sgw').value.trim()})).filter(o=>o.k),
     p2_docs:admReadLines('admDocs'),
+    p3_stage1:admReadLines('admP3S1'),
+    p3_stage2:admReadLines('admP3S2'),
+    p3_final:admReadLines('admP3F'),
+    p3_process:admReadLines('admP3Proc'),
     p2_exp:[...document.querySelectorAll('#admExp .adm-row')].map(r=>({desc:r.querySelector('.adm-ed').value.trim(),just:r.querySelector('.adm-ej').value.trim(),ltype:r.querySelector('.adm-et').value,lval:r.querySelector('.adm-ev').value.trim()})).filter(o=>o.desc)
   };
 }
@@ -3340,8 +3465,8 @@ window.onload=function(){
    Οι παρακάτω συναρτήσεις υπερισχύουν των τοπικών εκδόσεων.
    ============================================================ */
 /*__SUPA_CONFIG_START__*/
-const SUPA_URL = 'https://xkwscqnfsdvqyeoxkwdh.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhrd3NjcW5mc2R2cXllb3hrd2RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzNDk5OTcsImV4cCI6MjA5OTkyNTk5N30.BRzhJK1jap0X3JvykF6lhTUgHubUkRGXMr6CLxVxZ8I';
+const SUPA_URL = 'ΒΑΛΤΕ_ΕΔΩ_ΤΟ_PROJECT_URL';
+const SUPA_KEY = 'ΒΑΛΤΕ_ΕΔΩ_ΤΟ_ANON_PUBLIC_KEY';
 /* Κωδικός που απαιτείται για να μπορεί κάποιος να κάνει εγγραφή.
    Αλλάξτε τον εδώ όποτε θέλετε. */
 const SIGNUP_GATE_CODE = 'bcsa1234';
