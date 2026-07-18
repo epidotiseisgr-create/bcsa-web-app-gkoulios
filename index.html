@@ -210,6 +210,7 @@ footer{text-align:center;padding:15px;background-color:#e9ecef;color:#6c757d;fon
 .login-link{color:var(--secondary-blue);cursor:pointer;font-size:13px;margin-top:16px;text-decoration:underline;}
 .reg-l{display:block;font-size:12.5px;font-weight:bold;color:#555;margin:6px 0 3px 0;}
 #registerBox input{width:280px;margin-bottom:4px;}
+.login-box input{display:block;margin-left:auto;margin-right:auto;}
 #usersModal .modal-content{max-width:920px;max-height:90vh;overflow-y:auto;}
 .usr-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px;}
 .usr-table th,.usr-table td{border:1px solid #e2e2e2;padding:7px 8px;text-align:left;}
@@ -303,6 +304,8 @@ header{padding-left:110px;padding-right:110px;}
 .exp-ind-badge{background:#f1c232;color:#5c4600;border-radius:10px;padding:2px 10px;font-size:11px;font-weight:bold;white-space:nowrap;}
 .gate-box{background:#fff8e6;border:2px solid #f1c232;border-radius:8px;padding:18px;margin-bottom:20px;}
 .gate-box h4{margin:0 0 12px 0;color:#8a6d00;font-size:16px;}
+
+.owner-tag{display:inline-block;background:#f3ecf9;color:#4b2e6b;border-radius:10px;padding:2px 9px;font-size:11.5px;font-weight:bold;}
 </style>
 </head>
 <body>
@@ -313,24 +316,24 @@ header{padding-left:110px;padding-right:110px;}
 <div id="loginOverlay">
   <div class="login-box" id="loginBox">
     <h2>ΠΡΟΣΒΑΣΗ ΣΤΟ ΣΥΣΤΗΜΑ</h2>
-    <input type="password" id="passwordInput" placeholder="Εισάγετε Κωδικό">
+    <input type="email" id="emailInput" placeholder="E-mail" autocomplete="username">
+    <input type="password" id="passwordInput" placeholder="Κωδικός" autocomplete="current-password" onkeydown="if(event.key==='Enter')checkPassword()">
     <br><button onclick="checkPassword()">ΕΙΣΟΔΟΣ</button>
-    <p id="loginError">Λάθος κωδικός πρόσβασης.</p>
+    <p id="loginError">Λάθος στοιχεία πρόσβασης.</p>
     <p class="login-link" onclick="showRegister()">Νέα εγγραφή χρήστη →</p>
+    <p class="login-link" style="font-size:12px;" onclick="resetPasswordPrompt()">Ξέχασα τον κωδικό μου</p>
   </div>
   <div class="login-box" id="registerBox" style="display:none;text-align:left;">
     <h2 style="text-align:center;">ΕΓΓΡΑΦΗ ΝΕΟΥ ΧΡΗΣΤΗ</h2>
-    <p style="font-size:13px;color:#666;text-align:center;margin-top:-8px;">Απαιτείται ο κωδικός του διαχειριστή.</p>
-    <label class="reg-l">Κωδικός Διαχειριστή</label>
-    <input type="password" id="regAdmin" placeholder="Κωδικός διαχειριστή">
-    <label class="reg-l">E-mail ενδιαφερόμενου</label>
-    <input type="email" id="regEmail" placeholder="name@example.com">
+    <p style="font-size:13px;color:#666;text-align:center;margin-top:-8px;">Αν ο διαχειριστής σας έχει ήδη προσκαλέσει, η πρόσβαση ενεργοποιείται αμέσως. Διαφορετικά, ο λογαριασμός μένει σε αναμονή έγκρισης.</p>
+    <label class="reg-l">E-mail</label>
+    <input type="email" id="regEmail" placeholder="name@example.com" autocomplete="email">
     <label class="reg-l">Ονοματεπώνυμο</label>
     <input type="text" id="regName" placeholder="Όνομα Επώνυμο">
-    <label class="reg-l">Κωδικός νέου χρήστη</label>
-    <input type="text" id="regPass" placeholder="Κωδικός που θα χρησιμοποιεί">
-    <label class="reg-l">Ημ/νία λήξης πρόσβασης (προαιρετικό)</label>
-    <input type="text" id="regExpiry" placeholder="π.χ. 31/12/2026">
+    <label class="reg-l">Κωδικός (τουλάχιστον 6 χαρακτήρες)</label>
+    <input type="password" id="regPass" placeholder="Κωδικός πρόσβασης" autocomplete="new-password">
+    <label class="reg-l">Επανάληψη κωδικού</label>
+    <input type="password" id="regPass2" placeholder="Επαναλάβετε τον κωδικό">
     <div style="text-align:center;">
       <button onclick="doRegister()" style="background-color:var(--green);">ΚΑΤΑΧΩΡΗΣΗ</button>
       <button onclick="showLogin()" style="background-color:#888;">Πίσω</button>
@@ -353,6 +356,8 @@ header{padding-left:110px;padding-right:110px;}
   <button class="btn btn-outline" onclick="exportDataAll()">⬇️ Εξαγωγή (.txt)</button>
   <button class="btn" id="adminBtn" style="display:none;background:#4b2e6b;color:#fff;" onclick="openAdmin()">🛠️ Διαχείριση Προτύπων</button>
   <button class="btn" id="usersBtn" style="display:none;background:#1a56b0;color:#fff;" onclick="openUsers()">👥 Διαχείριση Χρηστών</button>
+  <span id="cloudBadge" style="display:none;background:#eafaf1;color:#1e7e46;border:1px solid #b7e4c7;border-radius:12px;padding:4px 12px;font-size:12px;font-weight:bold;">☁</span>
+  <button class="btn" style="background:#eee;color:#444;" onclick="doLogout()">🚪 Αποσύνδεση</button>
   <span class="save-status" id="saveStatus"></span>
 </div>
 
@@ -423,6 +428,7 @@ header{padding-left:110px;padding-right:110px;}
     <div class="dash-hero">
       <h2 id="dashHello">Φάκελοι Πελατών</h2>
       <p id="dashSub">Κάθε πελάτης έχει τον δικό του φάκελο με τις Φάσεις 1, 2 και 3. Πατήστε «Επεξεργασία» για να ανοίξετε έναν φάκελο.</p>
+      <p id="dashScope" style="margin-top:8px;font-size:12.5px;opacity:.85;"></p>
     </div>
     <div class="clients-bar">
       <button class="btn-addclient" onclick="newClient()">+ Προσθήκη</button>
@@ -430,7 +436,7 @@ header{padding-left:110px;padding-right:110px;}
       <span id="clientsCount" class="clients-count">0 φάκελοι</span>
     </div>
     <table class="clients-table">
-      <thead><tr><th>Πελάτης</th><th>Κωδικός Έργου</th><th>Πρόγραμμα</th><th>Ενημέρωση</th><th>Πρόοδος</th><th>Ενέργειες</th></tr></thead>
+      <thead><tr><th>Πελάτης</th><th id="ownerCol" style="display:none;">Δημιουργός</th><th>Κωδικός Έργου</th><th>Πρόγραμμα</th><th>Ενημέρωση</th><th>Πρόοδος</th><th>Ενέργειες</th></tr></thead>
       <tbody id="clientsBody"></tbody>
     </table>
     <div class="dash-docs" style="margin-top:20px;">
@@ -632,9 +638,21 @@ header{padding-left:110px;padding-right:110px;}
       <span class="close-btn" onclick="document.getElementById('usersModal').style.display='none'">&times;</span>
     </div>
     <p class="adm-hint">Ορίστε ημ/νία λήξης και ενεργό/ανενεργό ανά χρήστη. Για να ισχύσουν οι αλλαγές σε όλους, εξάγετε το <span class="adm-tag">users.json</span> και ανεβάστε το στο GitHub δίπλα στο αρχείο.</p>
-    <table class="usr-table" id="usrTable"><thead><tr><th>Ονοματεπώνυμο</th><th>E-mail</th><th>Κωδικός</th><th>Εγγραφή</th><th>Λήξη</th><th>Κατάσταση</th><th></th></tr></thead><tbody id="usrBody"></tbody></table>
+    <div style="background:#eef5ff;border:1px solid #bcd8f5;border-radius:6px;padding:12px;margin-bottom:14px;">
+      <strong style="color:#1a56b0;font-size:14px;">➕ Πρόσκληση νέου χρήστη</strong>
+      <p style="font-size:12px;color:#666;margin:4px 0 8px 0;">Καταχωρήστε το e-mail. Όταν ο χρήστης εγγραφεί με αυτό, εγκρίνεται αυτόματα.</p>
+      <div class="adm-row">
+        <input type="email" id="invEmail" class="grow" placeholder="email@example.com">
+        <input type="text" id="invName" class="grow" placeholder="Ονοματεπώνυμο">
+        <input type="text" id="invExpiry" style="width:130px;" placeholder="Λήξη ΗΗ/ΜΜ/ΕΕΕΕ">
+        <button class="adm-addbtn" onclick="addInvite()">Πρόσκληση</button>
+      </div>
+      <div id="invList" style="font-size:12.5px;color:#555;margin-top:8px;"></div>
+    </div>
+    <table class="usr-table" id="usrTable"><thead><tr><th>Ονοματεπώνυμο</th><th>E-mail</th><th>Ρόλος</th><th>Εγγραφή</th><th>Λήξη</th><th>Κατάσταση</th><th></th></tr></thead><tbody id="usrBody"></tbody></table>
     <div class="adm-foot">
       <button class="btn btn-green" onclick="usrSaveAll()">✔ Αποθήκευση αλλαγών</button>
+      <button class="btn btn-blue" onclick="openUsers()">🔄 Ανανέωση</button>
       <button class="btn" style="background:#4b2e6b;color:#fff;font-weight:bold;" onclick="usrCollect();document.getElementById('usrStatus').innerText='Ανοίξτε τη Διαχείριση Προτύπων → 📦 Εξαγωγή πλήρους index.html';">📦 Οδηγία εξαγωγής index.html</button>
       <button class="btn btn-blue" onclick="usrExportJson()">⬇️ users.json</button>
       <button class="btn" style="background:#eee;color:#444;" onclick="document.getElementById('usrImport').click()">⬆️ Εισαγωγή users.json</button>
@@ -758,14 +776,16 @@ header{padding-left:110px;padding-right:110px;}
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 /* =================== LOGIN =================== */
 const ADMIN_PASSWORDS=['Vagelhs1234','Vagelhs1990'];
-function setUserBadge(name,role){
-  CURRENT_USER={name:name,role:role};
+function setUserBadge(name,role,id){
+  CURRENT_USER={id:id||name,name:name,role:role};
   document.getElementById('ubName').innerText=name;
   document.getElementById('ubRole').innerText=role;
 }
+function isAdminUser(){return CURRENT_USER.role==='Διαχειριστής';}
 function grantAdmin(){
   IS_ADMIN=true;
   document.getElementById('adminBtn').style.display='inline-block';
@@ -777,16 +797,16 @@ function checkPassword(){
   const expBcsa=new Date('2026-10-30T23:59:59');
   const expUser=new Date('2026-08-30T23:59:59');
   if(ADMIN_PASSWORDS.includes(pwd)){
-    grantAdmin();setUserBadge('Ευάγγελος Γκούλιος','Διαχειριστής');
+    grantAdmin();setUserBadge('Ευάγγελος Γκούλιος','Διαχειριστής','admin');
     afterLogin();return;
   }
   if(pwd==='User1234'){
-    if(now<=expUser){setUserBadge('Χρήστης','Απλός χρήστης');afterLogin();}
+    if(now<=expUser){setUserBadge('Χρήστης','Απλός χρήστης','legacy_user');afterLogin();}
     else{showLoginErr("Ο κωδικός πρόσβασης έχει λήξει (30/08/2026).");}
     return;
   }
   if(pwd==='bcsa1234'){
-    if(now<=expBcsa){setUserBadge('BCSA','Απλός χρήστης');afterLogin();}
+    if(now<=expBcsa){setUserBadge('BCSA','Απλός χρήστης','legacy_bcsa');afterLogin();}
     else{showLoginErr("Ο κωδικός πρόσβασης έχει λήξει (30/10/2026).");}
     return;
   }
@@ -798,7 +818,7 @@ function checkPassword(){
       const exp=parseGreekDate(u.expiry);
       if(exp&&now>exp){showLoginErr("Η πρόσβαση του λογαριασμού έληξε ("+u.expiry+").");return;}
     }
-    setUserBadge(u.name||u.email||'Χρήστης','Απλός χρήστης');
+    setUserBadge(u.name||u.email||'Χρήστης','Απλός χρήστης',u.email||u.pass);
     afterLogin();return;
   }
   showLoginErr("Λάθος κωδικός πρόσβασης.");
@@ -808,6 +828,7 @@ function afterLogin(){
   document.addEventListener('input',e=>{if(e.target.closest('#workspaceArea')||e.target.closest('#generalCard'))scheduleAutoSave();});
   document.addEventListener('change',e=>{if(e.target.closest('#workspaceArea')||e.target.closest('#generalCard'))scheduleAutoSave();});
   clientsLoad();
+  migrateClientOwners();
   showWorkspace(false);
   switchTab(0);
 }
@@ -1617,7 +1638,7 @@ function sendEmail(){
 /* =================== ΕΝΙΑΙΟ SAVE / LOAD (ΚΑΙ ΤΩΝ 3 ΦΑΣΕΩΝ) =================== */
 function collectData(){
   let data={
-    meta:{app:"BCSA_UNIFIED",version:10,exportedAt:new Date().toISOString()},
+    meta:{app:"BCSA_UNIFIED",version:11,exportedAt:new Date().toISOString()},
     general:{}, phase1:{}, phase2_fields:{}, phase2_dyn:{elig:[],bp:[],score:[],docs:[],expenses:[]}, phase3_invoices:[]
   };
   /* --- ΓΕΝΙΚΑ --- */
@@ -2162,8 +2183,14 @@ function generateGuidelinesEmail(){
 const EMPTY_DATA={meta:{app:"BCSA_UNIFIED",version:8},general:{},phase1:{},phase2_fields:{},phase2_dyn:{elig:[],bp:[],score:[],docs:[],expenses:[],kad:[]},phase3_invoices:[]};
 let CLIENTS=[];            /* [{id,name,code,program,created,updated,data}] */
 let CURRENT_CLIENT=null;   /* id */
-let CURRENT_USER={name:'',role:''};
+let CURRENT_USER={id:'',name:'',role:''};
 
+function migrateClientOwners(){
+  /* Παλαιοί φάκελοι χωρίς owner: αποδίδονται στον διαχειριστή ώστε να μη «χαθούν». */
+  let changed=false;
+  CLIENTS.forEach(c=>{if(!c.owner){c.owner='admin';c.ownerName='Ευάγγελος Γκούλιος';changed=true;}});
+  if(changed)clientsSave();
+}
 function clientsLoad(){try{const s=localStorage.getItem('bcsa_clients');CLIENTS=s?JSON.parse(s):[];}catch(e){CLIENTS=[];}}
 function clientsSave(){
   try{localStorage.setItem('bcsa_clients',JSON.stringify(CLIENTS));return true;}
@@ -2203,7 +2230,7 @@ function newClient(){
   if(name===null)return;
   if(!name.trim()){alert('Απαιτείται όνομα πελάτη.');return;}
   saveCurrentClient(true);
-  const c={id:'c_'+Date.now(),name:name.trim(),code:'',program:'',created:new Date().toISOString(),updated:new Date().toISOString(),data:JSON.parse(JSON.stringify(EMPTY_DATA))};
+  const c={id:'c_'+Date.now(),owner:CURRENT_USER.id||'unknown',ownerName:CURRENT_USER.name||'',name:name.trim(),code:'',program:'',created:new Date().toISOString(),updated:new Date().toISOString(),data:JSON.parse(JSON.stringify(EMPTY_DATA))};
   c.data.general={gen_beneficiary:name.trim()};
   CLIENTS.push(c);clientsSave();
   openClient(c.id);
@@ -2211,6 +2238,7 @@ function newClient(){
 function openClient(id){
   saveCurrentClient(true);
   const c=CLIENTS.find(x=>x.id===id);if(!c)return;
+  if(!canAccess(c)){alert('Δεν έχετε δικαίωμα πρόσβασης σε αυτόν τον φάκελο.');return;}
   CURRENT_CLIENT=id;
   resetForm();
   try{applyData(c.data||EMPTY_DATA);}catch(e){console.error(e);}
@@ -2223,6 +2251,7 @@ function openClient(id){
 function deleteClient(id,ev){
   if(ev)ev.stopPropagation();
   const c=CLIENTS.find(x=>x.id===id);if(!c)return;
+  if(!canAccess(c)){alert('Δεν έχετε δικαίωμα διαγραφής αυτού του φακέλου.');return;}
   if(!confirm('Οριστική διαγραφή του φακέλου «'+c.name+'»;\nΗ ενέργεια δεν αναιρείται.'))return;
   CLIENTS=CLIENTS.filter(x=>x.id!==id);
   if(CURRENT_CLIENT===id){CURRENT_CLIENT=null;resetForm();}
@@ -2254,15 +2283,26 @@ function clientProgress(c){
   Object.keys(p2).forEach(k=>{tot++;if(p2[k])fill++;});
   return tot?Math.round(fill/tot*100):0;
 }
+function visibleClients(){
+  if(isAdminUser())return CLIENTS;
+  const me=CURRENT_USER.id||'unknown';
+  return CLIENTS.filter(c=>(c.owner||'unknown')===me);
+}
+function canAccess(c){return isAdminUser()||((c.owner||'unknown')===(CURRENT_USER.id||'unknown'));}
 function renderClients(){
   const tb=document.getElementById('clientsBody');if(!tb)return;
   const q=(document.getElementById('clientSearch')?.value||'').toLowerCase();
   tb.innerHTML='';
-  const list=CLIENTS.filter(c=>!q||((c.name||'')+' '+(c.program||'')+' '+(c.code||'')).toLowerCase().includes(q))
+  const mine=visibleClients();
+  const list=mine.filter(c=>!q||((c.name||'')+' '+(c.program||'')+' '+(c.code||'')+' '+(c.ownerName||'')).toLowerCase().includes(q))
                     .sort((a,b)=>(b.updated||'').localeCompare(a.updated||''));
-  document.getElementById('clientsCount').innerText=CLIENTS.length+' φάκελοι';
+  document.getElementById('clientsCount').innerText=mine.length+' φάκελοι'+(isAdminUser()&&CLIENTS.length!==mine.length?(' (σύνολο '+CLIENTS.length+')'):'');
+  const sc=document.getElementById('dashScope');
+  if(sc)sc.innerText=isAdminUser()?'🛠️ Ως διαχειριστής βλέπετε τους φακέλους όλων των χρηστών.':'👤 Βλέπετε μόνο τους δικούς σας φακέλους.';
+  const ownerCol=document.getElementById('ownerCol');
+  if(ownerCol)ownerCol.style.display=isAdminUser()?'table-cell':'none';
   if(!list.length){
-    tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:#888;padding:26px;">'+(CLIENTS.length?'Κανένα αποτέλεσμα αναζήτησης.':'Δεν υπάρχουν φάκελοι πελατών. Πατήστε «+ Προσθήκη» για να ξεκινήσετε.')+'</td></tr>';
+    tb.innerHTML='<tr><td colspan="7" style="text-align:center;color:#888;padding:26px;">'+(mine.length?'Κανένα αποτέλεσμα αναζήτησης.':'Δεν υπάρχουν φάκελοι πελατών. Πατήστε «+ Προσθήκη» για να ξεκινήσετε.')+'</td></tr>';
     return;
   }
   list.forEach(c=>{
@@ -2270,6 +2310,7 @@ function renderClients(){
     const upd=c.updated?new Date(c.updated).toLocaleDateString('el-GR'):'-';
     const tr=document.createElement('tr');
     tr.innerHTML='<td><strong>'+(c.name||'(χωρίς όνομα)').replace(/</g,'&lt;')+'</strong></td>'+
+      (isAdminUser()?('<td><span class="owner-tag">'+((c.ownerName||c.owner||'—')+'').replace(/</g,'&lt;')+'</span></td>'):'')+
       '<td>'+(c.code||'-')+'</td>'+
       '<td>'+(c.program||'<span style="color:#aaa;">—</span>')+'</td>'+
       '<td style="white-space:nowrap;">'+upd+'</td>'+
@@ -2279,7 +2320,7 @@ function renderClients(){
   });
 }
 function backupClients(){
-  const blob=new Blob([JSON.stringify({app:'BCSA_CLIENTS',exportedAt:new Date().toISOString(),clients:CLIENTS},null,2)],{type:'application/json'});
+  const blob=new Blob([JSON.stringify({app:'BCSA_CLIENTS',exportedAt:new Date().toISOString(),owner:CURRENT_USER.name,clients:visibleClients()},null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Εφεδρικό_Πελατών.json';a.click();
 }
 function restoreClients(ev){
@@ -2290,7 +2331,8 @@ function restoreClients(ev){
       const o=JSON.parse(r.result);
       const arr=Array.isArray(o)?o:(o.clients||[]);
       if(!arr.length){alert('Το αρχείο δεν περιέχει φακέλους.');return;}
-      const byId={};CLIENTS.forEach(c=>byId[c.id]=c);arr.forEach(c=>byId[c.id]=c);
+      const byId={};CLIENTS.forEach(c=>byId[c.id]=c);
+      arr.forEach(c=>{if(!isAdminUser()){c.owner=CURRENT_USER.id||'unknown';c.ownerName=CURRENT_USER.name||'';}byId[c.id]=c;});
       CLIENTS=Object.values(byId);clientsSave();renderClients();
       alert('Επαναφέρθηκαν/ενημερώθηκαν '+arr.length+' φάκελοι.');
     }catch(e){alert('Μη έγκυρο αρχείο.');}
@@ -2309,7 +2351,7 @@ function refreshDashboard(){
   const ben=document.getElementById('gen_beneficiary').value.trim();
   const prog=document.getElementById('gen_program').value.trim();
   const h=document.getElementById('dashHello');if(!h)return;
-  h.innerText=ben?('Φάκελος: '+ben):'Καλώς ήρθατε';
+  h.innerText=ben?('Φάκελος: '+ben):(isAdminUser()?'Φάκελοι Πελατών — Προβολή Διαχειριστή (όλοι οι χρήστες)':'Οι Φάκελοί μου');
   document.getElementById('dashSub').innerText=prog?('Πρόγραμμα: '+prog):'Επιλέξτε πρόγραμμα στα «Γενικά Στοιχεία» και ξεκινήστε από τη Φάση 1, ή ανοίξτε υπάρχοντα φάκελο πελάτη.';
   /* Φάση 1 */
   const p1=[...document.querySelectorAll('#questionnaireContainer select, #questionnaireContainer input[type=text]')];
@@ -3134,6 +3176,358 @@ window.onload=function(){
   initUsers();
   document.querySelectorAll('#tab_2 select').forEach(el=>colorStandard(el));
 };
+
+
+/* ============================================================
+   ΕΠΙΠΕΔΟ ΚΕΝΤΡΙΚΗΣ ΒΑΣΗΣ (Supabase) — v15
+   Οι παρακάτω συναρτήσεις υπερισχύουν των τοπικών εκδόσεων.
+   ============================================================ */
+/*__SUPA_CONFIG_START__*/
+const SUPA_URL = 'https://xkwscqnfsdvqyeoxkwdh.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhrd3NjcW5mc2R2cXllb3hrd2RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzNDk5OTcsImV4cCI6MjA5OTkyNTk5N30.BRzhJK1jap0X3JvykF6lhTUgHubUkRGXMr6CLxVxZ8I';
+/*__SUPA_CONFIG_END__*/
+
+let SB=null, CLOUD=false, MY_PROFILE=null;
+
+function cloudReady(){
+  return CLOUD && SB!==null;
+}
+function initCloud(){
+  try{
+    if(!SUPA_URL||SUPA_URL.indexOf('http')!==0||!SUPA_KEY||SUPA_KEY.length<20){
+      console.warn('Supabase: δεν έχει ρυθμιστεί — λειτουργία τοπικής αποθήκευσης.');
+      return false;
+    }
+    if(typeof window.supabase==='undefined'){
+      console.warn('Supabase SDK δεν φορτώθηκε.');
+      return false;
+    }
+    SB=window.supabase.createClient(SUPA_URL,SUPA_KEY);
+    CLOUD=true;
+    const b=document.getElementById('cloudBadge');
+    if(b){b.innerText='☁ Κεντρική βάση';b.style.display='inline-block';}
+    return true;
+  }catch(e){console.error(e);return false;}
+}
+
+/* ---------------- ΣΥΝΔΕΣΗ ---------------- */
+async function checkPassword(){
+  const emailEl=document.getElementById('emailInput');
+  const email=(emailEl?emailEl.value:'').trim();
+  const pwd=document.getElementById('passwordInput').value;
+  if(!cloudReady()){showLoginErr('Το σύστημα δεν είναι συνδεδεμένο με την κεντρική βάση. Επικοινωνήστε με τον διαχειριστή.');return;}
+  if(!email||!pwd){showLoginErr('Συμπληρώστε e-mail και κωδικό.');return;}
+  showLoginErr('Γίνεται σύνδεση...');
+  const {data,error}=await SB.auth.signInWithPassword({email:email,password:pwd});
+  if(error){showLoginErr(error.message==='Invalid login credentials'?'Λάθος e-mail ή κωδικός.':error.message);return;}
+  await afterAuth(data.user);
+}
+async function afterAuth(user){
+  const {data:prof,error}=await SB.from('profiles').select('*').eq('id',user.id).maybeSingle();
+  if(error){showLoginErr('Σφάλμα ανάγνωσης προφίλ: '+error.message);return;}
+  if(!prof){showLoginErr('Δεν βρέθηκε προφίλ χρήστη. Επικοινωνήστε με τον διαχειριστή.');await SB.auth.signOut();return;}
+  if(!prof.approved){showLoginErr('Ο λογαριασμός σας αναμένει έγκριση από τον διαχειριστή.');await SB.auth.signOut();return;}
+  if(prof.active===false){showLoginErr('Ο λογαριασμός σας έχει απενεργοποιηθεί.');await SB.auth.signOut();return;}
+  if(prof.expiry){
+    const exp=new Date(prof.expiry+'T23:59:59');
+    if(new Date()>exp){showLoginErr('Η πρόσβασή σας έληξε ('+new Date(prof.expiry).toLocaleDateString('el-GR')+').');await SB.auth.signOut();return;}
+  }
+  MY_PROFILE=prof;
+  const isAdm=(prof.role==='admin');
+  setUserBadge(prof.full_name||prof.email,isAdm?'Διαχειριστής':'Απλός χρήστης',prof.id);
+  if(isAdm)grantAdmin();
+  document.getElementById('loginError').style.display='none';
+  await afterLogin();
+}
+function isAdminUser(){return MY_PROFILE?(MY_PROFILE.role==='admin'):false;}
+
+async function afterLogin(){
+  document.getElementById('loginOverlay').style.display='none';
+  if(!window._autoBound){
+    window._autoBound=true;
+    document.addEventListener('input',e=>{if(e.target.closest('#workspaceArea')||e.target.closest('#generalCard'))scheduleAutoSave();});
+    document.addEventListener('change',e=>{if(e.target.closest('#workspaceArea')||e.target.closest('#generalCard'))scheduleAutoSave();});
+  }
+  await loadProgramsFromCloud();
+  await clientsLoad();
+  showWorkspace(false);
+  switchTab(0);
+}
+async function doLogout(){
+  if(CURRENT_CLIENT!==null)await saveCurrentClient(true);
+  if(cloudReady())await SB.auth.signOut();
+  location.reload();
+}
+
+/* ---------------- ΕΓΓΡΑΦΗ ---------------- */
+async function doRegister(){
+  const email=document.getElementById('regEmail').value.trim();
+  const name=document.getElementById('regName').value.trim();
+  const p1=document.getElementById('regPass').value;
+  const p2=document.getElementById('regPass2').value;
+  const msg=document.getElementById('regMsg');
+  msg.style.display='block';
+  const bad=(t)=>{msg.style.color='var(--red)';msg.innerText=t;};
+  if(!cloudReady()){bad('Το σύστημα δεν είναι συνδεδεμένο με την κεντρική βάση.');return;}
+  if(!email||!name||!p1){bad('Συμπληρώστε e-mail, ονοματεπώνυμο και κωδικό.');return;}
+  if(p1.length<6){bad('Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες.');return;}
+  if(p1!==p2){bad('Οι δύο κωδικοί δεν ταιριάζουν.');return;}
+  msg.style.color='#555';msg.innerText='Γίνεται εγγραφή...';
+  const {error}=await SB.auth.signUp({email:email,password:p1,options:{data:{full_name:name}}});
+  if(error){bad(error.message);return;}
+  msg.style.color='var(--green)';
+  msg.innerText='✔ Η εγγραφή ολοκληρώθηκε. Αν χρειάζεται επιβεβαίωση e-mail, ελέγξτε το γραμματοκιβώτιό σας. Εφόσον δεν είχατε πρόσκληση, ο λογαριασμός αναμένει έγκριση από τον διαχειριστή.';
+  document.getElementById('regPass').value='';document.getElementById('regPass2').value='';
+}
+async function resetPasswordPrompt(){
+  if(!cloudReady()){alert('Δεν υπάρχει σύνδεση με την κεντρική βάση.');return;}
+  const email=prompt('Δώστε το e-mail σας για επαναφορά κωδικού:');
+  if(!email)return;
+  const {error}=await SB.auth.resetPasswordForEmail(email.trim(),{redirectTo:location.href});
+  alert(error?('Σφάλμα: '+error.message):'Στάλθηκε e-mail επαναφοράς κωδικού (ελέγξτε και τα ανεπιθύμητα).');
+}
+
+/* ---------------- ΦΑΚΕΛΟΙ ΠΕΛΑΤΩΝ ---------------- */
+async function clientsLoad(){
+  if(!cloudReady()){CLIENTS=[];return;}
+  const {data,error}=await SB.from('clients').select('*').order('updated_at',{ascending:false});
+  if(error){console.error(error);alert('Σφάλμα φόρτωσης φακέλων: '+error.message);CLIENTS=[];return;}
+  CLIENTS=(data||[]).map(r=>({
+    id:r.id,owner:r.owner,ownerName:(r.data&&r.data.__ownerName)||'',
+    name:r.name,code:r.code||'',program:r.program||'',
+    created:r.created_at,updated:r.updated_at,data:r.data||{}
+  }));
+  await attachOwnerNames();
+}
+async function attachOwnerNames(){
+  if(!isAdminUser())return;
+  const ids=[...new Set(CLIENTS.map(c=>c.owner))];
+  if(!ids.length)return;
+  const {data}=await SB.from('profiles').select('id,full_name,email').in('id',ids);
+  const map={};(data||[]).forEach(p=>map[p.id]=p.full_name||p.email);
+  CLIENTS.forEach(c=>{c.ownerName=map[c.owner]||'—';});
+}
+function clientsSave(){return true;}          /* δεν χρησιμοποιείται πλέον */
+function migrateClientOwners(){}
+
+async function newClient(){
+  if(!cloudReady()){alert('Δεν υπάρχει σύνδεση με την κεντρική βάση.');return;}
+  const name=prompt('Επωνυμία / Όνομα νέου πελάτη:');
+  if(name===null)return;
+  if(!name.trim()){alert('Απαιτείται όνομα πελάτη.');return;}
+  await saveCurrentClient(true);
+  const {data:{user}}=await SB.auth.getUser();
+  const payload={owner:user.id,name:name.trim(),code:'',program:'',data:JSON.parse(JSON.stringify(EMPTY_DATA))};
+  payload.data.general={gen_beneficiary:name.trim()};
+  const {data,error}=await SB.from('clients').insert(payload).select().single();
+  if(error){alert('Σφάλμα δημιουργίας: '+error.message);return;}
+  CLIENTS.push({id:data.id,owner:data.owner,ownerName:MY_PROFILE.full_name||MY_PROFILE.email,
+    name:data.name,code:'',program:'',created:data.created_at,updated:data.updated_at,data:data.data});
+  await openClient(data.id);
+}
+async function openClient(id){
+  await saveCurrentClient(true);
+  const c=CLIENTS.find(x=>x.id===id);if(!c)return;
+  CURRENT_CLIENT=id;
+  resetForm();
+  try{applyData(c.data||EMPTY_DATA);}catch(e){console.error(e);}
+  document.getElementById('gen_beneficiary').value=c.name||'';
+  showWorkspace(true);
+  _lastProgram=document.getElementById('gen_program_select').value||'';
+  switchTab(1);
+  setSaveStatus('Άνοιξε ο φάκελος «'+c.name+'».');
+}
+async function saveCurrentClient(silent){
+  if(CURRENT_CLIENT===null||!cloudReady())return;
+  const c=CLIENTS.find(x=>x.id===CURRENT_CLIENT);if(!c)return;
+  c.data=collectData();
+  c.name=document.getElementById('gen_beneficiary').value.trim()||c.name;
+  c.code=document.getElementById('gen_projectCode').value.trim();
+  c.program=document.getElementById('gen_program').value.trim();
+  const {error}=await SB.from('clients').update({name:c.name,code:c.code,program:c.program,data:c.data}).eq('id',c.id);
+  if(error){console.error(error);setSaveStatus('⚠ Σφάλμα αποθήκευσης: '+error.message);return;}
+  c.updated=new Date().toISOString();
+  if(!silent)setSaveStatus('Αποθηκεύτηκε ο φάκελος «'+c.name+'».');
+}
+async function deleteClient(id,ev){
+  if(ev)ev.stopPropagation();
+  const c=CLIENTS.find(x=>x.id===id);if(!c)return;
+  if(!confirm('Οριστική διαγραφή του φακέλου «'+c.name+'»;\nΗ ενέργεια δεν αναιρείται.'))return;
+  const {error}=await SB.from('clients').delete().eq('id',id);
+  if(error){alert('Σφάλμα διαγραφής: '+error.message);return;}
+  CLIENTS=CLIENTS.filter(x=>x.id!==id);
+  if(CURRENT_CLIENT===id){CURRENT_CLIENT=null;resetForm();}
+  renderClients();
+}
+async function backToList(){
+  await saveCurrentClient(true);
+  CURRENT_CLIENT=null;
+  await clientsLoad();
+  showWorkspace(false);
+  switchTab(0);
+}
+
+/* ---------------- ΠΡΟΓΡΑΜΜΑΤΑ ---------------- */
+async function loadProgramsFromCloud(){
+  if(!cloudReady()){return;}
+  const {data,error}=await SB.from('programs').select('*');
+  if(error){console.error(error);return;}
+  PROGRAMS={};
+  (data||[]).forEach(r=>{PROGRAMS[r.name]=r.config||{};});
+  if(!Object.keys(PROGRAMS).length)PROGRAMS=JSON.parse(JSON.stringify(EMBEDDED_PROGRAMS));
+  refreshProgramDropdown();
+}
+function initPrograms(){/* αντικαταστάθηκε από loadProgramsFromCloud */}
+function progSaveLocal(){}
+
+async function admSaveProgram(){
+  const name=document.getElementById('admName').value.trim();
+  if(!name){admStatus('⚠ Δώστε ονομασία προγράμματος.');return;}
+  if(!cloudReady()){admStatus('⚠ Δεν υπάρχει σύνδεση με την κεντρική βάση.');return;}
+  const cfg=admCollect();
+  if(admCurrent&&admCurrent!==name){
+    await SB.from('programs').delete().eq('name',admCurrent);
+    delete PROGRAMS[admCurrent];
+  }
+  const {error}=await SB.from('programs').upsert({name:name,config:cfg});
+  if(error){admStatus('⚠ '+error.message);return;}
+  PROGRAMS[name]=cfg;admCurrent=name;
+  admRefreshList();document.getElementById('admProgList').value=name;
+  refreshProgramDropdown();
+  admStatus('✔ Αποθηκεύτηκε «'+name+'» στην κεντρική βάση — είναι άμεσα διαθέσιμο σε όλους.');
+}
+async function admDeleteProgram(){
+  const n=document.getElementById('admProgList').value;
+  if(!n||!PROGRAMS[n])return;
+  if(!confirm('Διαγραφή του προγράμματος «'+n+'» από την κεντρική βάση;'))return;
+  const {error}=await SB.from('programs').delete().eq('name',n);
+  if(error){admStatus('⚠ '+error.message);return;}
+  delete PROGRAMS[n];admRefreshList();refreshProgramDropdown();
+  const first=Object.keys(PROGRAMS).sort()[0]||'';admCurrent=first;admLoadIntoForm(first);
+  admStatus('Διαγράφηκε «'+n+'».');
+}
+
+/* ---------------- ΧΡΗΣΤΕΣ (profiles) ---------------- */
+async function openUsers(){
+  if(!isAdminUser())return;
+  document.getElementById('usersModal').style.display='block';
+  document.getElementById('usrStatus').innerText='Φόρτωση...';
+  const {data,error}=await SB.from('profiles').select('*').order('created_at',{ascending:false});
+  if(error){document.getElementById('usrStatus').innerText='⚠ '+error.message;return;}
+  USERS=data||[];
+  usrRender();
+  await renderInvites();
+  document.getElementById('usrStatus').innerText=USERS.length+' χρήστες';
+}
+function usrRender(){
+  const b=document.getElementById('usrBody');b.innerHTML='';
+  if(!USERS.length){b.innerHTML='<tr><td colspan="7" style="text-align:center;color:#888;">Δεν υπάρχουν χρήστες.</td></tr>';return;}
+  const now=new Date();
+  USERS.forEach((u,i)=>{
+    let tag='<span class="usr-badge usr-on">Ενεργός</span>';
+    if(!u.approved)tag='<span class="usr-badge usr-exp">Αναμονή έγκρισης</span>';
+    else if(u.active===false)tag='<span class="usr-badge usr-off">Ανενεργός</span>';
+    else if(u.expiry&&new Date(u.expiry+'T23:59:59')<now)tag='<span class="usr-badge usr-exp">Έληξε</span>';
+    const tr=document.createElement('tr');
+    tr.innerHTML='<td>'+((u.full_name||'—')+'').replace(/</g,'&lt;')+'</td>'+
+      '<td style="font-size:12px;">'+(u.email||'—')+'</td>'+
+      '<td><select data-k="role" data-i="'+i+'"><option value="user"'+(u.role!=='admin'?' selected':'')+'>Χρήστης</option><option value="admin"'+(u.role==='admin'?' selected':'')+'>Διαχειριστής</option></select></td>'+
+      '<td style="white-space:nowrap;color:#666;font-size:12px;">'+(u.created_at?new Date(u.created_at).toLocaleDateString('el-GR'):'-')+'</td>'+
+      '<td><input type="date" data-k="expiry" data-i="'+i+'" value="'+(u.expiry||'')+'" style="width:135px;"></td>'+
+      '<td style="white-space:nowrap;">'+tag+'<br>'+
+        '<label style="font-size:11px;cursor:pointer;"><input type="checkbox" data-k="approved" data-i="'+i+'" '+(u.approved?'checked':'')+'> εγκεκριμένος</label> '+
+        '<label style="font-size:11px;cursor:pointer;"><input type="checkbox" data-k="active" data-i="'+i+'" '+(u.active!==false?'checked':'')+'> ενεργός</label></td>'+
+      '<td><button class="adm-xbtn" onclick="usrDelete('+i+')">🗑</button></td>';
+    b.appendChild(tr);
+  });
+}
+function usrCollect(){
+  document.querySelectorAll('#usrBody [data-k]').forEach(inp=>{
+    const i=parseInt(inp.dataset.i),k=inp.dataset.k;
+    if(!USERS[i])return;
+    if(k==='approved'||k==='active')USERS[i][k]=inp.checked;
+    else USERS[i][k]=inp.value||null;
+  });
+}
+async function usrSaveAll(){
+  usrCollect();
+  const st=document.getElementById('usrStatus');st.innerText='Αποθήκευση...';
+  for(const u of USERS){
+    const {error}=await SB.from('profiles').update({role:u.role,approved:u.approved,active:u.active,expiry:u.expiry||null}).eq('id',u.id);
+    if(error){st.innerText='⚠ '+error.message;return;}
+  }
+  st.innerText='✔ Οι αλλαγές αποθηκεύτηκαν και ισχύουν άμεσα για όλους.';
+  usrRender();
+}
+async function usrDelete(i){
+  const u=USERS[i];if(!u)return;
+  if(!confirm('Αφαίρεση πρόσβασης για «'+(u.full_name||u.email)+'»;\nΟι φάκελοί του θα διαγραφούν επίσης.'))return;
+  const {error}=await SB.from('profiles').delete().eq('id',u.id);
+  if(error){alert('Σφάλμα: '+error.message);return;}
+  USERS.splice(i,1);usrRender();
+}
+async function addInvite(){
+  const email=document.getElementById('invEmail').value.trim();
+  const name=document.getElementById('invName').value.trim();
+  const exp=document.getElementById('invExpiry').value.trim();
+  const st=document.getElementById('usrStatus');
+  if(!email){st.innerText='⚠ Δώστε e-mail.';return;}
+  let iso=null;
+  if(exp){const d=parseGreekDate(exp);if(!d){st.innerText='⚠ Μορφή ημ/νίας: ΗΗ/ΜΜ/ΕΕΕΕ.';return;}iso=d.toISOString().slice(0,10);}
+  const {error}=await SB.from('invites').upsert({email:email.toLowerCase(),full_name:name,expiry:iso});
+  if(error){st.innerText='⚠ '+error.message;return;}
+  document.getElementById('invEmail').value='';document.getElementById('invName').value='';document.getElementById('invExpiry').value='';
+  st.innerText='✔ Στάλθηκε πρόσκληση για '+email+'. Ζητήστε του να εγγραφεί με αυτό το e-mail.';
+  await renderInvites();
+}
+async function renderInvites(){
+  const c=document.getElementById('invList');if(!c)return;
+  const {data}=await SB.from('invites').select('*');
+  if(!data||!data.length){c.innerHTML='<em style="color:#999;">Καμία εκκρεμής πρόσκληση.</em>';return;}
+  c.innerHTML='<strong>Εκκρεμείς προσκλήσεις:</strong> '+data.map(i=>'<span class="adm-tag">'+i.email+'</span>').join(' ');
+}
+
+/* ---------------- ΕΦΕΔΡΙΚΑ ---------------- */
+function backupClients(){
+  const blob=new Blob([JSON.stringify({app:'BCSA_CLIENTS',exportedAt:new Date().toISOString(),owner:CURRENT_USER.name,clients:CLIENTS},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Εφεδρικό_Πελατών.json';a.click();
+}
+async function restoreClients(ev){
+  const f=ev.target.files[0];if(!f)return;
+  if(!cloudReady()){alert('Δεν υπάρχει σύνδεση με την κεντρική βάση.');return;}
+  const r=new FileReader();
+  r.onload=async()=>{
+    try{
+      const o=JSON.parse(r.result);
+      const arr=Array.isArray(o)?o:(o.clients||[]);
+      if(!arr.length){alert('Το αρχείο δεν περιέχει φακέλους.');return;}
+      const {data:{user}}=await SB.auth.getUser();
+      let n=0;
+      for(const c of arr){
+        const {error}=await SB.from('clients').insert({owner:user.id,name:c.name||'(χωρίς όνομα)',code:c.code||'',program:c.program||'',data:c.data||{}});
+        if(!error)n++;
+      }
+      await clientsLoad();renderClients();
+      alert('Εισήχθησαν '+n+' φάκελοι.');
+    }catch(e){alert('Μη έγκυρο αρχείο.');}
+    ev.target.value='';
+  };
+  r.readAsText(f);
+}
+
+/* ---------------- ΕΚΚΙΝΗΣΗ ---------------- */
+/* Τρέχει ΜΕΤΑ το window.onload του βασικού συστήματος, ώστε οι φόρμες
+   να έχουν ήδη δημιουργηθεί πριν φορτωθούν δεδομένα από τη βάση. */
+function initUsers(){}
+window.addEventListener('load',async ()=>{
+  initCloud();
+  if(cloudReady()){
+    const {data:{session}}=await SB.auth.getSession();
+    if(session&&session.user){await afterAuth(session.user);}
+  }else{
+    showLoginErr('⚠ Το σύστημα δεν έχει ρυθμιστεί για κεντρική βάση. Δείτε τις οδηγίες εγκατάστασης.');
+  }
+});
 </script>
 </body>
 </html>
