@@ -467,6 +467,7 @@ header{padding-left:110px;padding-right:110px;}
   <button class="mini-btn" title="Άνοιγμα φακέλου από αρχείο (.txt)" onclick="document.getElementById('importFile').click()">📂</button>
   <button class="btn" id="adminBtn" style="display:none;background:#4b2e6b;color:#fff;" onclick="openAdmin()">🛠️ Διαχείριση Προτύπων</button>
   <button class="btn" id="usersBtn" style="display:none;background:#1a56b0;color:#fff;" onclick="openUsers()">👥 Διαχείριση Χρηστών</button>
+  <button class="mini-btn" title="Ρυθμίσεις υπογραφής email" onclick="openSigModal()">⚙</button>
   <span id="cloudBadge" style="display:none;background:#eafaf1;color:#1e7e46;border:1px solid #b7e4c7;border-radius:12px;padding:4px 12px;font-size:12px;font-weight:bold;">☁</span>
   <button class="btn" style="background:#eee;color:#444;" onclick="doLogout()">🚪 Αποσύνδεση</button>
   <span class="save-status" id="saveStatus"></span>
@@ -535,7 +536,9 @@ header{padding-left:110px;padding-right:110px;}
     <button class="tab-btn" id="backBtn" style="display:none;background:#eee;" onclick="backToList()">← Επιστροφή στη λίστα</button>
     <button class="tab-btn" id="tabbtn_1" onclick="switchTab(1)">ΦΑΣΗ 1 · Τηλεφωνική</button>
     <button class="tab-btn" id="tabbtn_2" onclick="switchTab(2)">ΦΑΣΗ 2 · 1ο Meeting / Υποβολή</button>
-    <button class="tab-btn" id="tabbtn_3" onclick="switchTab(3)">ΦΑΣΗ 3 · Υλοποίηση / Δικαιολογητικά</button>
+    <button class="tab-btn" id="tabbtn_3" onclick="switchTab(3)">ΦΑΣΗ 3 · Business Plan</button>
+    <button class="tab-btn" id="tabbtn_4" onclick="switchTab(4)">ΦΑΣΗ 4 · Προ-υποβολή</button>
+    <button class="tab-btn" id="tabbtn_5" onclick="switchTab(5)">ΦΑΣΗ 5 · Υλοποίηση</button>
   </div>
   <div style="background:var(--white);border-radius:0 0 8px 8px;padding:20px;box-shadow:0 2px 5px rgba(0,0,0,0.05);">
 
@@ -690,9 +693,9 @@ header{padding-left:110px;padding-right:110px;}
         <h4>📎 Σύνδεσμοι δικαιολογητικών ανά τύπο επιχείρησης</h4>
         <p style="font-size:12px;color:#666;margin:-4px 0 10px 0;">Βάλτε τους συνδέσμους (π.χ. cloud) ώστε να βρίσκονται εύκολα και να αποστέλλονται στους πελάτες.</p>
         <div class="docs-links-row">
-          <div class="docs-links-col"><label>Υπό ίδρυση επιχείρηση</label><input type="text" id="doclink_new" class="save-data" placeholder="https://..." oninput="updateDocLink('new')"><a id="doclinka_new" class="disabled" target="_blank">Άνοιγμα ↗</a></div>
-          <div class="docs-links-col"><label>Νεοσύστατη</label><input type="text" id="doclink_recent" class="save-data" placeholder="https://..." oninput="updateDocLink('recent')"><a id="doclinka_recent" class="disabled" target="_blank">Άνοιγμα ↗</a></div>
-          <div class="docs-links-col"><label>Υφιστάμενη</label><input type="text" id="doclink_existing" class="save-data" placeholder="https://..." oninput="updateDocLink('existing')"><a id="doclinka_existing" class="disabled" target="_blank">Άνοιγμα ↗</a></div>
+          <div class="docs-links-col"><label>Υπό ίδρυση επιχείρηση</label><div style="display:flex;gap:5px;"><input type="text" id="doclink_new" class="save-data" placeholder="https://..." oninput="updateDocLink('new')" style="flex:1;"><button type="button" class="mini-btn" onclick="openLinkIn('doclink_new')">↗</button></div><a id="doclinka_new" class="disabled" target="_blank">Άνοιγμα ↗</a></div>
+          <div class="docs-links-col"><label>Νεοσύστατη</label><div style="display:flex;gap:5px;"><input type="text" id="doclink_recent" class="save-data" placeholder="https://..." oninput="updateDocLink('recent')" style="flex:1;"><button type="button" class="mini-btn" onclick="openLinkIn('doclink_recent')">↗</button></div><a id="doclinka_recent" class="disabled" target="_blank">Άνοιγμα ↗</a></div>
+          <div class="docs-links-col"><label>Υφιστάμενη</label><div style="display:flex;gap:5px;"><input type="text" id="doclink_existing" class="save-data" placeholder="https://..." oninput="updateDocLink('existing')" style="flex:1;"><button type="button" class="mini-btn" onclick="openLinkIn('doclink_existing')">↗</button></div><a id="doclinka_existing" class="disabled" target="_blank">Άνοιγμα ↗</a></div>
         </div>
       </div>
       <div class="grid-3" style="margin-top:25px;">
@@ -724,12 +727,80 @@ header{padding-left:110px;padding-right:110px;}
     <div class="bottom-actions">
       <button class="btn btn-green" onclick="generateMeetingReport('client')">📧 Email: Meeting Πελάτη</button>
       <button class="btn" onclick="generateMeetingReport('manager')">📧 Εσωτερική Αναφορά</button>
-      <button class="btn btn-outline" onclick="switchTab(3)">➡ ΜΕΤΑΒΑΣΗ ΣΤΗ ΦΑΣΗ ΥΛΟΠΟΙΗΣΗΣ</button>
+      <button class="btn btn-outline" onclick="switchTab(5)">➡ ΜΕΤΑΒΑΣΗ ΣΤΗ ΦΑΣΗ ΥΛΟΠΟΙΗΣΗΣ</button>
     </div>
   </div>
 
   <!-- ================= ΦΑΣΗ 3 ================= -->
+  
   <div class="tab-content" id="tab_3">
+    <div class="phase-header" style="background-color:#4b2e6b;">ΦΑΣΗ 3: ΠΡΟΕΤΟΙΜΑΣΙΑ BUSINESS PLAN</div>
+    <div class="card-section" style="border-left-color:#4b2e6b;">
+      <div class="form-row form-row-inline"><label>Απαιτείται δημιουργία Business Plan;</label>
+        <div><input type="text" id="bp4_required" class="form-control" readonly style="background:#eef2fb;font-weight:bold;" placeholder="αντλείται από τη Φάση 2"></div>
+      </div>
+      <p style="font-size:12.5px;color:#666;margin-top:-4px;">Η απάντηση αντλείται αυτόματα από τη Φάση 2 → ενότητα 4. Αν είναι «ΟΧΙ», τα παρακάτω βήματα δεν απαιτούνται.</p>
+    </div>
+    <div id="bp4Steps">
+      <div class="card-section" style="border-left-color:#4b2e6b;">
+        <h3>ΒΗΜΑΤΑ ΔΗΜΙΟΥΡΓΙΑΣ BUSINESS PLAN</h3>
+        <div class="form-row form-row-inline"><label>1. Αποθηκεύτηκαν τα αποτελέσματα της φόρμας δαπανών στον φάκελο του πελάτη;</label><div><select id="bp4_q1" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
+        <div class="form-row form-row-inline"><label>2. Αποθηκεύτηκαν τα λεκτικά του πελάτη στις στοχευμένες ερωτήσεις για το Business Plan στον φάκελο του πελάτη;</label><div><select id="bp4_q2" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
+        <div class="form-row form-row-inline"><label>3. Έγινε σύνταξη επιχειρηματικού σχεδίου σε Word, σύμφωνα με όσα ζητά να αναπτυχθούν το σύστημα (ΟΠΣΚΕ κ.λπ.);</label><div><select id="bp4_q3" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
+        <div class="form-row form-row-inline"><label>4. Απαιτείται να σταλούν άλλα δικαιολογητικά που τεκμηριώνουν το Business Plan (π.χ. προσφορές, ιδιωτικά συμφωνητικά, οικοδομικές άδειες);</label><div><select id="bp4_q4" class="form-control save-data bg-neutral" onchange="handleBp4Q4(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
+        <div id="bp4_sub" class="hidden" style="background:#fff8e6;border:1px solid #f1c232;border-radius:6px;padding:14px;margin-top:8px;">
+          <div class="form-row form-row-inline"><label>Απαιτείται η τεκμηρίωση των όσων αναφέρονται στο Business Plan με τα απαραίτητα δικαιολογητικά;</label><div><select id="bp4_q5" class="form-control save-data bg-neutral" onchange="handleBp4Q5(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
+          <div id="bp4_docs" class="hidden">
+            <p style="font-size:12.5px;color:#8a6d00;margin:6px 0;">Καταγράψτε ποια δικαιολογητικά απαιτούνται — θεωρούνται <strong>ελλείψεις</strong> μέχρι να παραληφθούν.</p>
+            <div id="bp4DocsContainer"></div>
+            <button class="btn-add" style="color:#b58900;border-color:#b58900;background:#fdf9eb;" onclick="addBp4Doc()">+ Προσθήκη δικαιολογητικού</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab_4">
+    <div class="phase-header" style="background-color:#1a56b0;">ΦΑΣΗ 4: ΣΥΛΛΟΓΗ ΕΓΓΡΑΦΩΝ ΠΡΙΝ ΤΗΝ ΑΠΟΤΥΠΩΣΗ ΣΤΟ ΣΥΣΤΗΜΑ</div>
+    <div class="card-section">
+      <h3>Α. ΕΛΕΓΧΟΣ ΠΛΗΡΟΤΗΤΑΣ</h3>
+      <div class="form-row form-row-inline"><label>Υπολογίστηκε το μέγεθος της ενιαίας επιχείρησης;</label><div><select id="pre5_q1" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
+      <div class="form-row form-row-inline"><label>Σχετικά με το de minimis, σωρεύει το επενδυτικό σχέδιο;</label><div><select id="pre5_q2" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option><option value="ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ">ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ</option></select></div></div>
+      <div class="form-row form-row-inline"><label>Έχουν συμπληρωθεί οι απαιτούμενες Ετήσιες Μονάδες Εργασίας (ΕΜΕ) για τα τελευταία ολοκληρωμένα φορολογικά έτη;</label><div><select id="pre5_q3" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
+      <div class="form-row form-row-inline"><label>Έχουν προσκομιστεί από τον πελάτη τα δικαιολογητικά που αφορούν την υποβολή;</label><div><select id="pre5_q4" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
+    </div>
+    <div class="card-section">
+      <h3>Β. ΕΣΩΤΕΡΙΚΟΣ ΕΛΕΓΧΟΣ (εφόσον υπάρχει δεύτερος συνεργάτης)</h3>
+      <div class="form-row form-row-inline"><label>Έλεγξε δεύτερος υπάλληλος ότι όσα μας στάλθηκαν είναι σωστά;</label><div><select id="pre5_q5" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option><option value="ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ">ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ</option></select></div></div>
+      <div class="form-row form-row-inline"><label>Έκανε δεύτερος υπάλληλος αξιολόγηση του επενδυτικού σχεδίου;</label><div><select id="pre5_q6" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option><option value="ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ">ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ</option></select></div></div>
+    </div>
+    <div class="card-section">
+      <h3>Γ. ΑΠΟΤΥΠΩΣΗ ΣΤΟ ΣΥΣΤΗΜΑ</h3>
+      <div class="form-row form-row-inline"><label>Υπάρχει εγχειρίδιο συμπλήρωσης για το σύστημα;</label><div><select id="pre5_q7" class="form-control save-data bg-neutral" onchange="handlePre5Manual(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
+      <div class="form-row form-row-inline" id="pre5_q8_row"><label id="pre5_q8_lbl">Συμπλήρωσα όλο το σύστημα ορθά;</label><div><select id="pre5_q8" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
+      <div class="form-row form-row-inline"><label>Έγινε εξέταση από τρίτο στη συμπλήρωση του συστήματος;</label><div><select id="pre5_q9" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option><option value="ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ">ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ</option></select></div></div>
+      <div class="form-row form-row-inline"><label>Η αποτύπωση στο σύστημα και η υποβολή για οριστικοποίηση είναι εντός των ορίων της προθεσμίας του οδηγού;</label><div><select id="pre5_q10" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
+      <div class="form-row form-row-inline"><label>Επισύναψα όλα τα δικαιολογητικά σύμφωνα με τον οδηγό;</label><div><select id="pre5_q11" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
+    </div>
+    <div class="card-section">
+      <h3>Δ. ΕΠΙΒΕΒΑΙΩΣΗ &amp; ΟΡΙΣΤΙΚΟΠΟΙΗΣΗ</h3>
+      <div class="grid-2">
+        <div><label class="question-label">Τελική βαθμολογία πελάτη</label><input type="text" id="pre5_score" class="form-control save-data" placeholder="π.χ. 82,50"></div>
+        <div><label class="question-label">Ποσό επιχορήγησης στο χρηματοδοτικό σχήμα</label><input type="text" id="pre5_amount" class="form-control save-data" placeholder="π.χ. 65.000,00 €" onblur="formatField(this,'currency')"></div>
+      </div>
+      <div class="form-row form-row-inline"><label>Το ποσό επιχορήγησης είναι αυτό που έχουμε συμφωνήσει;</label><div><select id="pre5_q12" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
+      <div class="form-row form-row-inline"><label>Πληροί η πρότασή μου όλα τα απαραίτητα κριτήρια;</label><div><select id="pre5_q13" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
+      <div class="form-row form-row-inline"><label>Έχω πληρωθεί το σύνολο της αμοιβής υποβολής από τον πελάτη;</label><div><select id="pre5_q14" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
+      <div class="form-row form-row-inline"><label>Οριστικοποίησα τη διαδικασία στο σύστημα;</label><div><select id="pre5_q15" class="form-control save-data bg-neutral" onchange="handlePre5Final(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
+      <div id="pre5_finalBox" class="hidden" style="background:#eafaf1;border:1px solid #b7e4c7;border-radius:6px;padding:14px;margin-top:8px;">
+        <div class="form-row form-row-inline"><label>Εκτύπωσα το αποδεικτικό οριστικοποίησης από το σύστημα;</label><div><select id="pre5_q16" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
+        <div class="form-row form-row-inline"><label>Αποθήκευσα την εκτύπωση μέσα στον φάκελο του πελάτη;</label><div><select id="pre5_q17" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
+        <div class="form-row form-row-inline"><label>Έστειλα στον πελάτη το έγγραφο που παρουσιάζει την επένδυση οριστικοποιημένη στο σύστημα;</label><div><select id="pre5_q18" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab_5">
     <div class="phase-header" style="background-color:#b58900;">ΦΑΣΗ 3: ΥΛΟΠΟΙΗΣΗ - ΕΛΕΓΧΟΣ ΔΙΚΑΙΟΛΟΓΗΤΙΚΩΝ ΠΑΡΑΣΤΑΤΙΚΩΝ</div>
     <div class="gate-box">
       <h4>Προϋποθέσεις έναρξης υλοποίησης</h4>
@@ -802,7 +873,30 @@ header{padding-left:110px;padding-right:110px;}
 
 </div>
 
-<div id="mailPickModal" class="modal">
+<div id="sigModal" class="modal" style="z-index:2100;">
+  <div class="modal-content" style="max-width:640px;">
+    <div class="modal-header">
+      <h2 style="margin:0;color:var(--primary-blue);font-size:18px;">⚙ ΥΠΟΓΡΑΦΗ EMAIL</h2>
+      <span class="close-btn" onclick="document.getElementById('sigModal').style.display='none'">&times;</span>
+    </div>
+    <p style="font-size:12.5px;color:#666;margin:0 0 10px 0;">Η υπογραφή προστίθεται στο τέλος κάθε email που συντάσσει το εργαλείο.</p>
+    <label class="question-label">Κείμενο υπογραφής</label>
+    <textarea id="sigText" rows="7" class="form-control" placeholder="Ονοματεπώνυμο&#10;Ιδιότητα&#10;Business Consultancy Services &amp; Academy&#10;Τηλ: ...&#10;Email: ...&#10;www: ..." style="font-family:inherit;line-height:1.5;"></textarea>
+    <div class="sme-note" style="margin-top:12px;">
+      <strong>Σημείωση για την εικόνα:</strong> τα μηνύματα συντάσσονται σε <strong>απλό κείμενο</strong>, οπότε λογότυπο δεν μπορεί να ενσωματωθεί μέσω του συνδέσμου. Αν στο Gmail/Outlook έχετε ήδη ρυθμισμένη υπογραφή με εικόνα, αφήστε το παρακάτω κενό και επιλέξτε «Χωρίς υπογραφή» — τότε θα εμφανίζεται η δική σας υπογραφή από το πρόγραμμα αλληλογραφίας.
+    </div>
+    <div style="margin-top:12px;">
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
+        <input type="checkbox" id="sigEnabled" style="width:17px;height:17px;"> Προσθήκη της παραπάνω υπογραφής στα email
+      </label>
+    </div>
+    <div style="text-align:right;margin-top:16px;border-top:1px solid var(--border-color);padding-top:12px;">
+      <button class="btn btn-green" onclick="saveSignature()">✔ Αποθήκευση</button>
+    </div>
+  </div>
+</div>
+
+<div id="mailPickModal" class="modal" style="z-index:2000;">
   <div class="modal-content small-modal">
     <div class="modal-header">
       <h2 style="margin:0;color:var(--primary-blue);font-size:17px;">ΑΠΟΣΤΟΛΗ EMAIL</h2>
@@ -1169,13 +1263,15 @@ document.getElementById("passwordInput").addEventListener("keypress",e=>{if(e.ke
 /* =================== TABS =================== */
 let CURRENT_TAB=1;
 function switchTab(n){
-  if(n>=1&&n<=3)CURRENT_TAB=n;
+  if(n>=1&&n<=5)CURRENT_TAB=n;
   if(typeof saveCurrentClient==='function')saveCurrentClient(true);
-  if(document.getElementById('tab_0')&&document.getElementById('tabbtn_0')){document.getElementById('tab_0').classList.remove('active');document.getElementById('tabbtn_0').classList.remove('active');if(n===0){document.getElementById('tab_0').classList.add('active');document.getElementById('tabbtn_0').classList.add('active');[1,2,3].forEach(i=>{document.getElementById('tab_'+i).classList.remove('active');document.getElementById('tabbtn_'+i).classList.remove('active');});window.scrollTo(0,0);renderClients();refreshDashboard();return;}}
-  for(let i=1;i<=3;i++){
-    document.getElementById('tab_'+i).classList.toggle('active',i===n);
-    document.getElementById('tabbtn_'+i).classList.toggle('active',i===n);
+  if(document.getElementById('tab_0')&&document.getElementById('tabbtn_0')){document.getElementById('tab_0').classList.remove('active');document.getElementById('tabbtn_0').classList.remove('active');if(n===0){document.getElementById('tab_0').classList.add('active');document.getElementById('tabbtn_0').classList.add('active');[1,2,3,4,5].forEach(i=>{const t=document.getElementById('tab_'+i),b=document.getElementById('tabbtn_'+i);if(t)t.classList.remove('active');if(b)b.classList.remove('active');});window.scrollTo(0,0);renderClients();refreshDashboard();return;}}
+  for(let i=1;i<=5;i++){
+    const t=document.getElementById('tab_'+i),b=document.getElementById('tabbtn_'+i);
+    if(t)t.classList.toggle('active',i===n);
+    if(b)b.classList.toggle('active',i===n);
   }
+  if(n===3&&typeof syncBp4==='function')syncBp4();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -1282,6 +1378,7 @@ function initPhoneForm(){
       html+=`<select id="input_${q.id}" class="form-control bg-neutral" onchange="${q.id==='q11'?`handleQ11Change(${index})`:`evaluateProgress(${index})`}">`;
       q.options.forEach(opt=>html+=`<option value="${opt==='Επιλέξτε'?'':opt}">${opt}</option>`);
       html+=`</select>`;
+      if(q.id==='q15')html+=`<div id="sub_q15_gdpr" class="sub-question-panel active"><button type="button" class="btn btn-blue" style="padding:7px 14px;font-size:13px;" onclick="generateGdprEmail()">📄 Προβολή / Αποστολή εγγράφου GDPR &amp; κωδικών</button></div>`;
       if(q.id==='q10')html+=`<div id="sub_q10_dm" class="sub-question-panel"></div>`;
       if(q.id==='q3')html+=`<div id="sub_q3_kad" class="sub-question-panel"><p style="margin:0 0 8px 0;font-size:12.5px;color:#555;">Προαιρετικά καταχωρήστε δραστηριότητες. Ο κωδικός ΚΑΔ δεν είναι υποχρεωτικός — αρκεί η περιγραφή.</p><div id="q3KadRows"></div><button type="button" class="btn-add" style="padding:6px 12px;font-size:13px;" onclick="addQ3Kad()">+ Προσθήκη δραστηριότητας</button></div>`;
       if(q.id==='q11')html+=`<div id="sub_q11_container" class="sub-question-panel" data-type=""></div>`;
@@ -1293,7 +1390,7 @@ function initPhoneForm(){
     } else if(q.type==='currency-percent'||q.type==='double-currency'){
       html+=`<div class="multi-input-row"><div class="input-group"><input type="text" id="input_${q.id}_1" class="form-control" placeholder="${q.placeholders[0]}" oninput="formatCurrencyInput(event,${index})"><span class="addon">€</span></div><div class="input-group"><input type="text" id="input_${q.id}_2" class="form-control" placeholder="${q.placeholders[1]}" oninput="${q.type==='currency-percent'?`evaluateProgress(${index})`:`formatCurrencyInput(event,${index})`}"><span class="addon">${q.type==='currency-percent'?'%':'€'}</span></div></div>`;
     } else if(q.type==='note'){
-      html+=`<div class="note-panel"><p style="margin:0 0 8px 0;">💡 <strong>Προτείνεται</strong> να δημιουργηθεί φάκελος πελάτη στο cloud:</p><input type="text" id="q16_cloud_link" class="form-control save-data" placeholder="Link φακέλου cloud (προαιρετικά)..."><p style="margin:12px 0 0 0;">💡 <strong>Προτείνεται</strong> να δημιουργηθεί αρχείο ιστορικού ενεργειών πελάτη.</p></div>`;
+      html+=`<div class="note-panel"><p style="margin:0 0 8px 0;">💡 <strong>Προτείνεται</strong> να δημιουργηθεί φάκελος πελάτη στο cloud:</p><div style="display:flex;gap:6px;align-items:center;"><input type="text" id="q16_cloud_link" class="form-control save-data" placeholder="Link φακέλου cloud (προαιρετικά)..." style="flex:1;"><button type="button" class="mini-btn" title="Άνοιγμα σε νέα καρτέλα" onclick="openLinkIn('q16_cloud_link')">↗</button></div><p style="margin:12px 0 0 0;">💡 <strong>Προτείνεται</strong> να δημιουργηθεί αρχείο ιστορικού ενεργειών πελάτη.</p></div>`;
     } else if(q.type==='multi'){
       for(let i=0;i<q.count;i++)html+=`<div class="multi-input-row"><input type="text" id="input_${q.id}_text_${i}" class="form-control" placeholder="Προϋπόθεση..." oninput="evaluateProgress(${index})"><select id="input_${q.id}_sel_${i}" class="form-control bg-neutral" onchange="evaluateProgress(${index})">${q.options.map(o=>`<option value="${o==='Επιλέξτε'?'':o}">${o}</option>`).join('')}</select></div>`;
     }
@@ -1640,6 +1737,13 @@ function evaluateAllExpenses(){
   /* Έλεγχος δαπανών που περιλαμβάνουν αμοιβή συμβούλου */
   checkConsultFee();
 }
+function openLinkIn(id){
+  const el=document.getElementById(id);if(!el)return;
+  let v=(el.value||'').trim();
+  if(!v){alert('Δεν έχει καταχωρηθεί σύνδεσμος.');return;}
+  if(!/^https?:\/\//i.test(v))v='https://'+v;
+  window.open(v,'_blank','noopener');
+}
 function updateDocLink(key){
   const inp=document.getElementById('doclink_'+key);
   const a=document.getElementById('doclinka_'+key);
@@ -1874,7 +1978,7 @@ function generateMeetingReport(type){
   /* --- Υποχρεώσεις ΑμεΑ & δημοσιότητας --- */
   const amEaHtml='<p style="background:#fff8e6;border-left:4px solid #f1c232;padding:12px;">'+
     '<strong><u>Σημαντικές υποχρεώσεις του δικαιούχου:</u></strong><br>'+
-    '<strong><u>Προσβασιμότητα ΑμεΑ:</u></strong> η επιχείρηση υποχρεούται να μεριμνήσει για την προσβασιμότητα ατόμων με αναπηρία, τόσο στον τόπο υλοποίησης της επένδυσης όσο και ηλεκτρονικά (ιστοσελίδα / e-shop).<br>'+
+    '<strong><u>Προσβασιμότητα ΑμεΑ:</u></strong> η επιχείρηση υποχρεούται να μεριμνήσει για την προσβασιμότητα ατόμων με αναπηρία, τόσο στον τόπο υλοποίησης της επένδυσης όσο και ηλεκτρονικά (ιστοσελίδα / e-shop), με έλεγχο συμμόρφωσης προς το πρότυπο <strong>WCAG 2.1</strong>.<br>'+
     '<strong><u>Δημοσιότητα του έργου:</u></strong> απαιτείται ανάρτηση της προβλεπόμενης αφίσας, όπως ορίζει ο οδηγός του προγράμματος, σε εμφανές σημείο στον τόπο υλοποίησης της επένδυσης, στην ιστοσελίδα της επιχείρησης και στα μέσα κοινωνικής δικτύωσης.</p>';
   /* --- Επισήμανση για τρίτους ΚΑΔ --- */
   const wantsThird=(document.getElementById('elig_s5')||{}).value;
@@ -2273,6 +2377,7 @@ function collectData(){
   data.contacts=(typeof getContacts==='function')?getContacts():[];
   data.mailLog=MAIL_LOG;
   data.sme=(typeof smeCollect==='function')?smeCollect():null;
+  data.bp4docs=(typeof getBp4Docs==='function')?getBp4Docs():[];
   data.deminimis=[...document.querySelectorAll('#sub_q10_dm .dm-row')].filter(r=>r.querySelector('.d-nm')).map(r=>({
     name:r.querySelector('.d-nm').value,years:[...r.querySelectorAll('.d-y')].map(i=>i.value)}));
   data.phase2_dyn.indirect={active:document.getElementById('ind_active')?document.getElementById('ind_active').checked:false,
@@ -2303,7 +2408,7 @@ function collectData(){
   });
 
   /* --- ΦΑΣΗ 2 STATIC --- */
-  document.querySelectorAll('#tab_2 .save-data[id], #tab_3 .save-data[id]').forEach(el=>data.phase2_fields[el.id]=el.value);
+  document.querySelectorAll('#tab_2 .save-data[id], #tab_3 .save-data[id], #tab_4 .save-data[id], #tab_5 .save-data[id]').forEach(el=>data.phase2_fields[el.id]=el.value);
   /* --- ΦΑΣΗ 2 DYNAMIC --- */
   document.querySelectorAll('#eligibilityContainer .dynamic-row').forEach(r=>data.phase2_dyn.elig.push({k:r.querySelector('.dyn-key').value,v:r.querySelector('.dyn-val').value,src:r.querySelector('.dyn-key').dataset.src||''}));
   document.querySelectorAll('#bpContainer .dynamic-row').forEach(r=>data.phase2_dyn.bp.push({k:r.querySelector('.dyn-key').value,v:r.querySelector('.dyn-val').value}));
@@ -2496,6 +2601,10 @@ function applyData(data){
       ['pre_q1','pre_q2','pre_q4','pre_q5'].forEach(id=>{const e=document.getElementById(id);if(!e)return;
         if(id==='pre_q1')handlePreQ1(e);else if(id==='pre_q2')handlePreQ2(e);else if(id==='pre_q4')handlePreQ4(e);else handlePreQ5(e);});
       MAIL_LOG=data.mailLog||[];
+      if(document.getElementById('bp4DocsContainer')){
+        const bc=document.getElementById('bp4DocsContainer');bc.innerHTML='';
+        (data.bp4docs||[]).forEach(d=>addBp4Doc(d.k,d.v));
+      }
       if(data.sme){
         const sb=document.getElementById('smeSelfBody');
         if(sb){
@@ -2537,6 +2646,10 @@ function applyData(data){
         data.phase3_docs.forEach(d=>addPh3DocRow(d.k,d.v));
       }
       syncProgramConfig();
+      if(typeof syncBp4==='function')syncBp4();
+      ['bp4_q4','bp4_q5','pre5_q7','pre5_q15'].forEach(id=>{const e=document.getElementById(id);if(!e)return;
+        if(id==='bp4_q4')handleBp4Q4(e);else if(id==='bp4_q5')handleBp4Q5(e);
+        else if(id==='pre5_q7')handlePre5Manual(e);else handlePre5Final(e);});
       renderLifeline();
       evaluateProgress(0);calculateTotalScore();evaluateAllExpenses();updateDynamicHeaders();calcFees();syncPhoneAutoFields();handlePhase3Gate();applyPhase3Mode();
     }
@@ -2797,6 +2910,76 @@ const LOGO_PARTS=[
 'gg==',
 ];
 function initLogo(){var el=document.getElementById('brandLogo');if(el)el.src='data:image/png;base64,'+LOGO_PARTS.join('');}
+/* =================== ΦΑΣΗ 3: BUSINESS PLAN (v27) =================== */
+function syncBp4(){
+  const src=(document.getElementById('bp_req')||{}).value||'';
+  const el=document.getElementById('bp4_required');
+  if(el)el.value=src||'— δεν έχει οριστεί —';
+  const steps=document.getElementById('bp4Steps');
+  if(steps)steps.style.display=(src==='ΟΧΙ')?'none':'block';
+}
+function handleBp4Q4(el){
+  colorStandard(el);
+  const box=document.getElementById('bp4_sub');
+  if(box)box.classList.toggle('hidden',el.value!=='ΟΧΙ');
+}
+function handleBp4Q5(el){
+  colorStandard(el);
+  const box=document.getElementById('bp4_docs');
+  if(box){box.classList.toggle('hidden',el.value!=='ΝΑΙ');
+    if(el.value==='ΝΑΙ'&&document.getElementById('bp4DocsContainer').children.length===0)addBp4Doc();}
+}
+function addBp4Doc(text,val){
+  const c=document.getElementById('bp4DocsContainer');if(!c)return;
+  const d=document.createElement('div');d.className='dynamic-row';
+  d.innerHTML='<input type="text" class="form-control bp4-key" placeholder="Απαιτούμενο δικαιολογητικό..." value="'+String(text||'').replace(/"/g,'&quot;')+'" style="flex:3;">'+
+    '<select class="form-control bp4-val bg-neutral" onchange="colorStandard(this)" style="flex:1;"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΠΑΡΑΛΗΦΘΗΚΕ</option><option value="ΟΧΙ">ΕΚΚΡΕΜΕΙ</option></select>'+
+    '<button class="btn-remove" onclick="this.parentElement.remove();scheduleAutoSave();">×</button>';
+  c.appendChild(d);
+  if(val){const s=d.querySelector('.bp4-val');s.value=val;colorStandard(s);}
+}
+function getBp4Docs(){
+  return [...document.querySelectorAll('#bp4DocsContainer .dynamic-row')].map(r=>({
+    k:r.querySelector('.bp4-key').value.trim(),v:r.querySelector('.bp4-val').value})).filter(x=>x.k);
+}
+/* =================== ΦΑΣΗ 4: ΠΡΟ-ΥΠΟΒΟΛΗ (v27) =================== */
+function handlePre5Manual(el){
+  colorStandard(el);
+  const lbl=document.getElementById('pre5_q8_lbl');
+  if(lbl)lbl.innerText=(el.value==='ΝΑΙ')?'Συμπλήρωσα όλο το σύστημα σύμφωνα με τον οδηγό συμπλήρωσης;':'Συμπλήρωσα όλο το σύστημα ορθά;';
+}
+function handlePre5Final(el){
+  colorStandard(el);
+  const box=document.getElementById('pre5_finalBox');
+  if(box)box.classList.toggle('hidden',el.value!=='ΝΑΙ');
+}
+
+/* =================== GDPR (v27) =================== */
+function generateGdprEmail(){
+  const g=id=>{const e=document.getElementById(id);return e?e.value.trim():'';};
+  const ben=g('gen_beneficiary')||'[Επωνυμία Πελάτη]';
+  const contact=g('gen_contact')||'[Επώνυμο Πελάτη]';
+  const own=(typeof MY_PROFILE!=='undefined'&&MY_PROFILE)?(MY_PROFILE.full_name||''):'';
+  const co='Business Consultancy Services &amp; Academy';
+  const h=`<p><strong>Θέμα: Αίτημα παροχής συγκατάθεσης για τη διαχείριση κωδικών πρόσβασης στο πλαίσιο της υλοποίησης του επενδυτικού σας σχεδίου</strong></p>
+<p>Αξιότιμε Πελάτη <strong>${contact}</strong>,</p>
+<p>Σε συνέχεια της συνεργασίας μας για την υποβολή και την υλοποίηση του επενδυτικού σας σχεδίου, και προκειμένου να προχωρήσουμε στις απαραίτητες τεχνικές ενέργειες στο Πληροφοριακό Σύστημα, απαιτείται η πρόσβαση των εξωτερικών μας συνεργατών στους κωδικούς του λογαριασμού σας.</p>
+<p>Στο πλαίσιο των αυστηρών κανόνων GDPR και συμμόρφωσης που διέπουν τη λειτουργία της <strong>${co}</strong>, με έδρα [Διεύθυνση], ΑΦΜ [ΑΦΜ] και νόμιμο εκπρόσωπο τον/την ${own||'[Νόμιμο Εκπρόσωπο]'}, σας ενημερώνουμε υπεύθυνα για τα κάτωθι:</p>
+<p><strong>Σκοπός Χρήσης:</strong> Οι κωδικοί πρόσβασης που θα μας παραχωρήσετε θα χρησιμοποιηθούν αποκλειστικά και μόνο για τις ανάγκες διαχείρισης, υποβολής και παρακολούθησης του συγκεκριμένου επενδυτικού σχεδίου της <strong>${ben}</strong>.</p>
+<p><strong>Ασφάλεια Δεδομένων:</strong> Τα διαπιστευτήρια αυτά θα αποθηκευτούν στο ασφαλές ψηφιακό περιβάλλον της εταιρείας μας για το χρονικό διάστημα που απαιτείται για την ολοκλήρωση της εντολής σας, τηρουμένων όλων των πρωτοκόλλων εμπιστευτικότητας.</p>
+<p><strong>Υποχρέωση Αλλαγής Κωδικών:</strong> Για την εξασφάλιση της μέγιστης ασφάλειας των δεδομένων σας, είναι επιβεβλημένο να προβείτε στην άμεση αλλαγή των κωδικών πρόσβασης αμέσως μόλις ολοκληρωθεί η διαδικασία υποβολής.</p>
+<p><strong>Αποποίηση Ευθύνης:</strong> Σας ενημερώνουμε ότι, σε περίπτωση παράλειψης της αλλαγής των κωδικών από την πλευρά σας μετά την ολοκλήρωση του έργου, η ${co} δεν φέρει καμία απολύτως ευθύνη για οποιοδήποτε συμβάν ή παραβίαση ασφαλείας προκύψει μετά την παύση της ενεργού εμπλοκής μας.</p>
+<p>Για να μπορέσουμε να προχωρήσουμε στις απαραίτητες ενέργειες, απαιτείται η ρητή συγκατάθεσή σας. Παρακαλούμε να απαντήσετε στο παρόν μήνυμα αναγράφοντας αποκλειστικά μία από τις παρακάτω φράσεις:</p>
+<p style="text-align:center;font-size:16px;"><strong>«Αποδέχομαι»</strong> ή <strong>«Δεν Αποδέχομαι»</strong></p>
+<p>Επισημαίνεται ότι η διαδικασία υποβολής δεν μπορεί να ξεκινήσει χωρίς την ανωτέρω επιβεβαίωση, καθώς η προστασία των προσωπικών σας δεδομένων αποτελεί πρωταρχική μας προτεραιότητα.</p>
+<p>Παραμένω στη διάθεσή σας για οποιαδήποτε διευκρίνιση.</p>`;
+  document.getElementById('reportOutput').innerHTML=h;
+  const xb=document.getElementById('reportExcelBtn');if(xb)xb.style.display='none';
+  attachSendButton(g('gen_email'),'','Αποδοχή GDPR & αποστολή κωδικών — '+ben);
+  document.getElementById('modalTitle').innerText='ΕΓΓΡΑΦΟ GDPR & ΚΩΔΙΚΟΙ ΠΡΟΣΒΑΣΗΣ';
+  document.getElementById('reportModal').style.display='block';
+}
+
 /* =================== ΙΔΙΟΤΗΤΑ ΜμΕ (v26) =================== */
 function smeYears(){
   const y=new Date().getFullYear();
@@ -2981,6 +3164,24 @@ function calcDeMinimis(){
 /* =================== ΑΠΟΣΤΟΛΗ EMAIL (v24) =================== */
 let MAIL_PAYLOAD={to:'',cc:'',subject:'',body:''};
 let MAIL_LOG=[];
+function openSigModal(){
+  document.getElementById('sigText').value=localStorage.getItem('bcsa_sig_text')||'';
+  document.getElementById('sigEnabled').checked=(localStorage.getItem('bcsa_sig_on')==='1');
+  document.getElementById('sigModal').style.display='block';
+}
+function saveSignature(){
+  try{
+    localStorage.setItem('bcsa_sig_text',document.getElementById('sigText').value);
+    localStorage.setItem('bcsa_sig_on',document.getElementById('sigEnabled').checked?'1':'0');
+    document.getElementById('sigModal').style.display='none';
+    setSaveStatus('Η υπογραφή αποθηκεύτηκε.');
+  }catch(e){alert('Δεν ήταν δυνατή η αποθήκευση.');}
+}
+function getSignature(){
+  if(localStorage.getItem('bcsa_sig_on')!=='1')return '';
+  const t=(localStorage.getItem('bcsa_sig_text')||'').trim();
+  return t?('\n'+t):'';
+}
 function prepareMail(to,cc,subject,body){
   MAIL_PAYLOAD={to:to||'',cc:cc||'',subject:subject||'',body:body||''};
   const info=document.getElementById('mailPickInfo');
@@ -3006,11 +3207,28 @@ function mailOpen(kind){
 /* Μετατροπή HTML προεπισκόπησης σε απλό κείμενο για το σώμα του email */
 function htmlToPlain(html){
   const d=document.createElement('div');d.innerHTML=html;
-  d.querySelectorAll('li').forEach(li=>{li.textContent='• '+li.textContent.trim();});
+  /* Το πρώτο <p> είναι ο τίτλος θέματος — αφαιρείται από το σώμα */
+  const first=d.querySelector('p');
+  if(first&&/^\s*Θέμα\s*:/i.test(first.textContent))first.remove();
+  /* Σύνδεσμοι: εμφανίζεται το πλήρες URL ώστε να είναι κλικαρίσιμο και αντιγράψιμο */
+  d.querySelectorAll('a[href]').forEach(a=>{
+    const href=a.getAttribute('href')||'';
+    const txt=(a.textContent||'').trim();
+    a.replaceWith(document.createTextNode(href&&href!==txt?(txt+' '+href):(txt||href)));
+  });
+  /* Αριθμημένες λίστες */
+  d.querySelectorAll('ol').forEach(ol=>{
+    [...ol.children].forEach((li,i)=>{li.textContent=(i+1)+'. '+li.textContent.trim();});
+  });
+  d.querySelectorAll('ul li').forEach(li=>{li.textContent='- '+li.textContent.trim();});
   d.querySelectorAll('br').forEach(b=>b.replaceWith('\n'));
-  d.querySelectorAll('p,div,li,tr,h1,h2,h3,h4').forEach(e=>{e.append('\n');});
+  d.querySelectorAll('li').forEach(e=>e.append('\n'));
+  d.querySelectorAll('p,div,tr,h1,h2,h3,h4,table,ul,ol').forEach(e=>e.append('\n\n'));
   let t=d.textContent||'';
-  return t.replace(/\n{3,}/g,'\n\n').replace(/[ \t]{2,}/g,' ').trim()+'\n\nΜε εκτίμηση,\n';
+  t=t.replace(/\r/g,'')
+     .split('\n').map(l=>l.replace(/[ \t]{2,}/g,' ').trimEnd()).join('\n')
+     .replace(/\n{3,}/g,'\n\n').trim();
+  return t+'\n\nΜε εκτίμηση,'+getSignature()+'\n';
 }
 /* Ενιαίο κουμπί αποστολής μέσα στο παράθυρο προεπισκόπησης */
 function attachSendButton(to,cc,subject){
@@ -3415,7 +3633,7 @@ function handlePhase3Gate(){
   blocked.classList.toggle('hidden',gl.value!=='ΟΧΙ');
 }
 const GUIDELINES=[
- 'Προσβασιμότητα ΑμεΑ: να διασφαλιστεί τόσο στον φυσικό τόπο υλοποίησης όσο και ηλεκτρονικά. Εφόσον η επιχείρηση διαθέτει ή πρόκειται να αποκτήσει ιστοσελίδα ή e-shop, ο έλεγχος προσβασιμότητας γίνεται μέσω του εργαλείου WAVE (wave.webaim.org).',
+ 'Προσβασιμότητα ΑμεΑ: να διασφαλιστεί τόσο στον φυσικό τόπο υλοποίησης όσο και ηλεκτρονικά. Εφόσον η επιχείρηση διαθέτει ή πρόκειται να αποκτήσει ιστοσελίδα ή e-shop, ο έλεγχος προσβασιμότητας γίνεται μέσω εργαλείου ελέγχου συμμόρφωσης με το πρότυπο WCAG 2.1.',
  'Ανάρτηση έγχρωμης αφίσας μεγέθους Α3 στον χώρο του καταστήματος, καθώς και δημοσίευσή της στην ιστοσελίδα και στα μέσα κοινωνικής δικτύωσης της επιχείρησης.',
  'Όλες οι πληρωμές να πραγματοποιούνται από επαγγελματικό/εταιρικό λογαριασμό της επιχείρησης προς εταιρικό λογαριασμό του προμηθευτή.',
  'Οι καταθέσεις σε τράπεζα (ταμείο, ATM ή εσωτερικό ATM) να πραγματοποιούνται αποκλειστικά από τον νόμιμο εκπρόσωπο της επιχείρησης ή τον δικαιούχο.',
@@ -3480,15 +3698,15 @@ function clientsSave(){
   catch(e){alert('Δεν ήταν δυνατή η αποθήκευση — ο αποθηκευτικός χώρος του browser γέμισε. Κατεβάστε εφεδρικό αντίγραφο και διαγράψτε παλαιούς φακέλους.');return false;}
 }
 function resetForm(){
-  document.querySelectorAll('#tab_1 input, #tab_2 input, #tab_3 input').forEach(el=>{if(el.type!=='file')el.value='';});
-  document.querySelectorAll('#tab_2 select, #tab_3 select').forEach(el=>{el.value='';if(el.classList.contains('bg-neutral')||el.classList.contains('form-control'))colorStandard(el);});
+  document.querySelectorAll('#tab_1 input, #tab_2 input, #tab_5 input').forEach(el=>{if(el.type!=='file')el.value='';});
+  document.querySelectorAll('#tab_2 select, #tab_5 select').forEach(el=>{el.value='';if(el.classList.contains('bg-neutral')||el.classList.contains('form-control'))colorStandard(el);});
   ['gen_beneficiary','gen_projectCode','gen_program','gen_type','genActionType','genEvalType','gen_budget','gen_fee_total','gen_fee_submit','gen_contact','gen_email','gen_phone'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('fee_pct_total').value='3';
   document.getElementById('fee_pct_sub').value='13';
   document.getElementById('gen_fee_total').dataset.manual='0';
   document.getElementById('gen_fee_submit').dataset.manual='0';
-  ['eligibilityContainer','bpContainer','scoringContainer','docsContainer','expensesContainer','kadContainer','expGroupsContainer','smeLinkedContainer','smeSelfBody'].forEach(id=>{const c=document.getElementById(id);if(c)c.innerHTML='';});
-  initPhoneForm();initPhase3();initIndirect();initContacts();refreshExpGroupOptions();initSme();handlePhase3Gate();applyPhase3Mode();renderLifeline();if(document.getElementById('ind_active'))document.getElementById('ind_active').checked=false;calcIndirect();
+  ['eligibilityContainer','bpContainer','scoringContainer','docsContainer','expensesContainer','kadContainer','expGroupsContainer','smeLinkedContainer','smeSelfBody','bp4DocsContainer'].forEach(id=>{const c=document.getElementById(id);if(c)c.innerHTML='';});
+  initPhoneForm();initPhase3();initIndirect();initContacts();refreshExpGroupOptions();initSme();syncBp4();handlePhase3Gate();applyPhase3Mode();renderLifeline();if(document.getElementById('ind_active'))document.getElementById('ind_active').checked=false;calcIndirect();
   if(typeof refreshProgramDropdown==='function')refreshProgramDropdown();
   calcFees();evaluateProgress(0);calculateTotalScore();updateDynamicHeaders();
 }
@@ -3563,7 +3781,7 @@ function showWorkspace(on){
   setGeneralEnabled(on);
   const ll=document.getElementById('lifeline');if(ll)ll.style.display=on?'block':'none';
   document.getElementById('workspaceArea').style.display=on?'block':'none';
-  [1,2,3].forEach(i=>{document.getElementById('tabbtn_'+i).style.display=on?'inline-block':'none';});
+  [1,2,3,4,5].forEach(i=>{const b=document.getElementById('tabbtn_'+i);if(b)b.style.display=on?'inline-block':'none';});
   document.getElementById('backBtn').style.display=on?'inline-block':'none';
 }
 function clientProgress(c){
@@ -3661,7 +3879,7 @@ function refreshDashboard(){
   document.getElementById('dashBar2').style.width=v2+'%';
   document.getElementById('dashTxt2').innerText='Συμπλήρωση '+v2+'%';
   /* Φάση 3 */
-  const p3=[...document.querySelectorAll('#tab_3 select')];
+  const p3=[...document.querySelectorAll('#tab_5 select')];
   const v3=pctFilled(p3);
   document.getElementById('dashBar3').style.width=v3+'%';
   document.getElementById('dashTxt3').innerText='Συμπλήρωση '+v3+'%';
