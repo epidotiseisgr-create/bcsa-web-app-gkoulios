@@ -306,6 +306,50 @@ header{padding-left:110px;padding-right:110px;}
 .gate-box h4{margin:0 0 12px 0;color:#8a6d00;font-size:16px;}
 
 .owner-tag{display:inline-block;background:#f3ecf9;color:#4b2e6b;border-radius:10px;padding:2px 9px;font-size:11.5px;font-weight:bold;}
+
+/* ===== v20 ===== */
+.mail-bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:10px;padding-top:10px;border-top:1px dashed #ddd;}
+.mail-bar-lbl{font-size:11.5px;color:#666;font-weight:bold;}
+.btn-mail{background:#eef5ff;color:#1a56b0;border:1px solid #bcd8f5;border-radius:12px;padding:4px 11px;font-size:11.5px;cursor:pointer;font-weight:bold;}
+.btn-mail:hover{background:var(--secondary-blue);color:#fff;}
+.contact-row{display:flex;gap:8px;align-items:center;margin-bottom:7px;flex-wrap:wrap;}
+.contact-row .c-role{flex:1.2;min-width:150px;}
+.contact-row .c-name{flex:1.5;min-width:140px;}
+.contact-row .c-mail{flex:2;min-width:170px;}
+.contact-row .c-phone{flex:1;min-width:120px;}
+/* --- Γραμμή ζωής έργου --- */
+#lifeline{background:#fff;border:1px solid var(--border-color);border-radius:8px;padding:22px 26px 16px 26px;margin:24px 0 10px 0;}
+#lifeline h4{margin:0 0 20px 0;color:var(--primary-blue);font-size:15px;}
+.ll-wrap{position:relative;padding:44px 0 40px 0;}
+.ll-track{position:absolute;left:0;right:0;top:50%;height:6px;background:#3a3a3a;border-radius:3px;transform:translateY(-50%);}
+.ll-node{position:absolute;top:50%;width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid #3a3a3a;transform:translate(-50%,-50%);z-index:2;}
+.ll-seg{position:absolute;top:50%;height:6px;transform:translateY(-50%);border-radius:3px;z-index:1;}
+.ll-lbl{position:absolute;transform:translateX(-50%);text-align:center;font-size:12px;font-weight:bold;color:#333;width:150px;}
+.ll-lbl.top{bottom:calc(50% + 22px);}
+.ll-lbl.bot{top:calc(50% + 22px);}
+.ll-lbl small{display:block;font-weight:normal;color:#777;font-size:10.5px;margin-top:2px;}
+.ll-marker{position:absolute;top:50%;transform:translate(-50%,-50%);z-index:5;transition:left .5s ease;}
+.ll-marker .dot{width:30px;height:30px;border-radius:50%;background:var(--green);border:4px solid #fff;box-shadow:0 0 0 3px var(--green),0 2px 8px rgba(0,0,0,.3);}
+.ll-badge{position:absolute;left:50%;transform:translateX(-50%);bottom:38px;background:var(--green);color:#fff;font-size:11.5px;font-weight:bold;padding:4px 12px;border-radius:12px;white-space:nowrap;}
+.ll-badge:after{content:"";position:absolute;left:50%;bottom:-5px;margin-left:-5px;border:5px solid transparent;border-top-color:var(--green);}
+@media(max-width:760px){.ll-lbl{font-size:10px;width:90px;}.ll-lbl small{display:none;}}
+
+/* ===== v22 δαπάνες 3 επιπέδων ===== */
+.expg-row{display:flex;gap:8px;align-items:center;background:#fff;border:1px solid #cfe8cf;border-radius:5px;padding:9px;margin-bottom:7px;flex-wrap:wrap;}
+.expg-row .g-name{flex:3;min-width:180px;}
+.expg-row .g-ltype{width:62px;}
+.expg-row .g-lval{width:110px;}
+.expg-row .g-total{font-weight:bold;font-size:12.5px;white-space:nowrap;min-width:190px;text-align:right;}
+.expg-row.over{border-color:var(--red);background:#fdeaea;}
+.exp-sub{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.exp-sub .sub-desc{flex:3;min-width:170px;}
+.exp-sub .sub-net,.exp-sub .sub-gross{width:100%;}
+.exp-sub .ig{flex:1.2;min-width:130px;}
+.exp-sub .sub-vat{width:56px;text-align:center;}
+.exp-cat{flex:2.2;min-width:160px;}
+.exp-grp{flex:2;min-width:160px;}
+.exp-sub-total{font-weight:bold;color:var(--green);font-size:12.5px;white-space:nowrap;min-width:150px;text-align:right;}
+.vat-lbl{font-size:11px;color:#888;}
 </style>
 </head>
 <body>
@@ -355,7 +399,7 @@ header{padding-left:110px;padding-right:110px;}
   <button class="btn btn-outline" onclick="document.getElementById('fileInput').click()">📂 Άνοιγμα Φακέλου (Load)</button>
   <input type="file" id="fileInput" accept=".txt" style="display:none;" onchange="importDataAll(event)">
   <button class="btn btn-green" onclick="saveCurrentClient()">💾 Αποθήκευση Πελάτη</button>
-  <button class="btn btn-outline" onclick="exportDataAll()">⬇️ Εξαγωγή (.txt)</button>
+  <button class="btn btn-outline" style="display:none;" onclick="exportDataAll()">⬇️ Εξαγωγή (.txt)</button>
   <button class="btn" id="adminBtn" style="display:none;background:#4b2e6b;color:#fff;" onclick="openAdmin()">🛠️ Διαχείριση Προτύπων</button>
   <button class="btn" id="usersBtn" style="display:none;background:#1a56b0;color:#fff;" onclick="openUsers()">👥 Διαχείριση Χρηστών</button>
   <span id="cloudBadge" style="display:none;background:#eafaf1;color:#1e7e46;border:1px solid #b7e4c7;border-radius:12px;padding:4px 12px;font-size:12px;font-weight:bold;">☁</span>
@@ -387,6 +431,9 @@ header{padding-left:110px;padding-right:110px;}
           <option value="Νεοσύστατη">Νεοσύστατη</option><option value="Υφιστάμενη">Υφιστάμενη</option>
         </select>
       </div>
+      <div><label class="question-label">Υπεύθυνος Επικοινωνίας</label><input type="text" id="gen_contact" class="form-control" placeholder="Ονοματεπώνυμο"></div>
+      <div><label class="question-label">E-mail Πελάτη</label><input type="email" id="gen_email" class="form-control" placeholder="client@example.com"></div>
+      <div><label class="question-label">Τηλέφωνο Πελάτη</label><input type="text" id="gen_phone" class="form-control" placeholder="π.χ. 210 1234567"></div>
       <div><label class="question-label">Είδος Δράσης</label>
         <select id="genActionType" class="form-control" onchange="applyPhase3Mode()">
           <option value="">Επιλέξτε</option><option value="Επενδυτικό Πρόγραμμα">Επενδυτικό Πρόγραμμα</option>
@@ -440,7 +487,7 @@ header{padding-left:110px;padding-right:110px;}
       <span id="clientsCount" class="clients-count">0 φάκελοι</span>
     </div>
     <table class="clients-table">
-      <thead><tr><th>Πελάτης</th><th id="ownerCol" style="display:none;">Δημιουργός</th><th>Κωδικός Έργου</th><th>Πρόγραμμα</th><th>Ενημέρωση</th><th>Πρόοδος</th><th>Ενέργειες</th></tr></thead>
+      <thead><tr><th>Πελάτης</th><th id="ownerCol" style="display:none;">Δημιουργός</th><th>Επικοινωνία</th><th>Κωδικός Έργου</th><th>Πρόγραμμα</th><th>Ενημέρωση</th><th>Πρόοδος</th><th>Ενέργειες</th></tr></thead>
       <tbody id="clientsBody"></tbody>
     </table>
     <div class="dash-docs" style="margin-top:20px;">
@@ -452,7 +499,7 @@ header{padding-left:110px;padding-right:110px;}
       <button class="btn btn-outline" onclick="backupClients()">⬇️ Εφεδρικό αντίγραφο όλων των πελατών</button>
       <button class="btn btn-outline" onclick="document.getElementById('restoreFile').click()">⬆️ Επαναφορά από εφεδρικό</button>
       <input type="file" id="restoreFile" accept=".json" style="display:none;" onchange="restoreClients(event)">
-      <button class="btn btn-outline" onclick="document.getElementById('importFile').click()">📂 Εισαγωγή μεμονωμένου φακέλου (.txt)</button>
+      <button class="btn btn-outline" style="display:none;" onclick="document.getElementById('importFile').click()">📂 Εισαγωγή μεμονωμένου φακέλου (.txt)</button>
     </div>
   </div>
 
@@ -571,9 +618,15 @@ header{padding-left:110px;padding-right:110px;}
       <div class="form-row form-row-inline"><label>Έχουμε συμπεριλάβει όλες τις δαπάνες ανά κατηγορία σύμφωνα με τον οδηγό;</label><div><select id="exp_2" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
       <h4 style="margin-top:25px;color:var(--green);border-bottom:1px solid #eee;padding-bottom:5px;">Ανάλυση Επιμέρους Δαπανών</h4>
       <p style="font-size:13px;color:#555;">Ο έλεγχος υπέρβασης υπολογίζεται βάσει του «Προϋπολογισμού Επενδυτικού Σχεδίου» στα Γενικά Στοιχεία. Οι τέσσερις γραμμές τεκμηρίωσης ανά δαπάνη είναι <strong>προαιρετικές</strong> — συμπληρώστε όσες χρειάζεστε.</p>
+      <div style="background:#eef7ee;border:1px solid #cfe8cf;border-radius:6px;padding:14px;margin-bottom:16px;">
+        <h4 style="margin:0 0 4px 0;color:var(--green);font-size:15px;">ΟΜΑΔΕΣ ΔΑΠΑΝΩΝ &amp; ΑΝΩΤΑΤΑ ΟΡΙΑ</h4>
+        <p style="font-size:12.5px;color:#666;margin:0 0 10px 0;">Το ανώτατο όριο (% επί του Π/Υ ή ποσό σε €) ορίζεται <strong>ανά ομάδα δαπάνης</strong> — π.χ. «Μηχανήματα &amp; Εξοπλισμός». Ο έλεγχος γίνεται στο άθροισμα όλων των υποκατηγοριών της ομάδας.</p>
+        <div id="expGroupsContainer"></div>
+        <button class="btn-add" style="color:var(--green);border-color:var(--green);background:#eafaf1;" onclick="addExpGroup()">+ Προσθήκη ομάδας δαπάνης</button>
+      </div>
       <div id="expensesContainer"></div>
       <div id="indirectContainer"></div>
-      <button class="btn-add" style="color:var(--green);border-color:var(--green);background:#eafaf1;" onclick="addExpenseRow()">+ Προσθήκη Δαπάνης</button>
+      <button class="btn-add" style="color:var(--green);border-color:var(--green);background:#eafaf1;" onclick="addExpenseRow()">+ Προσθήκη Υποκατηγορίας Δαπάνης</button>
       <button class="btn btn-green" style="margin-top:8px;" onclick="exportExpensesExcel()">⬇️ Excel Δαπανών</button>
     </div>
 
@@ -621,7 +674,20 @@ header{padding-left:110px;padding-right:110px;}
       </div>
     </div>
     <div id="ph3_invoiceMode">
+    <div style="background:#fff8e6;border:2px solid #f1c232;border-radius:8px;padding:14px 16px;margin-bottom:18px;">
+      <strong style="color:#8a6d00;font-size:14px;">⚠ Συμβουλευτείτε τον οδηγό του προγράμματος</strong>
+      <p style="margin:6px 0 0 0;font-size:13px;color:#6b5600;line-height:1.55;">Τα δικαιολογητικά που εμφανίζονται παρακάτω αποτελούν <strong>πλήρη προεπιλεγμένη λίστα</strong>. Κάθε πρόγραμμα ορίζει τα δικά του απαιτούμενα δικαιολογητικά, τα οποία συχνά είναι <strong>λιγότερα</strong>. Πριν ζητήσετε οτιδήποτε από τον δικαιούχο, ελέγξτε τον οδηγό της δράσης και σημειώστε ως «Δεν απαιτείται» ό,τι δεν προβλέπεται — ώστε να μην επιβαρύνετε άσκοπα τον πελάτη και να μη διογκώνεται η αναφορά ελλείψεων.</p>
+    </div>
+    <div class="card-section" style="border-left-color:#1a56b0;">
+      <h3>ΕΠΑΦΕΣ ΕΡΓΟΥ</h3>
+      <p style="font-size:12.5px;color:#666;margin-top:-6px;">Τα στοιχεία χρησιμοποιούνται για την αυτόματη αποστολή email ανά παραστατικό.</p>
+      <div id="contactsContainer"></div>
+      <button class="btn-add" onclick="addContactRow()">+ Προσθήκη επαφής</button>
+    </div>
     <div class="forms-grid" id="formsContainer"></div>
+    <div style="text-align:center;margin:14px 0;">
+      <button class="btn-add" style="max-width:280px;color:#b58900;border-color:#b58900;background:#fdf9eb;" onclick="addInvoiceCard()">+ Προσθήκη Παραστατικού</button>
+    </div>
     <div class="bottom-actions">
       <button class="btn" onclick="openReportModal()">📧 Δημιουργία Αναφοράς Ελλείψεων</button>
     </div>
@@ -637,6 +703,11 @@ header{padding-left:110px;padding-right:110px;}
   &copy; 2026 Κατασκευή και ανάπτυξη λογισμικού: <strong>Ευάγγελος Γκούλιος</strong>. Με την επιφύλαξη παντός δικαιώματος.
 </footer>
 
+</div>
+
+<div id="lifeline">
+  <h4>ΓΡΑΜΜΗ ΖΩΗΣ ΕΡΓΟΥ</h4>
+  <div class="ll-wrap" id="llWrap"></div>
 </div>
 
 <div id="reportModal" class="modal">
@@ -740,6 +811,17 @@ header{padding-left:110px;padding-right:110px;}
         <div id="admP3S2"></div><button class="adm-addbtn" onclick="admAddLine('admP3S2')">+ Προσθήκη</button>
         <strong style="font-size:13px;color:#4b2e6b;display:block;margin-top:12px;">Τελική Δόση</strong>
         <div id="admP3F"></div><button class="adm-addbtn" onclick="admAddLine('admP3F')">+ Προσθήκη</button>
+      </div></div>
+
+    <div class="adm-sec" id="admSecExpDocs"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 3 · Δικαιολογητικά ανά κατηγορία δαπάνης</span><span>▾</span></h4>
+      <div class="adm-body">
+        <p class="adm-hint">Επιλέξτε κατηγορία και προσαρμόστε τη λίστα για το συγκεκριμένο πρόγραμμα. Οι αλλαγές ισχύουν μόνο για αυτό το πρόγραμμα — οι προεπιλογές του συστήματος παραμένουν ανέπαφες.</p>
+        <div class="adm-row">
+          <select id="admExpCat" class="grow" onchange="admLoadExpDocs()"></select>
+          <button class="adm-addbtn" onclick="admResetExpDocs()">↻ Επαναφορά προεπιλογών</button>
+        </div>
+        <div id="admExpDocs"></div>
+        <button class="adm-addbtn" onclick="admAddLine('admExpDocs')">+ Προσθήκη δικαιολογητικού</button>
       </div></div>
 
     <div class="adm-sec" id="admSecP3Extra"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 3 · Επιπλέον δικαιολογητικά ανά κατηγορία (για προγράμματα με παραστατικά)</span><span>▾</span></h4>
@@ -928,7 +1010,9 @@ function showLoginErr(msg){const e=document.getElementById('loginError');e.inner
 document.getElementById("passwordInput").addEventListener("keypress",e=>{if(e.key==="Enter")checkPassword();});
 
 /* =================== TABS =================== */
+let CURRENT_TAB=1;
 function switchTab(n){
+  if(n>=1&&n<=3)CURRENT_TAB=n;
   if(typeof saveCurrentClient==='function')saveCurrentClient(true);
   if(document.getElementById('tab_0')&&document.getElementById('tabbtn_0')){document.getElementById('tab_0').classList.remove('active');document.getElementById('tabbtn_0').classList.remove('active');if(n===0){document.getElementById('tab_0').classList.add('active');document.getElementById('tabbtn_0').classList.add('active');[1,2,3].forEach(i=>{document.getElementById('tab_'+i).classList.remove('active');document.getElementById('tabbtn_'+i).classList.remove('active');});window.scrollTo(0,0);renderClients();refreshDashboard();return;}}
   for(let i=1;i<=3;i++){
@@ -1173,7 +1257,7 @@ function generatePhoneReport(){
   /* Κλείσιμο */
   html+=`<p>Βάσει της καταγραφής, πληρούνται οι αρχικές προϋποθέσεις και αναμένουμε να προχωρήσουμε στο επόμενο βήμα της διαδικασίας. Εντός των επόμενων ημερών θα οριστεί το επόμενο meeting (διά ζώσης ή online), όπου θα γίνουν ερωτήσεις επιλεξιμότητας, ερωτήσεις για τα βαθμολογούμενα κριτήρια, καταγραφή των δαπανών και —εφόσον απαιτείται— στοχευμένες ερωτήσεις για τη δημιουργία του Business Plan.</p><p>Παραμένουμε στη διάθεσή σας για οποιαδήποτε απορία.</p>`;
   document.getElementById('reportOutput').innerHTML=html;
-  const _xb=document.getElementById('reportExcelBtn');if(_xb)_xb.style.display='none';
+  const _xb=document.getElementById('reportExcelBtn');if(_xb)_xb.style.display='none';{const _mb=document.getElementById('mailSendBtn');if(_mb)_mb.style.display='none';}
   document.getElementById('modalTitle').innerText="ΠΡΟΣΧΕΔΙΟ EMAIL - ΤΗΛΕΦΩΝΙΚΗ";
   document.getElementById('reportModal').style.display='block';
 }
@@ -1231,12 +1315,40 @@ function calcIndirect(){
   row.style.opacity=on?'1':'.45';
   const pct=parseGreekNumber(document.getElementById('ind_pct').value)||0;
   let base=0;
-  document.querySelectorAll('#expensesContainer .expense-row .sub-net').forEach(n=>base+=parseGreekNumber(n.value));
+  document.querySelectorAll('#expensesContainer .sub-net').forEach(n=>base+=parseGreekNumber(n.value));
   const val=on?base*(pct/100):0;
   document.getElementById('ind_net').value=on?expFmt(val).replace(' €',''):'';
   document.getElementById('ind_total').innerText='Σύνολο: '+expFmt(val);
   document.getElementById('ind_status').innerHTML=on?'✅':'';
   return val;
+}
+function addExpGroup(name,ltype,lval){
+  const c=document.getElementById('expGroupsContainer');if(!c)return;
+  const d=document.createElement('div');d.className='expg-row';
+  d.innerHTML='<input type="text" class="form-control g-name" placeholder="Ομάδα δαπάνης (π.χ. Μηχανήματα &amp; Εξοπλισμός)" value="'+String(name||'').replace(/"/g,'&quot;')+'" oninput="refreshExpGroupOptions();evaluateAllExpenses();">'+
+    '<span class="vat-lbl">Όριο</span>'+
+    '<select class="form-control g-ltype" onchange="evaluateAllExpenses()"><option value="%"'+(ltype==='%'?' selected':'')+'>%</option><option value="€"'+(ltype==='€'?' selected':'')+'>€</option></select>'+
+    '<input type="text" class="form-control g-lval" placeholder="τιμή" value="'+String(lval||'').replace(/"/g,'&quot;')+'" oninput="evaluateAllExpenses()">'+
+    '<span class="g-total">—</span>'+
+    '<button class="btn-remove" onclick="this.parentElement.remove();refreshExpGroupOptions();evaluateAllExpenses();">×</button>';
+  c.appendChild(d);
+  refreshExpGroupOptions();
+}
+function getExpGroups(){
+  return [...document.querySelectorAll('#expGroupsContainer .expg-row')].map(r=>({
+    name:r.querySelector('.g-name').value.trim(),
+    ltype:r.querySelector('.g-ltype').value,
+    lval:r.querySelector('.g-lval').value.trim(),
+    el:r
+  })).filter(g=>g.name);
+}
+function refreshExpGroupOptions(){
+  const names=getExpGroups().map(g=>g.name);
+  document.querySelectorAll('#expensesContainer .exp-grp').forEach(sel=>{
+    const cur=sel.value;
+    sel.innerHTML='<option value="">— Ομάδα δαπάνης —</option>'+names.map(n=>'<option value="'+n.replace(/"/g,'&quot;')+'">'+n+'</option>').join('');
+    if(names.includes(cur))sel.value=cur;
+  });
 }
 function addExpenseRow(){
   const c=document.getElementById('expensesContainer');const rowId=`exp_row_${dynIds++}`;
@@ -1244,48 +1356,79 @@ function addExpenseRow(){
   let subs='';
   for(let i=0;i<4;i++){
     subs+=`<div class="exp-sub">
-      <input type="text" class="form-control sub-desc" placeholder="Τεκμηρίωση δαπάνης ${i+1} (προαιρετικό)">
-      <div class="input-group"><input type="text" class="form-control sub-net" placeholder="Καθαρή Αξία" oninput="evaluateExpense(this)" onblur="formatField(this,'currency')"><span class="addon">€</span></div>
-      <select class="form-control sub-ltype" onchange="evaluateExpense(this)"><option value="%">%</option><option value="€">€</option></select>
-      <input type="text" class="form-control sub-lval" placeholder="Όριο" oninput="evaluateExpense(this)">
-      <span class="sub-status"></span>
+      <input type="text" class="form-control sub-desc" placeholder="Τεκμηρίωση δαπάνης ${i+1} — π.χ. Ψυγείο μοντέλο Χ (προαιρετικό)">
+      <div class="input-group ig"><input type="text" class="form-control sub-net" placeholder="Καθαρή αξία" oninput="onNetInput(this)" onblur="formatField(this,'currency');evaluateExpense(this)"><span class="addon">€</span></div>
+      <div class="input-group ig"><input type="text" class="form-control sub-gross" placeholder="Συνολική αξία" oninput="onGrossInput(this)" onblur="formatField(this,'currency');evaluateExpense(this)"><span class="addon">€</span></div>
+      <span class="vat-lbl">ΦΠΑ</span><input type="text" class="form-control sub-vat" value="24" oninput="onNetInput(this.closest('.exp-sub').querySelector('.sub-net'))">
+      <span class="vat-lbl">%</span>
     </div>`;
   }
   row.innerHTML=`<div class="exp-main-head">
-      <input type="text" class="form-control exp-desc" placeholder="Περιγραφή Κύριας Δαπάνης" style="flex:3;">
-      <input type="text" class="form-control exp-opske" placeholder="Κωδικός ΟΠΣΚΕ" style="flex:1.3;">
-      <span class="exp-main-total">Σύνολο: 0,00 €</span>
+      <select class="form-control exp-grp" onchange="evaluateAllExpenses()"></select>
+      <input type="text" class="form-control exp-cat" placeholder="Υποκατηγορία / Χαρακτηρισμός (π.χ. Παραγωγικός &amp; Μηχανολογικός Εξοπλισμός)">
+      <input type="text" class="form-control exp-opske" placeholder="Κωδικός ΟΠΣΚΕ" style="flex:1;min-width:110px;">
+      <span class="exp-sub-total">Σύνολο: 0,00 €</span>
       <div class="move-col"><button class="btn-move" title="Μετακίνηση πάνω" onclick="moveExpense(this,-1)">▲</button><button class="btn-move" title="Μετακίνηση κάτω" onclick="moveExpense(this,1)">▼</button></div>
       <button class="btn-remove" onclick="document.getElementById('${rowId}').remove();evaluateAllExpenses();">×</button>
     </div>
     <div class="exp-subs">${subs}</div>`;
   c.appendChild(row);
+  refreshExpGroupOptions();
+}
+/* --- ΦΠΑ: αμφίδρομος υπολογισμός --- */
+function vatOf(sub){const v=parseGreekNumber(sub.querySelector('.sub-vat').value);return isFinite(v)?v:24;}
+function onNetInput(el){
+  const sub=el.closest('.exp-sub');if(!sub)return;
+  const net=parseGreekNumber(sub.querySelector('.sub-net').value);
+  const g=sub.querySelector('.sub-gross');
+  if(document.activeElement===g)return;
+  g.value=net>0?expFmt(net*(1+vatOf(sub)/100)).replace(' €',''):'';
+  evaluateExpense(el);
+}
+function onGrossInput(el){
+  const sub=el.closest('.exp-sub');if(!sub)return;
+  const gross=parseGreekNumber(sub.querySelector('.sub-gross').value);
+  const n=sub.querySelector('.sub-net');
+  if(document.activeElement===n)return;
+  n.value=gross>0?expFmt(gross/(1+vatOf(sub)/100)).replace(' €',''):'';
+  evaluateExpense(el);
 }
 function expFmt(v){return (v||0).toLocaleString('el-GR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';}
-function evaluateSub(sub){
-  const netI=sub.querySelector('.sub-net');
-  const ltype=sub.querySelector('.sub-ltype').value;
-  const lval=parseGreekNumber(sub.querySelector('.sub-lval').value);
-  const icon=sub.querySelector('.sub-status');
-  const netVal=parseGreekNumber(netI.value);
-  const budgetVal=parseGreekNumber(document.getElementById('gen_budget').value);
-  if(netVal===0&&lval===0){icon.innerHTML='';netI.style.borderColor='var(--border-color)';return;}
-  let maxAllowed=Infinity;
-  if(lval>0){maxAllowed=(ltype==='%')?budgetVal*(lval/100):lval;}
-  if(lval>0&&netVal>maxAllowed){icon.innerHTML='❌';icon.title='Υπέρβαση ορίου';netI.style.borderColor='var(--red)';}
-  else if(netVal>0){icon.innerHTML='✅';icon.title='Εντός ορίου';netI.style.borderColor='var(--green)';}
-  else{icon.innerHTML='';netI.style.borderColor='var(--border-color)';}
-}
-function updateExpTotal(row){
-  let total=0;row.querySelectorAll('.sub-net').forEach(n=>total+=parseGreekNumber(n.value));
-  const t=row.querySelector('.exp-main-total');if(t)t.innerText='Σύνολο: '+expFmt(total);
+function subRowTotal(row){
+  let t=0;row.querySelectorAll('.sub-net').forEach(n=>t+=parseGreekNumber(n.value));return t;
 }
 function evaluateExpense(element){
-  const sub=element.closest('.exp-sub');if(sub)evaluateSub(sub);
-  const row=element.closest('.expense-row');if(row)updateExpTotal(row);
+  const row=element.closest('.expense-row');
+  if(row){const t=row.querySelector('.exp-sub-total');if(t)t.innerText='Σύνολο: '+expFmt(subRowTotal(row));}
+  evaluateAllExpenses();
+}
+function evaluateAllExpenses(){
+  const budget=parseGreekNumber(document.getElementById('gen_budget').value);
+  /* σύνολα ανά υποκατηγορία */
+  document.querySelectorAll('#expensesContainer .expense-row').forEach(r=>{
+    const t=r.querySelector('.exp-sub-total');if(t)t.innerText='Σύνολο: '+expFmt(subRowTotal(r));
+  });
+  /* σύνολα & έλεγχος ανά ομάδα */
+  getExpGroups().forEach(g=>{
+    let sum=0;
+    document.querySelectorAll('#expensesContainer .expense-row').forEach(r=>{
+      const sel=r.querySelector('.exp-grp');
+      if(sel&&sel.value===g.name)sum+=subRowTotal(r);
+    });
+    const lval=parseGreekNumber(g.lval);
+    let maxA=Infinity,txt='Σύνολο: '+expFmt(sum);
+    if(lval>0){
+      maxA=(g.ltype==='%')?budget*(lval/100):lval;
+      txt+=' / όριο '+expFmt(maxA);
+    }
+    const over=(lval>0&&sum>maxA);
+    g.el.classList.toggle('over',over);
+    const te=g.el.querySelector('.g-total');
+    te.innerText=(over?'❌ ':(sum>0?'✅ ':''))+txt;
+    te.style.color=over?'var(--red)':'var(--green)';
+  });
   calcIndirect();
 }
-function evaluateAllExpenses(){document.querySelectorAll('#expensesContainer .expense-row').forEach(row=>{row.querySelectorAll('.exp-sub').forEach(evaluateSub);updateExpTotal(row);});calcIndirect();}
 function updateDocLink(key){
   const inp=document.getElementById('doclink_'+key);
   const a=document.getElementById('doclinka_'+key);
@@ -1298,46 +1441,79 @@ function getDocLinks(){
 }
 function buildExpensesData(){
   const budget=parseGreekNumber(document.getElementById('gen_budget').value);
+  const groups=getExpGroups();
   const out=[];
-  document.querySelectorAll('#expensesContainer .expense-row').forEach(r=>{
-    const desc=r.querySelector('.exp-desc').value.trim();
-    const opske=r.querySelector('.exp-opske').value.trim();
-    const subs=[];let total=0;
-    r.querySelectorAll('.exp-sub').forEach(s=>{
-      const sd=s.querySelector('.sub-desc').value.trim();
-      const net=parseGreekNumber(s.querySelector('.sub-net').value);
-      const ltype=s.querySelector('.sub-ltype').value;
-      const lval=parseGreekNumber(s.querySelector('.sub-lval').value);
-      if(!sd&&net===0&&lval===0)return;
-      let maxA=Infinity,status='';
-      if(lval>0){maxA=(ltype==='%')?budget*(lval/100):lval;status=(net>maxA)?'Υπέρβαση':'Εντός ορίου';}
-      subs.push({desc:sd,net:net,ltype:ltype,lval:lval,status:status});
-      total+=net;
+  groups.forEach(g=>{
+    const lval=parseGreekNumber(g.lval);
+    const maxA=lval>0?((g.ltype==='%')?budget*(lval/100):lval):Infinity;
+    const cats=[];let gsum=0;
+    document.querySelectorAll('#expensesContainer .expense-row').forEach(r=>{
+      const sel=r.querySelector('.exp-grp');
+      if(!sel||sel.value!==g.name)return;
+      const items=[];let csum=0;
+      r.querySelectorAll('.exp-sub').forEach(s=>{
+        const d=s.querySelector('.sub-desc').value.trim();
+        const net=parseGreekNumber(s.querySelector('.sub-net').value);
+        const gross=parseGreekNumber(s.querySelector('.sub-gross').value);
+        const vat=parseGreekNumber(s.querySelector('.sub-vat').value)||24;
+        if(!d&&net===0)return;
+        items.push({desc:d,net:net,gross:gross,vat:vat});csum+=net;
+      });
+      if(!r.querySelector('.exp-cat').value.trim()&&!items.length)return;
+      cats.push({cat:r.querySelector('.exp-cat').value.trim(),opske:r.querySelector('.exp-opske').value.trim(),items:items,total:csum});
+      gsum+=csum;
     });
-    if(!desc&&!subs.length)return;
-    out.push({desc:desc,opske:opske,subs:subs,total:total});
+    if(!cats.length&&lval<=0)return;
+    out.push({group:g.name,ltype:g.ltype,lval:lval,limit:maxA,cats:cats,total:gsum,
+              status:(lval>0?(gsum>maxA?'Υπέρβαση':'Εντός ορίου'):'')});
   });
+  /* δαπάνες χωρίς ομάδα */
+  const orphan=[];let osum=0;
+  document.querySelectorAll('#expensesContainer .expense-row').forEach(r=>{
+    const sel=r.querySelector('.exp-grp');
+    if(sel&&sel.value)return;
+    const items=[];let csum=0;
+    r.querySelectorAll('.exp-sub').forEach(s=>{
+      const d=s.querySelector('.sub-desc').value.trim();
+      const net=parseGreekNumber(s.querySelector('.sub-net').value);
+      const gross=parseGreekNumber(s.querySelector('.sub-gross').value);
+      if(!d&&net===0)return;
+      items.push({desc:d,net:net,gross:gross,vat:parseGreekNumber(s.querySelector('.sub-vat').value)||24});csum+=net;
+    });
+    const cn=r.querySelector('.exp-cat').value.trim();
+    if(!cn&&!items.length)return;
+    orphan.push({cat:cn,opske:r.querySelector('.exp-opske').value.trim(),items:items,total:csum});osum+=csum;
+  });
+  if(orphan.length)out.push({group:'(χωρίς ομάδα)',ltype:'',lval:0,limit:Infinity,cats:orphan,total:osum,status:''});
+  /* έμμεσες */
   const ia=document.getElementById('ind_active');
   if(ia&&ia.checked){
     const v=calcIndirect()||0;
     const pct=document.getElementById('ind_pct').value||'7';
-    out.push({desc:document.getElementById('ind_desc').value||'Έμμεσες δαπάνες',opske:document.getElementById('ind_opske').value||'',
-      subs:[{desc:'Σταθερό ποσοστό '+pct+'% επί των λοιπών δαπανών',net:v,ltype:'%',lval:parseGreekNumber(pct),status:'Εντός ορίου'}],
-      total:v,indirect:true});
+    out.push({group:document.getElementById('ind_desc').value||'Έμμεσες δαπάνες',ltype:'%',lval:parseGreekNumber(pct),limit:v,
+      cats:[{cat:'Σταθερό ποσοστό '+pct+'% επί των λοιπών δαπανών',opske:document.getElementById('ind_opske').value||'',
+             items:[{desc:'Αυτόματος υπολογισμός',net:v,gross:v,vat:0}],total:v}],
+      total:v,status:'Εντός ορίου',indirect:true});
   }
   return out;
 }
 function expensesToHtmlTable(){
   const data=buildExpensesData();
   if(!data.length)return '';
-  let h='<table class="exp-table"><thead><tr><th>Κύρια Δαπάνη</th><th>ΟΠΣΚΕ</th><th>Τεκμηρίωση</th><th>Καθαρή Αξία</th><th>Όριο</th><th>Έλεγχος</th></tr></thead><tbody>';
-  data.forEach(d=>{
-    h+=`<tr class="exp-main-tr"><td>${d.desc||'-'}</td><td>${d.opske||'-'}</td><td></td><td class="num">${expFmt(d.total)}</td><td></td><td></td></tr>`;
-    d.subs.forEach(s=>{
-      const lim=s.lval>0?(s.ltype==='%'?s.lval+'%':expFmt(s.lval)):'-';
-      h+=`<tr><td></td><td></td><td>${s.desc||'-'}</td><td class="num">${expFmt(s.net)}</td><td>${lim}</td><td>${s.status||''}</td></tr>`;
+  let grand=0;
+  let h='<table class="exp-table"><thead><tr><th>Ομάδα / Υποκατηγορία</th><th>ΟΠΣΚΕ</th><th>Τεκμηρίωση</th><th>Καθαρή Αξία</th><th>Συνολική Αξία</th><th>Όριο ομάδας</th></tr></thead><tbody>';
+  data.forEach(g=>{
+    grand+=g.total;
+    const lim=g.lval>0?((g.ltype==='%')?(g.lval+'% ('+expFmt(g.limit)+')'):expFmt(g.limit)):'—';
+    h+=`<tr class="exp-main-tr"><td colspan="3">${g.indirect?'🔒 ':''}${g.group||'-'}</td><td class="num">${expFmt(g.total)}</td><td></td><td>${lim}${g.status?(' · <strong>'+g.status+'</strong>'):''}</td></tr>`;
+    g.cats.forEach(c=>{
+      h+=`<tr><td style="padding-left:22px;"><em>${c.cat||'-'}</em></td><td>${c.opske||'-'}</td><td></td><td class="num">${expFmt(c.total)}</td><td></td><td></td></tr>`;
+      c.items.forEach(it=>{
+        h+=`<tr><td></td><td></td><td style="padding-left:14px;">${it.desc||'-'}</td><td class="num">${expFmt(it.net)}</td><td class="num">${expFmt(it.gross)}</td><td></td></tr>`;
+      });
     });
   });
+  h+=`<tr class="exp-main-tr"><td colspan="3"><strong>ΓΕΝΙΚΟ ΣΥΝΟΛΟ</strong></td><td class="num"><strong>${expFmt(grand)}</strong></td><td></td><td></td></tr>`;
   h+='</tbody></table>';
   return h;
 }
@@ -1361,9 +1537,8 @@ async function exportExpensesExcel(){
   const budget=document.getElementById('gen_budget').value||'';
   const wb=new ExcelJS.Workbook();
   const ws=wb.addWorksheet('Δαπάνες',{views:[{state:'frozen',ySplit:5}]});
-  ws.columns=[{width:38},{width:16},{width:40},{width:18},{width:10},{width:14},{width:16}];
+  ws.columns=[{width:40},{width:14},{width:42},{width:16},{width:16},{width:9},{width:20}];
 
-  /* Επικεφαλίδα εγγράφου */
   ws.mergeCells('A1:G1');
   const t=ws.getCell('A1');t.value='ΑΝΑΛΥΣΗ ΔΑΠΑΝΩΝ ΕΠΕΝΔΥΤΙΚΟΥ ΣΧΕΔΙΟΥ';
   t.font={bold:true,size:14,color:{argb:'FFFFFFFF'}};
@@ -1375,65 +1550,61 @@ async function exportExpensesExcel(){
   ws.getCell('A3').font={size:10,color:{argb:'FF555555'}};
   ws.addRow([]);
 
-  /* Κεφαλίδες πίνακα */
-  const hdr=ws.addRow(['Κύρια Δαπάνη','Κωδικός ΟΠΣΚΕ','Τεκμηρίωση Δαπάνης','Καθαρή Αξία (€)','Τύπος Ορίου','Όριο','Έλεγχος']);
+  const hdr=ws.addRow(['Ομάδα / Υποκατηγορία / Τεκμηρίωση','ΟΠΣΚΕ','Περιγραφή','Καθαρή Αξία (€)','Συνολική Αξία (€)','ΦΠΑ %','Όριο / Έλεγχος']);
   hdr.eachCell({includeEmpty:true},c=>{
     c.font={bold:true,color:{argb:'FFFFFFFF'}};
     c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF1A56B0'}};
     c.alignment={horizontal:'center',vertical:'middle',wrapText:true};
     expBorder(c);
   });
-  hdr.height=24;
+  hdr.height=26;
 
   let grand=0;
-  data.forEach((d,di)=>{
-    const color=d.indirect?'FFFDF0C8':EXP_PALETTE[di%EXP_PALETTE.length];
-    /* Γραμμή κύριας δαπάνης */
-    const r=ws.addRow([(d.indirect?'🔒 ':'')+(d.desc||'-'),d.opske||'',d.indirect?'ΣΤΑΘΕΡΗ ΔΑΠΑΝΗ (αυτόματος υπολογισμός)':' ',d.total,'','','']);
+  data.forEach((g,gi)=>{
+    const color=g.indirect?'FFFDF0C8':EXP_PALETTE[gi%EXP_PALETTE.length];
+    let limTxt='—';
+    if(g.lval>0)limTxt=(g.ltype==='%')?(g.lval+'% = '+expFmt(g.limit)):expFmt(g.limit);
+    if(g.status)limTxt+='  ['+g.status+']';
+    /* ΕΠΙΠΕΔΟ 1 — Ομάδα */
+    const r=ws.addRow([(g.indirect?'🔒 ':'')+g.group,'','',g.total,'','',limTxt]);
     r.eachCell({includeEmpty:true},c=>{
-      c.font={bold:true,size:11.5,color:{argb:d.indirect?'FF7A5C00':'FF1F3864'}};
+      c.font={bold:true,size:12,color:{argb:g.status==='Υπέρβαση'?'FFC00000':'FF1F3864'}};
       c.fill={type:'pattern',pattern:'solid',fgColor:{argb:color}};
-      expBorder(c);
+      const m={style:'medium',color:{argb:'FF808080'}};c.border={top:m,left:m,bottom:m,right:m};
     });
-    r.getCell(4).numFmt='#,##0.00 "€"';
-    r.getCell(4).alignment={horizontal:'right'};
-    r.height=20;
-    /* Υποδαπάνες */
-    d.subs.forEach(s=>{
-      const sr=ws.addRow(['','',s.desc||'-',s.net,s.ltype||'',s.lval||'',s.status||'']);
-      sr.eachCell({includeEmpty:true},c=>{expBorder(c);c.font={size:10.5};});
-      sr.getCell(3).alignment={indent:1,wrapText:true};
-      sr.getCell(4).numFmt='#,##0.00 "€"';
-      sr.getCell(4).alignment={horizontal:'right'};
-      sr.getCell(5).alignment={horizontal:'center'};
-      sr.getCell(6).alignment={horizontal:'right'};
-      if(s.status==='Υπέρβαση'){sr.getCell(7).font={bold:true,color:{argb:'FFC00000'}};sr.getCell(7).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFDE7E7'}};}
-      else if(s.status==='Εντός ορίου'){sr.getCell(7).font={color:{argb:'FF1E7E46'}};}
-      sr.getCell(7).alignment={horizontal:'center'};
+    r.getCell(4).numFmt='#,##0.00 "€"';r.getCell(4).alignment={horizontal:'right'};
+    r.height=22;
+    /* ΕΠΙΠΕΔΟ 2 — Υποκατηγορία */
+    g.cats.forEach(c2=>{
+      const cr=ws.addRow(['    ▸ '+(c2.cat||'-'),c2.opske||'','',c2.total,'','','']);
+      cr.eachCell({includeEmpty:true},c=>{
+        c.font={bold:true,size:11,italic:true,color:{argb:'FF444444'}};
+        c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF4F4F4'}};
+        expBorder(c);
+      });
+      cr.getCell(4).numFmt='#,##0.00 "€"';cr.getCell(4).alignment={horizontal:'right'};
+      /* ΕΠΙΠΕΔΟ 3 — Τεκμηριώσεις */
+      c2.items.forEach(it=>{
+        const ir=ws.addRow(['','','        • '+(it.desc||'-'),it.net,it.gross,it.vat,'']);
+        ir.eachCell({includeEmpty:true},c=>{expBorder(c);c.font={size:10.5};});
+        ir.getCell(3).alignment={wrapText:true};
+        ir.getCell(4).numFmt='#,##0.00 "€"';ir.getCell(4).alignment={horizontal:'right'};
+        ir.getCell(5).numFmt='#,##0.00 "€"';ir.getCell(5).alignment={horizontal:'right'};
+        ir.getCell(6).alignment={horizontal:'center'};
+      });
     });
-    /* Μερικό σύνολο */
-    const st=ws.addRow(['','','Μερικό σύνολο δαπάνης',d.total,'','','']);
-    st.eachCell({includeEmpty:true},c=>{
-      c.font={bold:true,size:11};
-      c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF0F0F0'}};
-      expBorder(c);
-    });
-    st.getCell(4).numFmt='#,##0.00 "€"';
-    st.getCell(4).alignment={horizontal:'right'};
     ws.addRow([]);
-    grand+=d.total;
+    grand+=g.total;
   });
 
-  /* Γενικό σύνολο */
-  const g=ws.addRow(['','','ΓΕΝΙΚΟ ΣΥΝΟΛΟ',grand,'','','']);
-  g.eachCell({includeEmpty:true},c=>{
+  const gr=ws.addRow(['ΓΕΝΙΚΟ ΣΥΝΟΛΟ','','',grand,'','','']);
+  gr.eachCell({includeEmpty:true},c=>{
     c.font={bold:true,size:12.5,color:{argb:'FFFFFFFF'}};
     c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF1E7E46'}};
     const t2={style:'medium',color:{argb:'FF14532D'}};c.border={top:t2,left:t2,bottom:t2,right:t2};
   });
-  g.getCell(4).numFmt='#,##0.00 "€"';
-  g.getCell(4).alignment={horizontal:'right'};
-  g.height=22;
+  gr.getCell(4).numFmt='#,##0.00 "€"';gr.getCell(4).alignment={horizontal:'right'};
+  gr.height=22;
 
   const buf=await wb.xlsx.writeBuffer();
   const blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
@@ -1545,16 +1716,17 @@ function generateMeetingReport(type){
   }
   document.getElementById('reportOutput').innerHTML=html;
   document.getElementById('reportExcelBtn').style.display=reportShowExcel?'inline-block':'none';
+  {const _mb=document.getElementById('mailSendBtn');if(_mb)_mb.style.display='none';}
   document.getElementById('reportModal').style.display='block';
 }
 /* =================== ΦΑΣΗ 3: ΔΙΚΑΙΟΛΟΓΗΤΙΚΑ ΠΑΡΑΣΤΑΤΙΚΩΝ =================== */
-const invoiceCount=6;
+let invoiceCount=4;
 const optionsData={
   biblia:["","Β κατηγορίας","Γ κατηγορίας"],
   timologio:["","Ελλάδα","Εξωτερικό"],
   exoflisi:["","Με μετρητά","Με κατάθεση","Με τραπεζικό μέσο"],
   leasing:["","Ναι","Όχι"],
-  dapani:["","Κτίρια","Εξοπλισμός","Εξοπλισμός Green","Ιστοσελίδα","Νέος Υπάλληλος","Μεταφορικά Μέσα"]
+  dapani:["","Κτίρια","Εξοπλισμός","Εξοπλισμός Green","Ιστοσελίδα","Λογισμικό","Διαφήμιση","Συμμετοχή σε Εκθέσεις","Νέος Υπάλληλος","Μεταφορικά Μέσα"]
 };
 const BANK_INSTRUMENTS=['Έμβασμα','Πληρωμή με χρεωστική κάρτα','Πληρωμή με πιστωτική κάρτα','Πληρωμή με κωδικό RF','Τραπεζική επιταγή','Επιταγή επιχείρησης'];
 let processChecks=[
@@ -1575,28 +1747,59 @@ let processChecks=[
   "Αν είναι έμβασμα εμφανίζονται και οι δύο λογαριασμοί Χρέωσης και Πίστωσης με αναφορά σε ποιον ανήκουν;"
 ];
 const DEFAULT_PROCESS_CHECKS=processChecks.slice();
+function addInvoiceCard(){
+  invoiceCount++;
+  buildInvoiceCard(invoiceCount);
+  scheduleAutoSave();
+}
 function initPhase3(){
   const fc=document.getElementById('formsContainer');
   const cc=document.getElementById('checklistsContainer');
+  if(!fc||!cc)return;
   fc.innerHTML='';cc.innerHTML='';
-  for(let i=1;i<=invoiceCount;i++){
+  for(let i=1;i<=invoiceCount;i++)buildInvoiceCard(i);
+}
+function buildInvoiceCard(i){
+  const fc=document.getElementById('formsContainer');
+  const cc=document.getElementById('checklistsContainer');
+  if(!fc||!cc)return;
     const card=document.createElement('div');card.className='card';
     card.innerHTML=`
       <div class="card-header"><h3>ΠΑΡΑΣΤΑΤΙΚΟ ${i}</h3><button class="clear-btn" onclick="clearForm(${i})">Καθαρισμός</button></div>
-      <div class="form-group"><label>Αρ. Τιμολογίου</label><input type="text" id="inv_num_${i}" placeholder="π.χ. ΤΙΜ-1234" oninput="updateChecklist(${i})"></div>
+      <div class="form-group"><label>Αρ. Τιμολογίου &amp; Προμηθευτής</label><input type="text" id="inv_num_${i}" placeholder="π.χ. ΤΙΜ-1234 — Επωνυμία Προμηθευτή" oninput="updateChecklist(${i})"></div>
+      <div class="form-group"><label>E-mail Προμηθευτή</label><input type="email" id="inv_supmail_${i}" placeholder="supplier@example.com"></div>
       <div class="form-group"><label>Βιβλία</label><select id="inv_biblia_${i}" onchange="updateChecklist(${i})">${optionsData.biblia.map(o=>`<option value="${o}">${o||'Επιλέξτε...'}</option>`).join('')}</select></div>
-      <div class="form-group"><label>Τύπος Τιμολογίου</label><select id="inv_timologio_${i}" onchange="updateChecklist(${i})">${optionsData.timologio.map(o=>`<option value="${o}">${o||'Επιλέξτε...'}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Χώρα Έκδοσης</label><select id="inv_timologio_${i}" onchange="updateChecklist(${i})">${optionsData.timologio.map(o=>`<option value="${o}">${o||'Επιλέξτε...'}</option>`).join('')}</select></div>
       <div class="form-group"><label>Εξόφληση</label><select id="inv_exoflisi_${i}" onchange="updateChecklist(${i})">${optionsData.exoflisi.map(o=>`<option value="${o}">${o||'Επιλέξτε...'}</option>`).join('')}</select></div>
       <div class="form-group"><label>Leasing</label><select id="inv_leasing_${i}" onchange="updateChecklist(${i})">${optionsData.leasing.map(o=>`<option value="${o}">${o||'Επιλέξτε...'}</option>`).join('')}</select></div>
       <div class="form-group"><label>Δαπάνη</label><select id="inv_dapani_${i}" onchange="updateChecklist(${i})">${optionsData.dapani.map(o=>`<option value="${o}">${o||'Επιλέξτε...'}</option>`).join('')}</select></div>`;
+    const mailBar=document.createElement('div');
+    mailBar.className='mail-bar';
+    mailBar.innerHTML=`<span class="mail-bar-lbl">📧 Αποστολή:</span>
+      <button class="btn-mail" onclick="sendInvoiceEmail(${i},'beneficiary')">Δικαιούχο</button>
+      <button class="btn-mail" onclick="sendInvoiceEmail(${i},'supplier')">Προμηθευτή</button>
+      <button class="btn-mail" onclick="sendInvoiceEmail(${i},'accountant')">Λογιστή</button>
+      <button class="btn-mail" onclick="sendInvoiceEmail(${i},'payroll')">Λογ. Μισθοδοσίας</button>
+      <button class="btn-mail" onclick="sendInvoiceEmail(${i},'engineer')">Μηχανικό</button>`;
+    card.appendChild(mailBar);
     fc.appendChild(card);
     const clc=document.createElement('div');clc.className='checklist-card';clc.id=`checklist_card_${i}`;cc.appendChild(clc);
-  }
 }
 function clearForm(index){
-  ['num','biblia','timologio','exoflisi','leasing','dapani'].forEach(k=>document.getElementById(`inv_${k}_${index}`).value='');
+  ['num','supmail','biblia','timologio','exoflisi','leasing','dapani'].forEach(k=>{const e=document.getElementById(`inv_${k}_${index}`);if(e)e.value='';});
   updateChecklist(index);
 }
+const DEFAULT_EXPENSE_DOCS={
+  "Κτίρια":["Εφόσον το Τιμολόγιο περιλαμβάνει υλικά, υπάρχουν Δελτία Αποστολής ή συνοδευόμενα παραστατικά στο τιμολόγιο;","Αντίγραφο τίτλου ιδιοκτησίας, ενοικιαστήριο, παραχωρητήριο ή άλλο έγγραφο για τον τόπο υλοποίησης;","Φωτογραφίες φυσικού αντικειμένου (υλοποίησης εργασιών (πριν τις εργασίες - κατά την διάρκεια - μετά τις εργασίες))","Άδεια δόμησης ή έγκριση εργασιών μικρής κλίμακας ή όποια άλλη μορφή έγκρισης/ενημέρωσης εκτέλεσης εργασιών","Αν απαιτείται για την τεκμηρίωση της δαπάνης Περιγραφή εργασιών από μηχανικό ή εργολάβο;","Εγκεκριμένα σχέδια θεωρημένα από την Πολεοδομία (τοπογραφικό διάγραμμα, διάγραμμα κάλυψης/δόμησης, κατόψεις, τομές, όψεις)","Βεβαίωση μηχανικού περί μη ύπαρξης αυθαιρέτων","Τεχνική έκθεση από αρμόδιο μηχανικό (εγγραμενο στο ΤΕΕ)","Ιδιωτικό Συμφωνητικό/Σύμβαση με προμηθευτή με σφραγίδες και υπογραφή (υποχρεωτικό για ποσά άνω των 6.000 €)","Αν υπάρχει ανάγκη ενεργειακής αναβάθμισης:Πιστοποιητικό ΠΕΑ (ένα πριν και ένα μετά που να εμφανίζονται οι εργασίες που πραγματοποιήθηκαν)"],
+  "Εξοπλισμός":["Αντίγραφο πιστοποιητικού CE από τον κατασκευαστή για παραγωγικό εξοπλισμό ή εξοπλισμό που αυξάνει την ενεργειακή κλάση","Υπάρχει βεβαίωση προμηθευτή για το καινουργές - αμεταχείριστο και περί μη παρακράτησης κυριότητας με αναφορά στο s/n του/των αντικειμένων;","Φωτογραφίες Μηχανήματος/Εξοπλισμού (από το s/n και τυχόν CE, αλλά και γενικές -> εξοπλισμός σε λειτουργία)","Packing List, CMR κοκ; (μόνο σε περίπτωση αγοράς από το εξωτερικό)","Το μηχάνημα/εξοπλισμός είναι εγκατεστημένος και λειτουργικός στον τόπο υλοποίησης της επένδυσης;"],
+  "Εξοπλισμός Green":["Αντίγραφο πιστοποιητικού CE από τον κατασκευαστή για παραγωγικό εξοπλισμό ή εξοπλισμό που αυξάνει την ενεργειακή κλάση","Υπάρχει βεβαίωση προμηθευτή για το καινουργές - αμεταχείριστο και περί μη παρακράτησης κυριότητας με αναφορά στο s/n του/των αντικειμένων;","Φωτογραφίες Μηχανήματος/Εξοπλισμού (από το s/n και τυχόν CE, αλλά και γενικές -> εξοπλισμός σε λειτουργία)","Packing List, CMR κοκ; (μόνο σε περίπτωση αγοράς από το εξωτερικό)","Το μηχάνημα/εξοπλισμός είναι εγκατεστημένος και λειτουργικός στον τόπο υλοποίησης της επένδυσης;","Πιστοποιητικό ΠΕΑ (ένα πριν και ένα μετά που να εμφανίζονται οι εργασίες)"],
+  "Ιστοσελίδα":["Η ιστοσελίδα εξυπηρετεί τους ΚΑΔ της επένδυσης;","Είναι εύλογο το κόστος της ιστοσελίδας;","Αφορά δημιουργίας νέας ή αναβάθμιση παλαιάς;","Αν αφορά αναβάθμιση παλαιάς, υπάρχει παλιά ιστοσελίδα; να γίνει αναφορά στο Link","Επιτρέπει το πρόγραμμα να υπάρξει παλαιότερη ιστοσελίδα;","Υπάρχουν Print Screens από τις σελίδες και τις υποσελίδες;","Η ιστοσελίδα αφορά τον τόπο υλοποίησης της επένδυσης;","Εμφανίζεται στο Τιμολόγιο το domain name της ιστοσελίδας;","Έχουν προστεθεί ορθά τα Banners;","Έχουν προστεθεί ορθά η αφίσα του προγράμματος;","Τηρείται η προσβασιμότητα ΑΜΕΑ σύμφωνα με το πρότυπο WCAG 2.1 σε όλες τις υποσελίδες τουλάχιστον 90% μέσω Achecks.org/achecker"],
+  "Νέος Υπάλληλος":["Αντίγραφο ταυτότητας νεοπροσλαμβανόμενου προσωπικού","Δελτίο ανεργίας από τον ΔΥΠΑ/ΟΑΕΔ με αναφορά στο διάστημα ανεργίας","Απογραφικό Δελτίο εισόδου του εργαζόμενου, εφόσον απαιτείται.","Απογραφικό Δελτίο εξόδου του εργαζόμενου, εφόσον απαιτείται.","Αναλυτική Περιοδική Δήλωση (ΑΠΔ) συνοδευόμενη από το αποδεικτικό υποβολής","Αναγγελία πρόσληψης","Έντυπο Ε4 ή Πίνακας Προσωπικού - Ετήσιος","Έντυπο Ε4 ή Πίνακας Προσωπικού - Αρχικός & Τροποποιητικοί","Γνωστοποίηση, του εργοδότη προς τον εργαζόμενο, ότι το μισθολογικό κόστος του νεοπροσλαμβανόμενου προσωπικού συγχρηματοδοτείται από το ΕΚΤ/ΕΤΠΑ","Ασφαλιστική Ενημερότητα, για την απόδειξη πληρωμής εισφορών ΕΦΚΑ","Φορολογική Ενημερότητα για την απόδειξη πληρωμής του ΦΜΥ, εφόσον υπάρχει ΦΜΥ","Μηνιαία Μισθοδοτική Κατάσταση με σφραγίδα & υπογραφή λογιστή","*SOS*Εφόσον απαιτείται, τηρείται η πρόσθετη ΕΜΕ;"],
+  "Μεταφορικά Μέσα":["Αντίγραφο άδειας πρώτης κυκλοφορίας","Βεβαίωση προμηθευτή για το καινούργιες, αμεταχείριστο και περί μη παρακράτησης κυριότητας του μεταφορικού μέσου με αναφορά στον αριθμό πλαισίου","Φωτογραφικό Υλικό μεταφορικού μέσου από όλες τις πλευρές, αλλά και τον αριθμό πλαισίου"],
+  "Λογισμικό":["Ανάλυση κόστους για ιδιοκατασκευή λογισμικών από τον προμηθευτή","Άδειες χρήσης λογισμικού (Licences)","Αποδεικτικά στοιχεία ότι το Λογισμικό εξυπηρετεί τις ανάγκες ατόμων με αναπηρία."],
+  "Διαφήμιση":["Τα υλικά διαφήμισης (π.χ. έντυπα κ.ά.) μεταφέρονται στον τόπο υλοποίησης της επένδυσης;","PrintScreen φυσικού αντικειμένου (διάρκεια υλοποίησης: πριν - διάρκεια - μετά) με εμφανή ημερομηνία PrintScreen","Ανάλυση κόστους από προμηθευτή με σφραγίδα και υπογραφή;","Διευκρινιστική επιστολή με περιγραφή αναγκαιότητας δαπάνης (εφόσον κρίνεται απαραίτητο)"],
+  "Συμμετοχή σε Εκθέσεις":["Αποδεικτικά συμμετοχής στην έκθεση (π.χ. κατάλογος εκθετών ή σχετικό φωτογραφικό υλικό κ.λπ.) ή βεβαίωση συμμετοχής από τον διοργανωτή της έκθεσης.","Παραστατικά μεταφοράς των επίπλων των εκθέσεων","Παραστατικά μεταφοράς του προσωπικού (επιδότηση μεταφορικών)","Παραστατικά επιδότησης προσωπικού για διαμονή (Παραστατικό Τιμολόγησης Ξενοδοχείου/Καταλύματος)"]
+};
 function updateChecklist(index){
   const num=document.getElementById(`inv_num_${index}`).value.trim();
   const biblia=document.getElementById(`inv_biblia_${index}`).value;
@@ -1634,6 +1837,8 @@ function updateChecklist(index){
     if(timologio==="Ελλάδα"){timItems=["Τιμολόγιο ή Τιμολόγιο Παροχής Υπηρεσιών ή ΤΔΑ με ή χωρίς Υλικά","Έχει εκδοθεί το Τιμολόγιο σε επιλέξιμη ημερομηνία έκδοσης;","Υπάρχει απαλλαγή ΦΠΑ, ώστε να απαιτείται απαλλακτικό ΦΠΑ;","Εφόσον απαιτείται Υπάρχουν Δελτία Αποστολής ή συνοδευόμενα παραστατικά στο τιμολόγιο;","Τα μηχανήματα ή τα υλικά μεταφέρονται στον τόπο υλοποίησης της επένδυσης;"];}
     else if(timologio==="Εξωτερικό"){timItems=["Υπάρχει Invoice","Υπάρχει Proforma Invoice","Το Invoice έχει εκδοθεί σε επιλέξιμη ημερομηνία;","Υπάρχει απαλλαγή ΦΠΑ, ώστε να απαιτείται απαλλακτικό ΦΠΑ;","Το Proforma Invoice έχει εκδοθεί σε επιλέξιμη ημερομηνία;"];}
   }
+  if(dapani==="Λογισμικό"){timItems=timItems.map(i=>i.replace("Τα μηχανήματα ή τα υλικά μεταφέρονται στον τόπο υλοποίησης της επένδυσης;","Τα λογισμικά μεταφέρονται στον τόπο υλοποίησης της επένδυσης;"));}
+  else if(dapani==="Διαφήμιση"){timItems=timItems.map(i=>i.replace("Τα μηχανήματα ή τα υλικά μεταφέρονται στον τόπο υλοποίησης της επένδυσης;","Τα υλικά διαφήμισης μεταφέρονται στον τόπο υλοποίησης της επένδυσης;"));}
   addSection("ΑΦΟΡΟΥΝ ΤΟ ΤΙΜΟΛΟΓΙΟ",timItems,"invoice","general");
   let exItems=[];
   if(exoflisi==="Με μετρητά"){exItems=["Πληρωμή με μετρητά επιτρέπεται μόνο για καθαρά ποσά τιμολογίων μέχρι 500€.","Απαιτείται σφραγίδα και υπογραφή προμηθευτή.Στην υπογραφή της βεβαίωσης Εξόφλησης ή Απόδειξη είσπραξης ανήκει στον νόμιμο εκπρόσωπο του προμηθευτή;","Είναι επιλέξιμη η ημερομηνία της πληρωμής;"];}
@@ -1646,15 +1851,7 @@ function updateChecklist(index){
   if(leasing==="Ναι"){
     addSection("ΖΗΤΑ ΑΠΟ ΠΡΟΜΗΘΕΥΤΗ LEASING",["Υπάρχει αγορά/μίσθωση με Leasing από προμηθευτή που έχει το δικαίωμα πώληση με Leasing;","Υπάρχει Συμφωνητικό κατατεθειμένο στη ΔΟΥ που να προβλέπει ότι με την ολοκλήρωση του Leasing το αντικείμενο αγορά θα περιέλθει στην κυριότητα του δικαιούχου της επένδυσης","Υπάρχει βεβαίωση προμηθευτή για καινουργίες - αμεταχείριστο του αντικειμένου με αναφορά στο s/n (εφόσον διαθέτει s/n το αντικείμενο);","Εφόσον υπάρχει απαλλαγή ΦΠΑ, υπάρχει σχετικό απαλλακτικό ΦΠΑ για το Leasing"],"leasing","leasing_provider");
   }
-  let dapItems=[];
-  switch(dapani){
-    case "Κτίρια":dapItems=["Εφόσον το Τιμολόγιο περιλαμβάνει υλικά, υπάρχουν Δελτία Αποστολής ή συνοδευόμενα παραστατικά στο τιμολόγιο;","Αντίγραφο τίτλου ιδιοκτησίας, ενοικιαστήριο, παραχωρητήριο ή άλλο έγγραφο για τον τόπο υλοποίησης;","Φωτογραφίες φυσικού αντικειμένου (υλοποίησης εργασιών (πριν τις εργασίες - κατά την διάρκεια - μετά τις εργασίες))","Άδεια δόμησης ή έγκριση εργασιών μικρής κλίμακας ή όποια άλλη μορφή έγκρισης/ενημέρωσης εκτέλεσης εργασιών","Αν απαιτείται για την τεκμηρίωση της δαπάνης Περιγραφή εργασιών από μηχανικό ή εργολάβο;","Εγκεκριμένα σχέδια θεωρημένα από την Πολεοδομία (τοπογραφικό διάγραμμα, διάγραμμα κάλυψης/δόμησης, κατόψεις, τομές, όψεις)","Βεβαίωση μηχανικού περί μη ύπαρξης αυθαιρέτων","Τεχνική έκθεση από αρμόδιο μηχανικό (εγγραμενο στο ΤΕΕ)","Ιδιωτικό Συμφωνητικό/Σύμβαση με προμηθευτή με σφραγίδες και υπογραφή (υποχρεωτικό για ποσά άνω των 6.000 €)","Αν υπάρχει ανάγκη ενεργειακής αναβάθμισης:Πιστοποιητικό ΠΕΑ (ένα πριν και ένα μετά που να εμφανίζονται οι εργασίες που πραγματοποιήθηκαν)"];break;
-    case "Εξοπλισμός":dapItems=["Αντίγραφο πιστοποιητικού CE από τον κατασκευαστή για παραγωγικό εξοπλισμό ή εξοπλισμό που αυξάνει την ενεργειακή κλάση","Υπάρχει βεβαίωση προμηθευτή για το καινουργές - αμεταχείριστο και περί μη παρακράτησης κυριότητας με αναφορά στο s/n του/των αντικειμένων;","Φωτογραφίες Μηχανήματος/Εξοπλισμού (από το s/n και τυχόν CE, αλλά και γενικές -> εξοπλισμός σε λειτουργία)","Packing List, CMR κοκ; (μόνο σε περίπτωση αγοράς από το εξωτερικό)","Το μηχάνημα/εξοπλισμός είναι εγκατεστημένος και λειτουργικός στον τόπο υλοποίησης της επένδυσης;"];break;
-    case "Εξοπλισμός Green":dapItems=["Αντίγραφο πιστοποιητικού CE από τον κατασκευαστή για παραγωγικό εξοπλισμό ή εξοπλισμό που αυξάνει την ενεργειακή κλάση","Υπάρχει βεβαίωση προμηθευτή για το καινουργές - αμεταχείριστο και περί μη παρακράτησης κυριότητας με αναφορά στο s/n του/των αντικειμένων;","Φωτογραφίες Μηχανήματος/Εξοπλισμού (από το s/n και τυχόν CE, αλλά και γενικές -> εξοπλισμός σε λειτουργία)","Packing List, CMR κοκ; (μόνο σε περίπτωση αγοράς από το εξωτερικό)","Το μηχάνημα/εξοπλισμός είναι εγκατεστημένος και λειτουργικός στον τόπο υλοποίησης της επένδυσης;","Πιστοποιητικό ΠΕΑ (ένα πριν και ένα μετά που να εμφανίζονται οι εργασίες)"];break;
-    case "Ιστοσελίδα":dapItems=["Η ιστοσελίδα εξυπηρετεί τους ΚΑΔ της επένδυσης;","Είναι εύλογο το κόστος της ιστοσελίδας;","Αφορά δημιουργίας νέας ή αναβάθμιση παλαιάς;","Αν αφορά αναβάθμιση παλαιάς, υπάρχει παλιά ιστοσελίδα; να γίνει αναφορά στο Link","Επιτρέπει το πρόγραμμα να υπάρξει παλαιότερη ιστοσελίδα;","Υπάρχουν Print Screens από τις σελίδες και τις υποσελίδες;","Η ιστοσελίδα αφορά τον τόπο υλοποίησης της επένδυσης;","Εμφανίζεται στο Τιμολόγιο το domain name της ιστοσελίδας;","Έχουν προστεθεί ορθά τα Banners;","Έχουν προστεθεί ορθά η αφίσα του προγράμματος;","Τηρείται η προσβασιμότητα ΑΜΕΑ σύμφωνα με το πρότυπο WCAG 2.1 σε όλες τις υποσελίδες τουλάχιστον 90% μέσω Achecks.org/achecker"];break;
-    case "Νέος Υπάλληλος":dapItems=["Αντίγραφο ταυτότητας νεοπροσλαμβανόμενου προσωπικού","Δελτίο ανεργίας από τον ΔΥΠΑ/ΟΑΕΔ με αναφορά στο διάστημα ανεργίας","Απογραφικό Δελτίο εισόδου του εργαζόμενου, εφόσον απαιτείται.","Απογραφικό Δελτίο εξόδου του εργαζόμενου, εφόσον απαιτείται.","Αναλυτική Περιοδική Δήλωση (ΑΠΔ) συνοδευόμενη από το αποδεικτικό υποβολής","Αναγγελία πρόσληψης","Έντυπο Ε4 ή Πίνακας Προσωπικού - Ετήσιος","Έντυπο Ε4 ή Πίνακας Προσωπικού - Αρχικός & Τροποποιητικοί","Γνωστοποίηση, του εργοδότη προς τον εργαζόμενο, ότι το μισθολογικό κόστος του νεοπροσλαμβανόμενου προσωπικού συγχρηματοδοτείται από το ΕΚΤ/ΕΤΠΑ","Ασφαλιστική Ενημερότητα, για την απόδειξη πληρωμής εισφορών ΕΦΚΑ","Φορολογική Ενημερότητα για την απόδειξη πληρωμής του ΦΜΥ, εφόσον υπάρχει ΦΜΥ","Μηνιαία Μισθοδοτική Κατάσταση με σφραγίδα & υπογραφή λογιστή","*SOS*Εφόσον απαιτείται, τηρείται η πρόσθετη ΕΜΕ;"];break;
-    case "Μεταφορικά Μέσα":dapItems=["Αντίγραφο άδειας πρώτης κυκλοφορίας","Βεβαίωση προμηθευτή για το καινούργιες, αμεταχείριστο και περί μη παρακράτησης κυριότητας του μεταφορικού μέσου με αναφορά στον αριθμό πλαισίου","Φωτογραφικό Υλικό μεταφορικού μέσου από όλες τις πλευρές, αλλά και τον αριθμό πλαισίου"];break;
-  }
+  let dapItems=(_cfg.p3_expense_docs&&_cfg.p3_expense_docs[dapani])?_cfg.p3_expense_docs[dapani].slice():((DEFAULT_EXPENSE_DOCS[dapani]||[]).slice());
   dapItems=dapItems.concat(_cfg.p3_extra_supplier||[]);
   addSection("ΔΙΚΑΙΟΛΟΓΗΤΙΚΑ ΓΙΑ ΤΗΝ ΣΥΓΚΕΚΡΙΜΕΝΗ ΔΑΠΑΝΗ",dapItems,"expense","general");
   container.innerHTML=html;
@@ -1685,12 +1882,20 @@ function formatReportText(originalText,isProcessCheck){
     if(out.includes("Απογραφικό Δελτίο εισόδου"))return "παρατηρήθηκε έλλειψη στο Απογραφικό Δελτίο εισόδου του εργαζόμενου";
     if(out.includes("Απογραφικό Δελτίο εξόδου"))return "παρατηρήθηκε έλλειψη στο Απογραφικό Δελτίο εξόδου του εργαζόμενου";
     if(out.includes("Γνωστοποίηση, του εργοδότη προς τον εργαζόμενο, ότι το μισθολογικό κόστος"))return "παρατηρήθηκε ότι ΔΕΝ πραγματοποιήθηκε η Γνωστοποίηση συγχρηματοδότησης (ΕΚΤ/ΕΤΠΑ) προς τον εργαζόμενο";
-    return "παρατηρήθηκε απόκλιση στη διαδικασία: "+out.replace(/\?$/,"");
+    if(out.includes("Τα λογισμικά μεταφέρονται στον τόπο υλοποίησης"))return "παρατηρήθηκε ότι τα λογισμικά ΔΕΝ μεταφέρονται/εγκαθίστανται στον τόπο υλοποίησης της επένδυσης";
+    if(out.includes("Τα υλικά διαφήμισης"))return "παρατηρήθηκε ότι τα υλικά διαφήμισης ΔΕΝ μεταφέρονται στον τόπο υλοποίησης της επένδυσης";
+    if(out.includes("Ανάλυση κόστους από προμηθευτή με σφραγίδα"))return "παρατηρήθηκε έλλειψη ανάλυσης κόστους από τον προμηθευτή με σφραγίδα και υπογραφή";
+    return "παρατηρήθηκε απόκλιση ως προς το ακόλουθο: "+out.replace(/\?$/,"").replace(/^Υπάρχ(ει|ουν) /i,"").replace(/^Έχ(ει|ουν) /i,"");
   } else {
     let out=originalText;
-    out=out.replace(/^Υπάρχει /i,"");
+    out=out.replace(/^Υπάρχ(ει|ουν) /i,"");
+    out=out.replace(/^Αντίγραφο /i,"Αντίγραφο ");
     out=out.replace(/\?$/,"");
-    out=out.replace(/, εφόσον απαιτείται\./i,"");
+    out=out.replace(/\s*\([^)]*εφόσον[^)]*\)/gi,"");
+    out=out.replace(/,?\s*εφόσον (απαιτείται|κρίνεται απαραίτητο)\.?/gi,"");
+    out=out.replace(/\s*\(\s*\)/g,"");
+    out=out.replace(/\s{2,}/g," ").trim();
+    out=out.replace(/[.;]+$/,"");
     return out;
   }
 }
@@ -1702,7 +1907,7 @@ function openReportModal(){
   const projCode=document.getElementById('gen_projectCode').value.trim()||"[Εισάγετε Κωδικό Έργου]";
   const programAction=document.getElementById('gen_program').value.trim();
   let programText=programAction?`στο πλαίσιο της δράσης <strong>${programAction}</strong>, `:"";
-  let reportHTML="<p>Καλησπέρα σας,</p>";
+  let reportHTML="<p>Αξιότιμε/η συνεργάτη,</p><p>Κατόπιν ελέγχου των δικαιολογητικών που προσκομίστηκαν, σας παραθέτουμε τις εκκρεμότητες που εντοπίστηκαν ανά παραστατικό. Παρακαλούμε για τις ενέργειές σας ώστε να ολοκληρωθεί ο φάκελος.</p>";
   let hasContent=false;
   for(let i=1;i<=invoiceCount;i++){
     const container=document.getElementById(`checklist_card_${i}`);
@@ -1748,7 +1953,7 @@ function openReportModal(){
     }
   }
   document.getElementById('reportOutput').innerHTML=reportHTML;
-  {const _xb=document.getElementById('reportExcelBtn');if(_xb)_xb.style.display='none';}
+  {const _xb=document.getElementById('reportExcelBtn');if(_xb)_xb.style.display='none';}{const _mb=document.getElementById('mailSendBtn');if(_mb)_mb.style.display='none';}
   document.getElementById('modalTitle').innerText="ΑΝΑΦΟΡΑ ΕΛΛΕΙΨΕΩΝ ΔΙΚΑΙΟΛΟΓΗΤΙΚΩΝ";
   document.getElementById('reportModal').style.display='block';
 }
@@ -1779,10 +1984,12 @@ function collectData(){
     general:{}, phase1:{}, phase2_fields:{}, phase2_dyn:{elig:[],bp:[],score:[],docs:[],expenses:[]}, phase3_invoices:[]
   };
   /* --- ΓΕΝΙΚΑ --- */
-  ['gen_beneficiary','gen_projectCode','gen_program','gen_type','genActionType','genEvalType','gen_budget','gen_fee_total','gen_fee_submit','fee_pct_total','fee_pct_sub'].forEach(id=>data.general[id]=document.getElementById(id).value);
+  ['gen_beneficiary','gen_projectCode','gen_program','gen_type','genActionType','genEvalType','gen_budget','gen_fee_total','gen_fee_submit','fee_pct_total','fee_pct_sub','gen_contact','gen_email','gen_phone'].forEach(id=>data.general[id]=document.getElementById(id).value);
   data.general.fee_manual={total:document.getElementById('gen_fee_total').dataset.manual||'0',submit:document.getElementById('gen_fee_submit').dataset.manual||'0'};
   data.phase2_dyn.kad=getKadSummary();
   data.phase3_docs=(typeof getPh3Docs==='function')?getPh3Docs():[];
+  data.lastTab=(typeof CURRENT_TAB!=='undefined')?CURRENT_TAB:1;
+  data.contacts=(typeof getContacts==='function')?getContacts():[];
   data.phase2_dyn.indirect={active:document.getElementById('ind_active')?document.getElementById('ind_active').checked:false,
     pct:document.getElementById('ind_pct')?document.getElementById('ind_pct').value:'7',
     desc:document.getElementById('ind_desc')?document.getElementById('ind_desc').value:'',
@@ -1811,20 +2018,21 @@ function collectData(){
   });
 
   /* --- ΦΑΣΗ 2 STATIC --- */
-  document.querySelectorAll('#tab_2 .save-data[id]').forEach(el=>data.phase2_fields[el.id]=el.value);
+  document.querySelectorAll('#tab_2 .save-data[id], #tab_3 .save-data[id]').forEach(el=>data.phase2_fields[el.id]=el.value);
   /* --- ΦΑΣΗ 2 DYNAMIC --- */
   document.querySelectorAll('#eligibilityContainer .dynamic-row').forEach(r=>data.phase2_dyn.elig.push({k:r.querySelector('.dyn-key').value,v:r.querySelector('.dyn-val').value,src:r.querySelector('.dyn-key').dataset.src||''}));
   document.querySelectorAll('#bpContainer .dynamic-row').forEach(r=>data.phase2_dyn.bp.push({k:r.querySelector('.dyn-key').value,v:r.querySelector('.dyn-val').value}));
   document.querySelectorAll('#scoringContainer .score-row').forEach(r=>data.phase2_dyn.score.push({k:r.querySelector('.dyn-key').value,sc:r.querySelector('.dyn-score').value,cw:r.querySelector('.dyn-cw').value,gw:r.querySelector('.dyn-group').value,v:r.querySelector('.dyn-val').value,src:r.querySelector('.dyn-key').dataset.src||''}));
   document.querySelectorAll('#docsContainer .dynamic-row').forEach(r=>data.phase2_dyn.docs.push({k:r.querySelector('.dyn-key').value,v:r.querySelector('.dyn-val').value,src:r.querySelector('.dyn-key').dataset.src||''}));
+  data.phase2_dyn.expGroups=getExpGroups().map(g=>({name:g.name,ltype:g.ltype,lval:g.lval}));
   document.querySelectorAll('#expensesContainer .expense-row').forEach(r=>{
-    const subs=[...r.querySelectorAll('.exp-sub')].map(s=>({desc:s.querySelector('.sub-desc').value,net:s.querySelector('.sub-net').value,ltype:s.querySelector('.sub-ltype').value,lval:s.querySelector('.sub-lval').value}));
-    data.phase2_dyn.expenses.push({desc:r.querySelector('.exp-desc').value,opske:r.querySelector('.exp-opske').value,subs:subs});
+    const subs=[...r.querySelectorAll('.exp-sub')].map(s=>({desc:s.querySelector('.sub-desc').value,net:s.querySelector('.sub-net').value,gross:s.querySelector('.sub-gross').value,vat:s.querySelector('.sub-vat').value}));
+    data.phase2_dyn.expenses.push({group:r.querySelector('.exp-grp').value,cat:r.querySelector('.exp-cat').value,opske:r.querySelector('.exp-opske').value,subs:subs});
   });
 
   /* --- ΦΑΣΗ 3 --- */
   for(let i=1;i<=invoiceCount;i++){
-    const inv={num:document.getElementById(`inv_num_${i}`).value.trim(),biblia:document.getElementById(`inv_biblia_${i}`).value,timologio:document.getElementById(`inv_timologio_${i}`).value,exoflisi:document.getElementById(`inv_exoflisi_${i}`).value,leasing:document.getElementById(`inv_leasing_${i}`).value,dapani:document.getElementById(`inv_dapani_${i}`).value,statuses:[]};
+    const inv={num:document.getElementById(`inv_num_${i}`).value.trim(),supmail:(document.getElementById(`inv_supmail_${i}`)||{}).value||'',biblia:document.getElementById(`inv_biblia_${i}`).value,timologio:document.getElementById(`inv_timologio_${i}`).value,exoflisi:document.getElementById(`inv_exoflisi_${i}`).value,leasing:document.getElementById(`inv_leasing_${i}`).value,dapani:document.getElementById(`inv_dapani_${i}`).value,statuses:[]};
     const container=document.getElementById(`checklist_card_${i}`);
     if(container.classList.contains('active')){container.querySelectorAll('.status-select').forEach(sel=>inv.statuses.push(sel.value));}
     data.phase3_invoices.push(inv);
@@ -1873,6 +2081,7 @@ function applyData(data){
       document.getElementById('genActionType').value=g.genActionType||'';
       document.getElementById('genEvalType').value=g.genEvalType||'';
       document.getElementById('gen_budget').value=g.gen_budget||'';
+      ['gen_contact','gen_email','gen_phone'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=g[id]||'';});
       document.getElementById('fee_pct_total').value=g.fee_pct_total||'3';
       document.getElementById('fee_pct_sub').value=g.fee_pct_sub||'13';
       document.getElementById('gen_fee_total').value=g.gen_fee_total||'';
@@ -1933,10 +2142,17 @@ function applyData(data){
               addFn();const row=cont.lastElementChild;
               if(type==='score'){row.querySelector('.dyn-key').value=item.k||'';row.querySelector('.dyn-score').value=item.sc||'';row.querySelector('.dyn-cw').value=item.cw||'';row.querySelector('.dyn-group').value=item.gw||'';const vEl=row.querySelector('.dyn-val');vEl.value=item.v||'';colorStandard(vEl);}
               else if(type==='exp'){
-                row.querySelector('.exp-desc').value=item.desc||'';row.querySelector('.exp-opske').value=item.opske||'';
+                row.querySelector('.exp-cat').value=item.cat||item.desc||'';
+                row.querySelector('.exp-opske').value=item.opske||'';
+                if(item.group){const gs=row.querySelector('.exp-grp');if(![...gs.options].some(o=>o.value===item.group)){const o=document.createElement('option');o.value=item.group;o.textContent=item.group;gs.appendChild(o);}gs.value=item.group;}
                 const subEls=row.querySelectorAll('.exp-sub');
-                const subs=item.subs|| (item.net!==undefined?[{desc:item.just||'',net:item.net||'',ltype:item.ltype||'%',lval:item.lval||''}]:[]);
-                subs.slice(0,4).forEach((s,si)=>{if(!subEls[si])return;subEls[si].querySelector('.sub-desc').value=s.desc||'';subEls[si].querySelector('.sub-net').value=s.net||'';subEls[si].querySelector('.sub-ltype').value=s.ltype||'%';subEls[si].querySelector('.sub-lval').value=s.lval||'';});
+                (item.subs||[]).slice(0,4).forEach((s,si)=>{
+                  if(!subEls[si])return;
+                  subEls[si].querySelector('.sub-desc').value=s.desc||'';
+                  subEls[si].querySelector('.sub-net').value=s.net||'';
+                  subEls[si].querySelector('.sub-gross').value=s.gross||'';
+                  subEls[si].querySelector('.sub-vat').value=s.vat||'24';
+                });
               }
               else{row.querySelector('.dyn-key').value=item.k||'';const vEl=row.querySelector('.dyn-val');vEl.value=item.v||'';if(vEl.tagName==='SELECT')colorStandard(vEl);}
               if(item.src&&type!=='exp')attachSource(row,item.src,'.dyn-key');
@@ -1947,7 +2163,12 @@ function applyData(data){
         populate('bpContainer',data.phase2_dyn.bp,'standard',()=>addDynamicRow('bpContainer','Ερώτηση BP...','text'));
         populate('scoringContainer',data.phase2_dyn.score,'score',addScoringRow);
         populate('docsContainer',data.phase2_dyn.docs,'standard',addDocRow);
+        {const gc2=document.getElementById('expGroupsContainer');
+         if(gc2){gc2.innerHTML='';(data.phase2_dyn.expGroups||[]).forEach(g=>addExpGroup(g.name,g.ltype,g.lval));refreshExpGroupOptions();}}
         populate('expensesContainer',data.phase2_dyn.expenses,'exp',addExpenseRow);
+        refreshExpGroupOptions();
+        const gc=document.getElementById('expGroupsContainer');
+        if(gc){gc.innerHTML='';(data.phase2_dyn.expGroups||[]).forEach(g=>addExpGroup(g.name,g.ltype,g.lval));refreshExpGroupOptions();}
         const ind=data.phase2_dyn.indirect;
         if(ind&&document.getElementById('ind_active')){
           document.getElementById('ind_active').checked=!!ind.active;
@@ -1975,6 +2196,7 @@ function applyData(data){
         for(let i=1;i<=invoiceCount;i++){
           const inv=invArr[i-1];if(!inv)continue;
           document.getElementById(`inv_num_${i}`).value=inv.num||'';
+          {const sm=document.getElementById(`inv_supmail_${i}`);if(sm)sm.value=inv.supmail||'';}
           document.getElementById(`inv_biblia_${i}`).value=inv.biblia||'';
           document.getElementById(`inv_timologio_${i}`).value=inv.timologio||'';
           document.getElementById(`inv_exoflisi_${i}`).value=inv.exoflisi||'';
@@ -1990,11 +2212,17 @@ function applyData(data){
 
       ['pre_q1','pre_q2','pre_q4','pre_q5'].forEach(id=>{const e=document.getElementById(id);if(!e)return;
         if(id==='pre_q1')handlePreQ1(e);else if(id==='pre_q2')handlePreQ2(e);else if(id==='pre_q4')handlePreQ4(e);else handlePreQ5(e);});
+      if(document.getElementById('contactsContainer')){
+        const cc=document.getElementById('contactsContainer');cc.innerHTML='';
+        if(data.contacts&&data.contacts.length)data.contacts.forEach(x=>addContactRow(x.role,x.name,x.mail,x.phone));
+        else initContacts();
+      }
       if(data.phase3_docs&&document.getElementById('ph3_docsList')){
         const c=document.getElementById('ph3_docsList');c.innerHTML='';
         data.phase3_docs.forEach(d=>addPh3DocRow(d.k,d.v));
       }
       syncProgramConfig();
+      renderLifeline();
       evaluateProgress(0);calculateTotalScore();evaluateAllExpenses();updateDynamicHeaders();calcFees();syncPhoneAutoFields();handlePhase3Gate();applyPhase3Mode();
     }
 }
@@ -2254,6 +2482,174 @@ const LOGO_PARTS=[
 'gg==',
 ];
 function initLogo(){var el=document.getElementById('brandLogo');if(el)el.src='data:image/png;base64,'+LOGO_PARTS.join('');}
+/* =================== ΕΠΑΦΕΣ ΕΡΓΟΥ (v20) =================== */
+const DEFAULT_CONTACTS=['Λογιστής','Λογιστής Μισθοδοσίας','Μηχανικός','Δικηγόρος'];
+function addContactRow(role,name,mail,phone){
+  const c=document.getElementById('contactsContainer');if(!c)return;
+  const d=document.createElement('div');d.className='contact-row';
+  d.innerHTML='<input type="text" class="form-control c-role" placeholder="Ιδιότητα" value="'+String(role||'').replace(/"/g,'&quot;')+'">'+
+    '<input type="text" class="form-control c-name" placeholder="Ονοματεπώνυμο" value="'+String(name||'').replace(/"/g,'&quot;')+'">'+
+    '<input type="email" class="form-control c-mail" placeholder="E-mail" value="'+String(mail||'').replace(/"/g,'&quot;')+'">'+
+    '<input type="text" class="form-control c-phone" placeholder="Τηλέφωνο" value="'+String(phone||'').replace(/"/g,'&quot;')+'">'+
+    '<button class="btn-remove" onclick="this.parentElement.remove();scheduleAutoSave();">×</button>';
+  c.appendChild(d);
+}
+function initContacts(){
+  const c=document.getElementById('contactsContainer');if(!c||c.children.length)return;
+  DEFAULT_CONTACTS.forEach(r=>addContactRow(r,'','',''));
+}
+function getContacts(){
+  return [...document.querySelectorAll('#contactsContainer .contact-row')].map(r=>({
+    role:r.querySelector('.c-role').value.trim(),
+    name:r.querySelector('.c-name').value.trim(),
+    mail:r.querySelector('.c-mail').value.trim(),
+    phone:r.querySelector('.c-phone').value.trim()
+  })).filter(x=>x.role||x.name||x.mail);
+}
+function findContact(kind){
+  const list=getContacts();
+  const pat={accountant:/λογιστ/i,payroll:/μισθοδοσ/i,engineer:/μηχανικ/i,lawyer:/δικηγορ|δικηγόρ/i}[kind];
+  if(!pat)return null;
+  if(kind==='accountant'){
+    const c=list.find(x=>/λογιστ/i.test(x.role)&&!/μισθοδοσ/i.test(x.role));
+    return c||null;
+  }
+  return list.find(x=>pat.test(x.role))||null;
+}
+
+/* =================== EMAIL ΑΝΑ ΠΑΡΑΣΤΑΤΙΚΟ (v20) =================== */
+function collectChecklistFor(index,categories){
+  const card=document.getElementById('checklist_card_'+index);
+  if(!card)return [];
+  const out=[];
+  card.querySelectorAll('.checklist-item').forEach(it=>{
+    const cat=it.dataset.category||'';
+    if(categories.length&&!categories.includes(cat))return;
+    const txt=(it.querySelector('.checklist-text')||{}).innerText||'';
+    const sel=it.querySelector('.status-select');
+    const val=sel?sel.value:'';
+    if(val==='Ναι'||val==='Δεν απαιτείται')return;   /* μένουν μόνο τα εκκρεμή */
+    out.push(txt.trim());
+  });
+  return out;
+}
+const MAIL_TARGETS={
+  beneficiary:{label:'Δικαιούχο', cats:[], intro:'Σας παραθέτουμε συγκεντρωτικά τα δικαιολογητικά που εκκρεμούν για το παρακάτω παραστατικό.'},
+  supplier:{label:'Προμηθευτή', cats:['invoice'], intro:'Σας παραθέτουμε τα δικαιολογητικά που απαιτούνται από πλευράς σας για το παρακάτω παραστατικό.'},
+  accountant:{label:'Λογιστή', cats:['accountant'], intro:'Σας παραθέτουμε τα λογιστικά δικαιολογητικά που εκκρεμούν για το παρακάτω παραστατικό.'},
+  payroll:{label:'Λογιστή Μισθοδοσίας', cats:['accountant'], intro:'Σας παραθέτουμε τα δικαιολογητικά μισθοδοσίας που εκκρεμούν.'},
+  engineer:{label:'Μηχανικό', cats:['expense','general'], intro:'Σας παραθέτουμε τα τεχνικά δικαιολογητικά που εκκρεμούν για το παρακάτω παραστατικό.'}
+};
+function sendInvoiceEmail(index,kind){
+  const t=MAIL_TARGETS[kind];if(!t)return;
+  const g=id=>{const e=document.getElementById(id);return e?e.value.trim():'';};
+  const invNum=g('inv_num_'+index)||('Παραστατικό '+index);
+  const ben=g('gen_beneficiary')||'[Δικαιούχος]';
+  const prog=g('gen_program')||'';
+  const code=g('gen_projectCode')||'';
+  const benMail=g('gen_email');
+  /* Παραλήπτης */
+  let to='',recipientName='';
+  if(kind==='beneficiary'){to=benMail;recipientName=ben;}
+  else if(kind==='supplier'){to=g('inv_supmail_'+index);recipientName='Προμηθευτή';}
+  else{const c=findContact(kind==='payroll'?'payroll':kind);if(c){to=c.mail;recipientName=c.name||c.role;}}
+  const cc=(kind!=='beneficiary')?benMail:'';
+  const items=collectChecklistFor(index,t.cats);
+
+  const subject='['+(code||prog||'Έργο')+'] '+ben+' — Εκκρεμή δικαιολογητικά · '+invNum;
+  let body='Αξιότιμε/η '+(recipientName||'κύριε/κυρία')+',\n\n';
+  body+=t.intro+'\n\n';
+  body+='Δικαιούχος: '+ben+'\n';
+  if(prog)body+='Πρόγραμμα: '+prog+'\n';
+  if(code)body+='Κωδικός Έργου: '+code+'\n';
+  body+='Παραστατικό: '+invNum+'\n\n';
+  if(items.length){
+    body+='Εκκρεμούν τα ακόλουθα:\n';
+    items.forEach((x,i)=>{body+=(i+1)+'. '+x+'\n';});
+  }else{
+    body+='Δεν εντοπίστηκαν εκκρεμότητες για την κατηγορία σας.\n';
+  }
+  body+='\nΠαρακαλούμε για τις δικές σας ενέργειες. Παραμένουμε στη διάθεσή σας για οποιαδήποτε διευκρίνιση.\n\nΜε εκτίμηση,\n';
+
+  showMailPreview(to,cc,subject,body,t.label);
+}
+function showMailPreview(to,cc,subject,body,label){
+  const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const h='<div style="background:#eef5ff;border:1px solid #bcd8f5;border-radius:6px;padding:12px;margin-bottom:12px;font-size:13px;">'+
+    '<div><strong>Προς:</strong> '+(to?esc(to):'<span style="color:#b02a37;">— δεν έχει καταχωρηθεί e-mail —</span>')+'</div>'+
+    (cc?'<div><strong>Κοινοποίηση:</strong> '+esc(cc)+'</div>':'')+
+    '<div><strong>Θέμα:</strong> '+esc(subject)+'</div></div>'+
+    '<div style="white-space:pre-wrap;font-family:inherit;line-height:1.55;">'+esc(body)+'</div>';
+  document.getElementById('reportOutput').innerHTML=h;
+  const xb=document.getElementById('reportExcelBtn');if(xb)xb.style.display='none';{const _mb=document.getElementById('mailSendBtn');if(_mb)_mb.style.display='none';}
+  let sb=document.getElementById('mailSendBtn');
+  if(!sb){
+    sb=document.createElement('button');sb.id='mailSendBtn';sb.className='btn btn-green';
+    document.querySelector('#reportModal .modal-content > div:last-child').prepend(sb);
+  }
+  sb.style.display='inline-block';
+  sb.innerText='✉ Άνοιγμα στο πρόγραμμα email';
+  sb.onclick=()=>{
+    const url='mailto:'+encodeURIComponent(to||'')+'?'+
+      (cc?('cc='+encodeURIComponent(cc)+'&'):'')+
+      'subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+    window.location.href=url;
+  };
+  document.getElementById('modalTitle').innerText='EMAIL ΠΡΟΣ '+(label||'').toUpperCase();
+  document.getElementById('reportModal').style.display='block';
+}
+
+/* =================== ΓΡΑΜΜΗ ΖΩΗΣ ΕΡΓΟΥ (v20) =================== */
+/* Θέσεις σε ποσοστό του πλάτους. Οι 4 κόμβοι είναι τα ορόσημα. */
+const LL_NODES=[
+  {pos:3,  lbl:'Υποβολή',      sub:'Φάκελος & αίτηση'},
+  {pos:22, lbl:'Ένταξη',       sub:'Απόφαση έγκρισης', dateFrom:'ph3_approved_date'},
+  {pos:62, lbl:'Ολοκλήρωση',   sub:'Τελικός έλεγχος'},
+  {pos:78, lbl:'Τελική πληρωμή',sub:'Εκταμίευση'},
+  {pos:96, lbl:'Υποχρεώσεις',  sub:'3 ή 5 έτη'}
+];
+const LL_STAGES=[
+  {key:'submit',   pos:3,  txt:'Υποβολή'},
+  {key:'eval',     pos:22, txt:'Αξιολόγηση'},
+  {key:'impl',     pos:32, txt:'Υλοποίηση'},
+  {key:'inter1',   pos:42, txt:'1η Ενδιάμεση'},
+  {key:'inter2',   pos:52, txt:'2η Ενδιάμεση'},
+  {key:'final',    pos:62, txt:'Τελική / Ολοκλήρωση'},
+  {key:'paid',     pos:78, txt:'Τελική Πληρωμή'},
+  {key:'after',    pos:96, txt:'Υποχρεώσεις'}
+];
+function currentLifeStage(){
+  const gv=id=>{const e=document.getElementById(id);return e?e.value:'';};
+  const approved=gv('ph3_approved');
+  const stage=gv('ph3_stage');
+  if(approved==='ΝΑΙ'){
+    if(stage==='Τελική')return 'final';
+    if(stage==='2η Ενδιάμεση')return 'inter2';
+    if(stage==='1η Ενδιάμεση')return 'inter1';
+    return 'impl';
+  }
+  if(approved==='ΟΧΙ')return 'eval';
+  /* Πριν την έγκριση: αν έχει ξεκινήσει η Φάση 2, θεωρείται υποβολή/αξιολόγηση */
+  const anyP2=[...document.querySelectorAll('#tab_2 .save-data')].some(e=>e.value&&e.value.trim()!=='');
+  return anyP2?'eval':'submit';
+}
+function renderLifeline(){
+  const w=document.getElementById('llWrap');if(!w)return;
+  const cur=currentLifeStage();
+  const st=LL_STAGES.find(s=>s.key===cur)||LL_STAGES[0];
+  let h='<div class="ll-track"></div>';
+  h+='<div class="ll-seg" style="left:0;width:'+st.pos+'%;background:var(--green);opacity:.85;"></div>';
+  LL_NODES.forEach((n,i)=>{
+    h+='<div class="ll-node" style="left:'+n.pos+'%;'+(n.pos<=st.pos?'border-color:var(--green);':'')+'"></div>';
+    const cls=(i%2===0)?'top':'bot';
+    let sub=n.sub;
+    if(n.dateFrom){const dv=(document.getElementById(n.dateFrom)||{}).value;if(dv)sub=dv;}
+    h+='<div class="ll-lbl '+cls+'" style="left:'+n.pos+'%;">'+n.lbl+'<small>'+sub+'</small></div>';
+  });
+  h+='<div class="ll-marker" style="left:'+st.pos+'%;"><div class="ll-badge">'+st.txt+'</div><div class="dot"></div></div>';
+  w.innerHTML=h;
+}
+
 /* =================== ΦΑΣΗ 3: ΤΡΟΠΟΣ ΛΕΙΤΟΥΡΓΙΑΣ (v18) =================== */
 /* Είδη δράσης που απαιτούν συλλογή παραστατικών (τιμολόγια/εξοφλήσεις). */
 const INVOICE_ACTIONS=['Επενδυτικό Πρόγραμμα','Επιδότηση τόκων Δανείου','Επιδότηση Προσωπικού (ΔΥΠΑ)'];
@@ -2424,8 +2820,8 @@ function handlePhase3Gate(){
   const approved=(ap.value==='ΝΑΙ');
   apd.classList.toggle('hidden',!approved);
   s2.classList.toggle('hidden',!approved);
-  if(!approved){work.classList.add('hidden');blocked.classList.add('hidden');return;}
-  applyPhase3Mode();
+  if(!approved){work.classList.add('hidden');blocked.classList.add('hidden');renderLifeline();return;}
+  applyPhase3Mode();renderLifeline();
   colorStandard(gl);
   const ok=(gl.value==='ΝΑΙ'||gl.value==='Θα σταλεί σύντομα');
   gld.classList.toggle('hidden',gl.value!=='ΝΑΙ');
@@ -2477,6 +2873,21 @@ function generateGuidelinesEmail(){
   document.getElementById('reportOutput').innerHTML=h;
   const xb=document.getElementById('reportExcelBtn');if(xb)xb.style.display='none';
   document.getElementById('modalTitle').innerText='EMAIL ΕΝΤΑΞΗΣ & ΚΑΤΕΥΘΥΝΤΗΡΙΩΝ ΓΡΑΜΜΩΝ';
+  {
+    const to=(document.getElementById('gen_email')||{}).value||'';
+    const subj='Ένταξη στο πρόγραμμα '+prog+' — Κατευθυντήριες γραμμές υλοποίησης';
+    let txt='Αξιότιμε/η '+ben+',\n\nΜε ιδιαίτερη χαρά σας ενημερώνουμε ότι η επιχείρησή σας εντάχθηκε στο πρόγραμμα '+prog+(appd?(' (ημερομηνία έγκρισης: '+appd+')'):'')+'.\n\n';
+    txt+='Κωδικός Έργου: '+code+'\nΠροϋπολογισμός Επενδυτικού Σχεδίου: '+budget+'\n\n';
+    txt+='Παρακαλούμε να λάβετε υπόψη σας τα ακόλουθα:\n\n';
+    GUIDELINES.forEach((gl,i)=>{txt+=(i+1)+'. '+gl+'\n\n';});
+    if(feeT){txt+='Υπενθύμιση αμοιβής συμβούλου: η συνολική αμοιβή ανέρχεται σε '+feeT+'.'+(feeS?(' Στο ποσό αυτό συμπεριλαμβάνεται και η αμοιβή υποβολής ('+feeS+'), η οποία έχει ήδη καταβληθεί.'):'')+'\n\n';}
+    txt+='Παραμένουμε στη διάθεσή σας για κάθε διευκρίνιση.\n\nΜε εκτίμηση,\n';
+    let sb=document.getElementById('mailSendBtn');
+    if(!sb){sb=document.createElement('button');sb.id='mailSendBtn';sb.className='btn btn-green';document.querySelector('#reportModal .modal-content > div:last-child').prepend(sb);}
+    sb.style.display='inline-block';
+    sb.innerText='✉ Αποστολή στον δικαιούχο';
+    sb.onclick=()=>{window.location.href='mailto:'+encodeURIComponent(to)+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(txt);};
+  }
   document.getElementById('reportModal').style.display='block';
 }
 
@@ -2500,18 +2911,19 @@ function clientsSave(){
 function resetForm(){
   document.querySelectorAll('#tab_1 input, #tab_2 input, #tab_3 input').forEach(el=>{if(el.type!=='file')el.value='';});
   document.querySelectorAll('#tab_2 select, #tab_3 select').forEach(el=>{el.value='';if(el.classList.contains('bg-neutral')||el.classList.contains('form-control'))colorStandard(el);});
-  ['gen_beneficiary','gen_projectCode','gen_program','gen_type','genActionType','genEvalType','gen_budget','gen_fee_total','gen_fee_submit'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['gen_beneficiary','gen_projectCode','gen_program','gen_type','genActionType','genEvalType','gen_budget','gen_fee_total','gen_fee_submit','gen_contact','gen_email','gen_phone'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('fee_pct_total').value='3';
   document.getElementById('fee_pct_sub').value='13';
   document.getElementById('gen_fee_total').dataset.manual='0';
   document.getElementById('gen_fee_submit').dataset.manual='0';
-  ['eligibilityContainer','bpContainer','scoringContainer','docsContainer','expensesContainer','kadContainer'].forEach(id=>{const c=document.getElementById(id);if(c)c.innerHTML='';});
-  initPhoneForm();initPhase3();initIndirect();handlePhase3Gate();applyPhase3Mode();if(document.getElementById('ind_active'))document.getElementById('ind_active').checked=false;calcIndirect();
+  ['eligibilityContainer','bpContainer','scoringContainer','docsContainer','expensesContainer','kadContainer','expGroupsContainer'].forEach(id=>{const c=document.getElementById(id);if(c)c.innerHTML='';});
+  initPhoneForm();initPhase3();initIndirect();initContacts();refreshExpGroupOptions();handlePhase3Gate();applyPhase3Mode();renderLifeline();if(document.getElementById('ind_active'))document.getElementById('ind_active').checked=false;calcIndirect();
   if(typeof refreshProgramDropdown==='function')refreshProgramDropdown();
   calcFees();evaluateProgress(0);calculateTotalScore();updateDynamicHeaders();
 }
 let _autoSaveT=null;
 function scheduleAutoSave(){
+  if(typeof renderLifeline==='function')renderLifeline();
   if(CURRENT_CLIENT===null)return;
   clearTimeout(_autoSaveT);
   _autoSaveT=setTimeout(()=>{saveCurrentClient(true);const s=document.getElementById('saveStatus');if(s){s.innerText='✔ Αυτόματη αποθήκευση';setTimeout(()=>{if(s.innerText==='✔ Αυτόματη αποθήκευση')s.innerText='';},2500);}},900);
@@ -2523,6 +2935,8 @@ function saveCurrentClient(silent){
   c.name=document.getElementById('gen_beneficiary').value.trim()||c.name;
   c.code=document.getElementById('gen_projectCode').value.trim();
   c.program=document.getElementById('gen_program').value.trim();
+  c.email=document.getElementById('gen_email').value.trim();
+  c.phone=document.getElementById('gen_phone').value.trim();
   c.updated=new Date().toISOString();
   if(clientsSave()&&!silent)setSaveStatus('Αποθηκεύτηκε ο φάκελος «'+c.name+'».');
 }
@@ -2546,7 +2960,7 @@ function openClient(id){
   document.getElementById('gen_beneficiary').value=c.name||'';
   showWorkspace(true);
   _lastProgram=document.getElementById('gen_program_select').value||'';
-  switchTab(1);
+  switchTab((c.data&&c.data.lastTab)?c.data.lastTab:1);
   setSaveStatus('Άνοιξε ο φάκελος «'+c.name+'».');
 }
 function deleteClient(id,ev){
@@ -2572,6 +2986,7 @@ function setGeneralEnabled(on){
 }
 function showWorkspace(on){
   setGeneralEnabled(on);
+  const ll=document.getElementById('lifeline');if(ll)ll.style.display=on?'block':'none';
   document.getElementById('workspaceArea').style.display=on?'block':'none';
   [1,2,3].forEach(i=>{document.getElementById('tabbtn_'+i).style.display=on?'inline-block':'none';});
   document.getElementById('backBtn').style.display=on?'inline-block':'none';
@@ -2603,7 +3018,7 @@ function renderClients(){
   const ownerCol=document.getElementById('ownerCol');
   if(ownerCol)ownerCol.style.display=isAdminUser()?'table-cell':'none';
   if(!list.length){
-    tb.innerHTML='<tr><td colspan="7" style="text-align:center;color:#888;padding:26px;">'+(mine.length?'Κανένα αποτέλεσμα αναζήτησης.':'Δεν υπάρχουν φάκελοι πελατών. Πατήστε «+ Προσθήκη» για να ξεκινήσετε.')+'</td></tr>';
+    tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:#888;padding:26px;">'+(mine.length?'Κανένα αποτέλεσμα αναζήτησης.':'Δεν υπάρχουν φάκελοι πελατών. Πατήστε «+ Προσθήκη» για να ξεκινήσετε.')+'</td></tr>';
     return;
   }
   list.forEach(c=>{
@@ -2612,6 +3027,12 @@ function renderClients(){
     const tr=document.createElement('tr');
     tr.innerHTML='<td><strong>'+(c.name||'(χωρίς όνομα)').replace(/</g,'&lt;')+'</strong></td>'+
       (isAdminUser()?('<td><span class="owner-tag">'+((c.ownerName||c.owner||'—')+'').replace(/</g,'&lt;')+'</span></td>'):'')+
+      '<td style="font-size:12px;line-height:1.5;">'+
+        (c.email?('✉ <a href="mailto:'+c.email+'">'+c.email+'</a>'):'')+
+        (c.email&&c.phone?'<br>':'')+
+        (c.phone?('☎ <a href="tel:'+c.phone.replace(/\s/g,'')+'">'+c.phone+'</a>'):'')+
+        (!c.email&&!c.phone?'<span style="color:#bbb;">—</span>':'')+
+      '</td>'+
       '<td>'+(c.code||'-')+'</td>'+
       '<td>'+(c.program||'<span style="color:#aaa;">—</span>')+'</td>'+
       '<td style="white-space:nowrap;">'+upd+'</td>'+
@@ -2863,11 +3284,12 @@ function applyProgramTemplate(t){
 
   /* Φάση 2 ενότητα 7: δαπάνες */
   const xC=document.getElementById('expensesContainer');xC.innerHTML='';
-  (t.p2_exp||[]).forEach(o=>{addExpenseRow();const r=xC.lastElementChild;r.querySelector('.exp-desc').value=o.desc||'';
-    const subEls=r.querySelectorAll('.exp-sub');
-    const subs=o.subs||(o.just||o.lval?[{desc:o.just||'',net:'',ltype:o.ltype||'%',lval:o.lval||''}]:[]);
-    subs.slice(0,4).forEach((s,si)=>{if(!subEls[si])return;subEls[si].querySelector('.sub-desc').value=s.desc||'';subEls[si].querySelector('.sub-net').value=s.net||'';subEls[si].querySelector('.sub-ltype').value=s.ltype||'%';subEls[si].querySelector('.sub-lval').value=s.lval||'';});
-  });
+  const gC=document.getElementById('expGroupsContainer');
+  if(gC){
+    gC.innerHTML='';
+    (t.p2_exp||[]).forEach(o=>addExpGroup(o.desc||'',o.ltype||'%',o.lval||''));
+    refreshExpGroupOptions();
+  }
   evaluateAllExpenses();
   if(t.p3_process&&t.p3_process.length)processChecks=t.p3_process.slice();
   else processChecks=DEFAULT_PROCESS_CHECKS.slice();
@@ -2901,7 +3323,36 @@ function admAddScore(){document.getElementById('admScore').insertAdjacentHTML('b
 function admExpHtml(o){o=o||{};return '<div class="adm-row"><input type="text" class="grow adm-ed" value="'+String(o.desc||'').replace(/"/g,'&quot;')+'" placeholder="Περιγραφή δαπάνης"><input type="text" class="grow adm-ej" value="'+String(o.just||'').replace(/"/g,'&quot;')+'" placeholder="Τεκμηρίωση"><select class="adm-et" style="width:60px;"><option value="%"'+(o.ltype==='%'?' selected':'')+'>%</option><option value="€"'+(o.ltype==='€'?' selected':'')+'>€</option></select><input type="text" class="w80 adm-ev" value="'+String(o.lval||'').replace(/"/g,'&quot;')+'" placeholder="Όριο"><button class="adm-xbtn" onclick="this.parentElement.remove()">×</button></div>';}
 function admAddExp(){document.getElementById('admExp').insertAdjacentHTML('beforeend',admExpHtml({}));}
 
+let _admExpDocs={};let _admExpLast='';
+function admFillExpCats(){
+  const sel=document.getElementById('admExpCat');if(!sel)return;
+  const cur=sel.value;
+  sel.innerHTML='';
+  Object.keys(DEFAULT_EXPENSE_DOCS).forEach(k=>{
+    const o=document.createElement('option');o.value=k;o.textContent=k;sel.appendChild(o);
+  });
+  if(cur)sel.value=cur;
+}
+function admLoadExpDocs(){
+  if(_admExpLast){const prev=_admExpLast;_admExpDocs[prev]=admReadLines('admExpDocs');}
+  const cat=document.getElementById('admExpCat').value;_admExpLast=cat;
+  const list=_admExpDocs[cat]||DEFAULT_EXPENSE_DOCS[cat]||[];
+  admFillLines('admExpDocs',list,'Δικαιολογητικό');
+}
+function admStoreExpDocs(){
+  const cat=document.getElementById('admExpCat').value;
+  if(!cat)return;
+  _admExpDocs[cat]=admReadLines('admExpDocs');
+}
+function admResetExpDocs(){
+  const cat=document.getElementById('admExpCat').value;
+  delete _admExpDocs[cat];
+  admFillLines('admExpDocs',DEFAULT_EXPENSE_DOCS[cat]||[],'Δικαιολογητικό');
+  admStatus('Επαναφέρθηκαν οι προεπιλογές για «'+cat+'».');
+}
 function admResetProc(){
+  _admExpDocs=JSON.parse(JSON.stringify(t.p3_expense_docs||{}));
+  admFillExpCats();admLoadExpDocs();
   admFillLines('admP3Acc',t.p3_extra_accountant,'Δικαιολογητικό λογιστή');
   admFillLines('admP3Bank',t.p3_extra_bank,'Δικαιολογητικό τράπεζας/προμηθευτή');
   admFillLines('admP3Sup',t.p3_extra_supplier,'Δικαιολογητικό δαπάνης');
@@ -2940,6 +3391,7 @@ function admCollect(){
     p3_stage2:admReadLines('admP3S2'),
     p3_final:admReadLines('admP3F'),
     p3_process:admReadLines('admP3Proc'),
+    p3_expense_docs:(function(){admStoreExpDocs();const o={};Object.keys(_admExpDocs).forEach(k=>{const v=_admExpDocs[k];if(v&&v.length)o[k]=v;});return o;})(),
     p3_extra_accountant:admReadLines('admP3Acc'),
     p3_extra_bank:admReadLines('admP3Bank'),
     p3_extra_supplier:admReadLines('admP3Sup'),
@@ -3494,6 +3946,8 @@ window.onload=function(){
   initLogo();
   initPhase3();
   initIndirect();
+  initContacts();
+  renderLifeline();
   calcFees();
   initPrograms();
   initUsers();
@@ -3623,6 +4077,8 @@ async function clientsLoad(){
   CLIENTS=(data||[]).map(r=>({
     id:r.id,owner:r.owner,ownerName:(r.data&&r.data.__ownerName)||'',
     name:r.name,code:r.code||'',program:r.program||'',
+    email:((r.data||{}).general||{}).gen_email||'',
+    phone:((r.data||{}).general||{}).gen_phone||'',
     created:r.created_at,updated:r.updated_at,data:r.data||{}
   }));
   await attachOwnerNames();
