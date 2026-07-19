@@ -350,6 +350,19 @@ header{padding-left:110px;padding-right:110px;}
 .exp-grp{flex:2;min-width:160px;}
 .exp-sub-total{font-weight:bold;color:var(--green);font-size:12.5px;white-space:nowrap;min-width:150px;text-align:right;}
 .vat-lbl{font-size:11px;color:#888;}
+
+/* ===== v23 ===== */
+.exp-grp-head{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;padding-bottom:8px;border-bottom:2px solid #cfe8cf;}
+.exp-grp-head .exp-grp{flex:3;min-width:220px;font-weight:bold;color:var(--primary-blue);background:#f2f8f2;}
+.exp-grp-head .grp-ltype{width:62px;}
+.exp-grp-head .grp-lval{width:110px;}
+.expense-row.grp-over{border-color:var(--red);background:#fdf3f3;}
+.grp-sum{width:100%;border-collapse:collapse;font-size:13px;margin-top:14px;}
+.grp-sum th{background:var(--green);color:#fff;padding:8px 10px;text-align:left;font-size:12.5px;}
+.grp-sum td{border-bottom:1px solid #e4e4e4;padding:8px 10px;}
+.grp-sum td.num{text-align:right;white-space:nowrap;font-weight:bold;}
+.grp-sum tr.over td{background:#fdeaea;color:#b02a37;}
+.grp-sum tr.grand td{background:#eafaf1;font-weight:bold;border-top:2px solid var(--green);}
 </style>
 </head>
 <body>
@@ -618,15 +631,12 @@ header{padding-left:110px;padding-right:110px;}
       <div class="form-row form-row-inline"><label>Έχουμε συμπεριλάβει όλες τις δαπάνες ανά κατηγορία σύμφωνα με τον οδηγό;</label><div><select id="exp_2" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
       <h4 style="margin-top:25px;color:var(--green);border-bottom:1px solid #eee;padding-bottom:5px;">Ανάλυση Επιμέρους Δαπανών</h4>
       <p style="font-size:13px;color:#555;">Ο έλεγχος υπέρβασης υπολογίζεται βάσει του «Προϋπολογισμού Επενδυτικού Σχεδίου» στα Γενικά Στοιχεία. Οι τέσσερις γραμμές τεκμηρίωσης ανά δαπάνη είναι <strong>προαιρετικές</strong> — συμπληρώστε όσες χρειάζεστε.</p>
-      <div style="background:#eef7ee;border:1px solid #cfe8cf;border-radius:6px;padding:14px;margin-bottom:16px;">
-        <h4 style="margin:0 0 4px 0;color:var(--green);font-size:15px;">ΟΜΑΔΕΣ ΔΑΠΑΝΩΝ &amp; ΑΝΩΤΑΤΑ ΟΡΙΑ</h4>
-        <p style="font-size:12.5px;color:#666;margin:0 0 10px 0;">Το ανώτατο όριο (% επί του Π/Υ ή ποσό σε €) ορίζεται <strong>ανά ομάδα δαπάνης</strong> — π.χ. «Μηχανήματα &amp; Εξοπλισμός». Ο έλεγχος γίνεται στο άθροισμα όλων των υποκατηγοριών της ομάδας.</p>
-        <div id="expGroupsContainer"></div>
-        <button class="btn-add" style="color:var(--green);border-color:var(--green);background:#eafaf1;" onclick="addExpGroup()">+ Προσθήκη ομάδας δαπάνης</button>
-      </div>
+      <p style="font-size:12.5px;color:#666;margin:0 0 12px 0;">Γράψτε την <strong>ομάδα δαπάνης</strong> (π.χ. «Μηχανήματα &amp; Εξοπλισμός») με το ανώτατο όριό της, και από κάτω την <strong>υποκατηγορία</strong> (π.χ. «Παραγωγικός Εξοπλισμός») με τις τεκμηριώσεις. Γραμμές με την <strong>ίδια ομάδα</strong> αθροίζονται αυτόματα για τον έλεγχο του ορίου, επί του Π/Υ των Γενικών Στοιχείων.</p>
+      <div id="expGroupsContainer" style="display:none;"></div>
       <div id="expensesContainer"></div>
+      <div id="expGroupSummary"></div>
       <div id="indirectContainer"></div>
-      <button class="btn-add" style="color:var(--green);border-color:var(--green);background:#eafaf1;" onclick="addExpenseRow()">+ Προσθήκη Υποκατηγορίας Δαπάνης</button>
+      <button class="btn-add" style="color:var(--green);border-color:var(--green);background:#eafaf1;" onclick="addExpenseRow()">+ Προσθήκη Δαπάνης</button>
       <button class="btn btn-green" style="margin-top:8px;" onclick="exportExpensesExcel()">⬇️ Excel Δαπανών</button>
     </div>
 
@@ -699,15 +709,16 @@ header{padding-left:110px;padding-right:110px;}
   </div><!-- /tab wrapper -->
 </div>
 
+<div id="lifeline">
+  <h4>ΓΡΑΜΜΗ ΖΩΗΣ ΕΡΓΟΥ</h4>
+  <div class="ll-wrap" id="llWrap"></div>
 <footer>
   &copy; 2026 Κατασκευή και ανάπτυξη λογισμικού: <strong>Ευάγγελος Γκούλιος</strong>. Με την επιφύλαξη παντός δικαιώματος.
 </footer>
 
 </div>
 
-<div id="lifeline">
-  <h4>ΓΡΑΜΜΗ ΖΩΗΣ ΕΡΓΟΥ</h4>
-  <div class="ll-wrap" id="llWrap"></div>
+
 </div>
 
 <div id="reportModal" class="modal">
@@ -783,6 +794,39 @@ header{padding-left:110px;padding-right:110px;}
       <button class="adm-xbtn" title="Διαγραφή προγράμματος" onclick="admDeleteProgram()">🗑</button>
     </div>
     <div class="adm-row"><input type="text" id="admName" class="grow" placeholder="Ονομασία προγράμματος (π.χ. Ξεκινώ Επιχειρηματικά)" oninput="admRenameLive()"></div>
+    <div class="adm-sec open" id="admSecMeta"><h4 onclick="admToggle(this)"><span>ΣΤΟΙΧΕΙΑ ΠΡΟΓΡΑΜΜΑΤΟΣ</span><span>▾</span></h4>
+      <div class="adm-body">
+        <div class="adm-row">
+          <span style="min-width:150px;font-size:12.5px;">Καθεστώς επιχείρησης</span>
+          <input type="text" id="admMetaType" class="grow" placeholder="π.χ. Υπό ίδρυση / Νεοσύστατη / Υφιστάμενη (χωρίστε με κόμμα)">
+        </div>
+        <div class="adm-row">
+          <span style="min-width:150px;font-size:12.5px;">Είδος δράσης</span>
+          <select id="admMetaAction" class="grow">
+            <option value="">— κανένα —</option>
+            <option>Επενδυτικό Πρόγραμμα</option><option>Κεφαλαίου κίνησης ή Απλοποιημένο κόστους</option>
+            <option>Επιδότηση τόκων Δανείου</option><option>Voucher</option>
+            <option>Επιδότηση Προσωπικού (ΔΥΠΑ)</option><option>Επιδότηση Προσωπικού 100% (ΔΥΠΑ)</option>
+          </select>
+        </div>
+        <div class="adm-row">
+          <span style="min-width:150px;font-size:12.5px;">Τρόπος αξιολόγησης</span>
+          <select id="admMetaEval" class="grow"><option value="">— κανένας —</option><option>FIFO</option><option>Συγκριτική Αξιολόγηση</option></select>
+        </div>
+        <div class="adm-row">
+          <span style="min-width:150px;font-size:12.5px;">Π/Υ επενδυτικού σχεδίου</span>
+          <input type="text" id="admMetaBudMin" style="width:150px;" placeholder="από (€)">
+          <input type="text" id="admMetaBudMax" style="width:150px;" placeholder="έως (€)">
+          <span style="min-width:120px;font-size:12.5px;">Ένταση ενίσχυσης</span>
+          <input type="text" id="admMetaAid" style="width:100px;" placeholder="π.χ. 65 %">
+        </div>
+        <div class="adm-row">
+          <label style="display:flex;align-items:center;gap:7px;font-size:12.5px;cursor:pointer;">
+            <input type="checkbox" id="admMetaIndirect" style="width:17px;height:17px;"> Το πρόγραμμα έχει <strong>έμμεσες δαπάνες</strong>
+          </label>
+          <input type="text" id="admMetaIndirectPct" style="width:80px;" placeholder="π.χ. 7"><span style="font-size:12.5px;">% επί των λοιπών</span>
+        </div>
+      </div></div>
 
     <div class="adm-sec open" id="admSecBasic"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 1 · Οι 2 βασικές προϋποθέσεις συμμετοχής</span><span>▾</span></h4>
       <div class="adm-body"><p class="adm-hint">Δύο σημαντικότερες προϋποθέσεις. Ο χρήστης απαντά απλώς αν τις πληροί.</p><div id="admBasic"></div></div></div>
@@ -822,6 +866,16 @@ header{padding-left:110px;padding-right:110px;}
         </div>
         <div id="admExpDocs"></div>
         <button class="adm-addbtn" onclick="admAddLine('admExpDocs')">+ Προσθήκη δικαιολογητικού</button>
+      </div></div>
+
+    <div class="adm-sec" id="admSecP3Full"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 3 · Πλήρης επεξεργασία δικαιολογητικών ανά δαπάνη</span><span>▾</span></h4>
+      <div class="adm-body">
+        <p class="adm-hint">Επιλέξτε κατηγορία δαπάνης και προσαρμόστε <strong>κάθε</strong> ενότητα του checklist. Το ✕ αφαιρεί, το + προσθέτει. Ισχύει μόνο για αυτό το πρόγραμμα.</p>
+        <div class="adm-row">
+          <select id="admP3Cat" class="grow" onchange="admLoadP3Full()"></select>
+          <button class="adm-addbtn" onclick="admResetP3Full()">↻ Επαναφορά προεπιλογών</button>
+        </div>
+        <div id="admP3Sections"></div>
       </div></div>
 
     <div class="adm-sec" id="admSecP3Extra"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 3 · Επιπλέον δικαιολογητικά ανά κατηγορία (για προγράμματα με παραστατικά)</span><span>▾</span></h4>
@@ -1322,34 +1376,6 @@ function calcIndirect(){
   document.getElementById('ind_status').innerHTML=on?'✅':'';
   return val;
 }
-function addExpGroup(name,ltype,lval){
-  const c=document.getElementById('expGroupsContainer');if(!c)return;
-  const d=document.createElement('div');d.className='expg-row';
-  d.innerHTML='<input type="text" class="form-control g-name" placeholder="Ομάδα δαπάνης (π.χ. Μηχανήματα &amp; Εξοπλισμός)" value="'+String(name||'').replace(/"/g,'&quot;')+'" oninput="refreshExpGroupOptions();evaluateAllExpenses();">'+
-    '<span class="vat-lbl">Όριο</span>'+
-    '<select class="form-control g-ltype" onchange="evaluateAllExpenses()"><option value="%"'+(ltype==='%'?' selected':'')+'>%</option><option value="€"'+(ltype==='€'?' selected':'')+'>€</option></select>'+
-    '<input type="text" class="form-control g-lval" placeholder="τιμή" value="'+String(lval||'').replace(/"/g,'&quot;')+'" oninput="evaluateAllExpenses()">'+
-    '<span class="g-total">—</span>'+
-    '<button class="btn-remove" onclick="this.parentElement.remove();refreshExpGroupOptions();evaluateAllExpenses();">×</button>';
-  c.appendChild(d);
-  refreshExpGroupOptions();
-}
-function getExpGroups(){
-  return [...document.querySelectorAll('#expGroupsContainer .expg-row')].map(r=>({
-    name:r.querySelector('.g-name').value.trim(),
-    ltype:r.querySelector('.g-ltype').value,
-    lval:r.querySelector('.g-lval').value.trim(),
-    el:r
-  })).filter(g=>g.name);
-}
-function refreshExpGroupOptions(){
-  const names=getExpGroups().map(g=>g.name);
-  document.querySelectorAll('#expensesContainer .exp-grp').forEach(sel=>{
-    const cur=sel.value;
-    sel.innerHTML='<option value="">— Ομάδα δαπάνης —</option>'+names.map(n=>'<option value="'+n.replace(/"/g,'&quot;')+'">'+n+'</option>').join('');
-    if(names.includes(cur))sel.value=cur;
-  });
-}
 function addExpenseRow(){
   const c=document.getElementById('expensesContainer');const rowId=`exp_row_${dynIds++}`;
   const row=document.createElement('div');row.className='expense-row';row.id=rowId;
@@ -1363,9 +1389,14 @@ function addExpenseRow(){
       <span class="vat-lbl">%</span>
     </div>`;
   }
-  row.innerHTML=`<div class="exp-main-head">
-      <select class="form-control exp-grp" onchange="evaluateAllExpenses()"></select>
-      <input type="text" class="form-control exp-cat" placeholder="Υποκατηγορία / Χαρακτηρισμός (π.χ. Παραγωγικός &amp; Μηχανολογικός Εξοπλισμός)">
+  row.innerHTML=`<div class="exp-grp-head">
+      <input type="text" class="form-control exp-grp" placeholder="ΟΜΑΔΑ ΔΑΠΑΝΗΣ — π.χ. Μηχανήματα &amp; Εξοπλισμός" oninput="evaluateAllExpenses()">
+      <span class="vat-lbl">Όριο ομάδας</span>
+      <select class="form-control grp-ltype" onchange="evaluateAllExpenses()"><option value="%">%</option><option value="€">€</option></select>
+      <input type="text" class="form-control grp-lval" placeholder="τιμή" oninput="evaluateAllExpenses()">
+    </div>
+    <div class="exp-main-head">
+      <input type="text" class="form-control exp-cat" placeholder="Υποκατηγορία / Χαρακτηρισμός — π.χ. Παραγωγικός Εξοπλισμός">
       <input type="text" class="form-control exp-opske" placeholder="Κωδικός ΟΠΣΚΕ" style="flex:1;min-width:110px;">
       <span class="exp-sub-total">Σύνολο: 0,00 €</span>
       <div class="move-col"><button class="btn-move" title="Μετακίνηση πάνω" onclick="moveExpense(this,-1)">▲</button><button class="btn-move" title="Μετακίνηση κάτω" onclick="moveExpense(this,1)">▼</button></div>
@@ -1373,8 +1404,24 @@ function addExpenseRow(){
     </div>
     <div class="exp-subs">${subs}</div>`;
   c.appendChild(row);
-  refreshExpGroupOptions();
 }
+function getExpGroups(){
+  /* Συγκεντρώνει τις μοναδικές ομάδες από τις γραμμές δαπανών. */
+  const map={};
+  document.querySelectorAll('#expensesContainer .expense-row').forEach(r=>{
+    const n=r.querySelector('.exp-grp').value.trim();
+    if(!n)return;
+    if(!map[n])map[n]={name:n,ltype:r.querySelector('.grp-ltype').value,lval:r.querySelector('.grp-lval').value.trim(),rows:[]};
+    /* Το όριο λαμβάνεται από την πρώτη γραμμή που το ορίζει. */
+    if(!parseGreekNumber(map[n].lval)&&parseGreekNumber(r.querySelector('.grp-lval').value)){
+      map[n].ltype=r.querySelector('.grp-ltype').value;map[n].lval=r.querySelector('.grp-lval').value.trim();
+    }
+    map[n].rows.push(r);
+  });
+  return Object.values(map);
+}
+function refreshExpGroupOptions(){}
+function addExpGroup(){}
 /* --- ΦΠΑ: αμφίδρομος υπολογισμός --- */
 function vatOf(sub){const v=parseGreekNumber(sub.querySelector('.sub-vat').value);return isFinite(v)?v:24;}
 function onNetInput(el){
@@ -1394,9 +1441,7 @@ function onGrossInput(el){
   evaluateExpense(el);
 }
 function expFmt(v){return (v||0).toLocaleString('el-GR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';}
-function subRowTotal(row){
-  let t=0;row.querySelectorAll('.sub-net').forEach(n=>t+=parseGreekNumber(n.value));return t;
-}
+function subRowTotal(row){let t=0;row.querySelectorAll('.sub-net').forEach(n=>t+=parseGreekNumber(n.value));return t;}
 function evaluateExpense(element){
   const row=element.closest('.expense-row');
   if(row){const t=row.querySelector('.exp-sub-total');if(t)t.innerText='Σύνολο: '+expFmt(subRowTotal(row));}
@@ -1404,29 +1449,26 @@ function evaluateExpense(element){
 }
 function evaluateAllExpenses(){
   const budget=parseGreekNumber(document.getElementById('gen_budget').value);
-  /* σύνολα ανά υποκατηγορία */
   document.querySelectorAll('#expensesContainer .expense-row').forEach(r=>{
     const t=r.querySelector('.exp-sub-total');if(t)t.innerText='Σύνολο: '+expFmt(subRowTotal(r));
   });
-  /* σύνολα & έλεγχος ανά ομάδα */
-  getExpGroups().forEach(g=>{
-    let sum=0;
-    document.querySelectorAll('#expensesContainer .expense-row').forEach(r=>{
-      const sel=r.querySelector('.exp-grp');
-      if(sel&&sel.value===g.name)sum+=subRowTotal(r);
-    });
+  const groups=getExpGroups();
+  let sumHtml='';let grand=0;
+  groups.forEach(g=>{
+    let sum=0;g.rows.forEach(r=>sum+=subRowTotal(r));
+    grand+=sum;
     const lval=parseGreekNumber(g.lval);
-    let maxA=Infinity,txt='Σύνολο: '+expFmt(sum);
-    if(lval>0){
-      maxA=(g.ltype==='%')?budget*(lval/100):lval;
-      txt+=' / όριο '+expFmt(maxA);
-    }
+    let maxA=Infinity,lim='—';
+    if(lval>0){maxA=(g.ltype==='%')?budget*(lval/100):lval;lim=(g.ltype==='%')?(g.lval+'% = '+expFmt(maxA)):expFmt(maxA);}
     const over=(lval>0&&sum>maxA);
-    g.el.classList.toggle('over',over);
-    const te=g.el.querySelector('.g-total');
-    te.innerText=(over?'❌ ':(sum>0?'✅ ':''))+txt;
-    te.style.color=over?'var(--red)':'var(--green)';
+    g.rows.forEach(r=>r.classList.toggle('grp-over',over));
+    sumHtml+='<tr class="'+(over?'over':'')+'"><td>'+g.name+'</td><td class="num">'+expFmt(sum)+'</td><td>'+lim+'</td><td>'+(lval>0?(over?'❌ Υπέρβαση':'✅ Εντός ορίου'):'')+'</td></tr>';
   });
+  const box=document.getElementById('expGroupSummary');
+  if(box){
+    box.innerHTML=groups.length?('<table class="grp-sum"><thead><tr><th>Ομάδα δαπάνης</th><th>Σύνολο</th><th>Όριο</th><th>Έλεγχος</th></tr></thead><tbody>'+sumHtml+
+      '<tr class="grand"><td>ΣΥΝΟΛΟ ΔΑΠΑΝΩΝ</td><td class="num">'+expFmt(grand)+'</td><td colspan="2"></td></tr></tbody></table>'):'';
+  }
   calcIndirect();
 }
 function updateDocLink(key){
@@ -1447,9 +1489,7 @@ function buildExpensesData(){
     const lval=parseGreekNumber(g.lval);
     const maxA=lval>0?((g.ltype==='%')?budget*(lval/100):lval):Infinity;
     const cats=[];let gsum=0;
-    document.querySelectorAll('#expensesContainer .expense-row').forEach(r=>{
-      const sel=r.querySelector('.exp-grp');
-      if(!sel||sel.value!==g.name)return;
+    g.rows.forEach(r=>{
       const items=[];let csum=0;
       r.querySelectorAll('.exp-sub').forEach(s=>{
         const d=s.querySelector('.sub-desc').value.trim();
@@ -1470,8 +1510,7 @@ function buildExpensesData(){
   /* δαπάνες χωρίς ομάδα */
   const orphan=[];let osum=0;
   document.querySelectorAll('#expensesContainer .expense-row').forEach(r=>{
-    const sel=r.querySelector('.exp-grp');
-    if(sel&&sel.value)return;
+    if(r.querySelector('.exp-grp').value.trim())return;
     const items=[];let csum=0;
     r.querySelectorAll('.exp-sub').forEach(s=>{
       const d=s.querySelector('.sub-desc').value.trim();
@@ -1830,6 +1869,8 @@ function updateChecklist(index){
     if(biblia==="Β κατηγορίας"&&bibliaItems.length>0){bibliaItems[0]="Λογιστική εγγραφή (στήλη εξόδων) Εσόδων Εξόδων με σφραγίδα & υπογραφή λογιστή ή/και του νόμιμου εκπροσώπου";}
   }
   const _cfg=(typeof currentProgramCfg==='function')?currentProgramCfg():{};
+  const _pf=(_cfg.p3_full&&_cfg.p3_full[dapani])||{};
+  if(_pf.accountant&&_pf.accountant.length)bibliaItems=_pf.accountant.slice();
   bibliaItems=bibliaItems.concat(_cfg.p3_extra_accountant||[]);
   addSection("ΖΗΤΑ ΑΠΟ ΤΟΝ ΛΟΓΙΣΤΗ",bibliaItems,"accountant","accountant");
   let timItems=[];
@@ -1839,6 +1880,7 @@ function updateChecklist(index){
   }
   if(dapani==="Λογισμικό"){timItems=timItems.map(i=>i.replace("Τα μηχανήματα ή τα υλικά μεταφέρονται στον τόπο υλοποίησης της επένδυσης;","Τα λογισμικά μεταφέρονται στον τόπο υλοποίησης της επένδυσης;"));}
   else if(dapani==="Διαφήμιση"){timItems=timItems.map(i=>i.replace("Τα μηχανήματα ή τα υλικά μεταφέρονται στον τόπο υλοποίησης της επένδυσης;","Τα υλικά διαφήμισης μεταφέρονται στον τόπο υλοποίησης της επένδυσης;"));}
+  if(_pf.invoice&&_pf.invoice.length)timItems=_pf.invoice.slice();
   addSection("ΑΦΟΡΟΥΝ ΤΟ ΤΙΜΟΛΟΓΙΟ",timItems,"invoice","general");
   let exItems=[];
   if(exoflisi==="Με μετρητά"){exItems=["Πληρωμή με μετρητά επιτρέπεται μόνο για καθαρά ποσά τιμολογίων μέχρι 500€.","Απαιτείται σφραγίδα και υπογραφή προμηθευτή.Στην υπογραφή της βεβαίωσης Εξόφλησης ή Απόδειξη είσπραξης ανήκει στον νόμιμο εκπρόσωπο του προμηθευτή;","Είναι επιλέξιμη η ημερομηνία της πληρωμής;"];}
@@ -1846,12 +1888,14 @@ function updateChecklist(index){
   else if(exoflisi==="Με τραπεζικό μέσο"){exItems=["__BANK_INSTRUMENT__","Extrait","Μεταφέρονται από τον εταιρικό λογαριασμό του δικαιούχου στον εταιρικό λογαριασμό του προμηθευτή;","Αν είναι έμβασμα εμφανίζονται και οι δύο λογαριασμοί Χρέωσης και Πίστωσης με αναφορά σε ποιον ανήκουν;"];
     if(dapani==="Νέος Υπάλληλος"){exItems=exItems.map(i=>i.replace("στον εταιρικό λογαριασμό του προμηθευτή","στον λογαριασμό του υπαλλήλου"));}
   }
+  if(_pf.bank&&_pf.bank.length)exItems=_pf.bank.slice();
   exItems=exItems.concat(_cfg.p3_extra_bank||[]);
   addSection("ΔΙΚΑΙΟΛΟΓΗΤΙΚΑ ΑΠΟ ΤΡΑΠΕΖΑ / ΠΡΟΜΗΘΕΥΤΗ",exItems,"bank","bank");
   if(leasing==="Ναι"){
     addSection("ΖΗΤΑ ΑΠΟ ΠΡΟΜΗΘΕΥΤΗ LEASING",["Υπάρχει αγορά/μίσθωση με Leasing από προμηθευτή που έχει το δικαίωμα πώληση με Leasing;","Υπάρχει Συμφωνητικό κατατεθειμένο στη ΔΟΥ που να προβλέπει ότι με την ολοκλήρωση του Leasing το αντικείμενο αγορά θα περιέλθει στην κυριότητα του δικαιούχου της επένδυσης","Υπάρχει βεβαίωση προμηθευτή για καινουργίες - αμεταχείριστο του αντικειμένου με αναφορά στο s/n (εφόσον διαθέτει s/n το αντικείμενο);","Εφόσον υπάρχει απαλλαγή ΦΠΑ, υπάρχει σχετικό απαλλακτικό ΦΠΑ για το Leasing"],"leasing","leasing_provider");
   }
   let dapItems=(_cfg.p3_expense_docs&&_cfg.p3_expense_docs[dapani])?_cfg.p3_expense_docs[dapani].slice():((DEFAULT_EXPENSE_DOCS[dapani]||[]).slice());
+  if(_pf.expense&&_pf.expense.length)dapItems=_pf.expense.slice();
   dapItems=dapItems.concat(_cfg.p3_extra_supplier||[]);
   addSection("ΔΙΚΑΙΟΛΟΓΗΤΙΚΑ ΓΙΑ ΤΗΝ ΣΥΓΚΕΚΡΙΜΕΝΗ ΔΑΠΑΝΗ",dapItems,"expense","general");
   container.innerHTML=html;
@@ -2024,10 +2068,9 @@ function collectData(){
   document.querySelectorAll('#bpContainer .dynamic-row').forEach(r=>data.phase2_dyn.bp.push({k:r.querySelector('.dyn-key').value,v:r.querySelector('.dyn-val').value}));
   document.querySelectorAll('#scoringContainer .score-row').forEach(r=>data.phase2_dyn.score.push({k:r.querySelector('.dyn-key').value,sc:r.querySelector('.dyn-score').value,cw:r.querySelector('.dyn-cw').value,gw:r.querySelector('.dyn-group').value,v:r.querySelector('.dyn-val').value,src:r.querySelector('.dyn-key').dataset.src||''}));
   document.querySelectorAll('#docsContainer .dynamic-row').forEach(r=>data.phase2_dyn.docs.push({k:r.querySelector('.dyn-key').value,v:r.querySelector('.dyn-val').value,src:r.querySelector('.dyn-key').dataset.src||''}));
-  data.phase2_dyn.expGroups=getExpGroups().map(g=>({name:g.name,ltype:g.ltype,lval:g.lval}));
   document.querySelectorAll('#expensesContainer .expense-row').forEach(r=>{
     const subs=[...r.querySelectorAll('.exp-sub')].map(s=>({desc:s.querySelector('.sub-desc').value,net:s.querySelector('.sub-net').value,gross:s.querySelector('.sub-gross').value,vat:s.querySelector('.sub-vat').value}));
-    data.phase2_dyn.expenses.push({group:r.querySelector('.exp-grp').value,cat:r.querySelector('.exp-cat').value,opske:r.querySelector('.exp-opske').value,subs:subs});
+    data.phase2_dyn.expenses.push({group:r.querySelector('.exp-grp').value,gltype:r.querySelector('.grp-ltype').value,glval:r.querySelector('.grp-lval').value,cat:r.querySelector('.exp-cat').value,opske:r.querySelector('.exp-opske').value,subs:subs});
   });
 
   /* --- ΦΑΣΗ 3 --- */
@@ -2144,7 +2187,9 @@ function applyData(data){
               else if(type==='exp'){
                 row.querySelector('.exp-cat').value=item.cat||item.desc||'';
                 row.querySelector('.exp-opske').value=item.opske||'';
-                if(item.group){const gs=row.querySelector('.exp-grp');if(![...gs.options].some(o=>o.value===item.group)){const o=document.createElement('option');o.value=item.group;o.textContent=item.group;gs.appendChild(o);}gs.value=item.group;}
+                row.querySelector('.exp-grp').value=item.group||'';
+                if(item.gltype)row.querySelector('.grp-ltype').value=item.gltype;
+                row.querySelector('.grp-lval').value=item.glval||'';
                 const subEls=row.querySelectorAll('.exp-sub');
                 (item.subs||[]).slice(0,4).forEach((s,si)=>{
                   if(!subEls[si])return;
@@ -2163,12 +2208,7 @@ function applyData(data){
         populate('bpContainer',data.phase2_dyn.bp,'standard',()=>addDynamicRow('bpContainer','Ερώτηση BP...','text'));
         populate('scoringContainer',data.phase2_dyn.score,'score',addScoringRow);
         populate('docsContainer',data.phase2_dyn.docs,'standard',addDocRow);
-        {const gc2=document.getElementById('expGroupsContainer');
-         if(gc2){gc2.innerHTML='';(data.phase2_dyn.expGroups||[]).forEach(g=>addExpGroup(g.name,g.ltype,g.lval));refreshExpGroupOptions();}}
         populate('expensesContainer',data.phase2_dyn.expenses,'exp',addExpenseRow);
-        refreshExpGroupOptions();
-        const gc=document.getElementById('expGroupsContainer');
-        if(gc){gc.innerHTML='';(data.phase2_dyn.expGroups||[]).forEach(g=>addExpGroup(g.name,g.ltype,g.lval));refreshExpGroupOptions();}
         const ind=data.phase2_dyn.indirect;
         if(ind&&document.getElementById('ind_active')){
           document.getElementById('ind_active').checked=!!ind.active;
@@ -2922,7 +2962,9 @@ function resetForm(){
   calcFees();evaluateProgress(0);calculateTotalScore();updateDynamicHeaders();
 }
 let _autoSaveT=null;
+let LOADING=false;
 function scheduleAutoSave(){
+  if(LOADING)return;
   if(typeof renderLifeline==='function')renderLifeline();
   if(CURRENT_CLIENT===null)return;
   clearTimeout(_autoSaveT);
@@ -2955,8 +2997,10 @@ function openClient(id){
   const c=CLIENTS.find(x=>x.id===id);if(!c)return;
   if(!canAccess(c)){alert('Δεν έχετε δικαίωμα πρόσβασης σε αυτόν τον φάκελο.');return;}
   CURRENT_CLIENT=id;
+  LOADING=true;
   resetForm();
   try{applyData(c.data||EMPTY_DATA);}catch(e){console.error(e);}
+  LOADING=false;
   document.getElementById('gen_beneficiary').value=c.name||'';
   showWorkspace(true);
   _lastProgram=document.getElementById('gen_program_select').value||'';
@@ -3284,11 +3328,19 @@ function applyProgramTemplate(t){
 
   /* Φάση 2 ενότητα 7: δαπάνες */
   const xC=document.getElementById('expensesContainer');xC.innerHTML='';
-  const gC=document.getElementById('expGroupsContainer');
-  if(gC){
-    gC.innerHTML='';
-    (t.p2_exp||[]).forEach(o=>addExpGroup(o.desc||'',o.ltype||'%',o.lval||''));
-    refreshExpGroupOptions();
+  (t.p2_exp||[]).forEach(o=>{
+    addExpenseRow();
+    const r=xC.lastElementChild;
+    r.querySelector('.exp-grp').value=o.desc||'';
+    if(o.ltype)r.querySelector('.grp-ltype').value=o.ltype;
+    r.querySelector('.grp-lval').value=o.lval||'';
+    if(o.just)r.querySelector('.exp-cat').value=o.just;
+  });
+  if(t.meta_action&&document.getElementById('genActionType'))document.getElementById('genActionType').value=t.meta_action;
+  if(t.meta_eval&&document.getElementById('genEvalType'))document.getElementById('genEvalType').value=t.meta_eval;
+  if(document.getElementById('ind_active')){
+    document.getElementById('ind_active').checked=!!t.meta_indirect;
+    if(t.meta_indirect_pct)document.getElementById('ind_pct').value=t.meta_indirect_pct;
   }
   evaluateAllExpenses();
   if(t.p3_process&&t.p3_process.length)processChecks=t.p3_process.slice();
@@ -3300,8 +3352,21 @@ function applyProgramTemplate(t){
 
 /* =================== ADMIN PANEL =================== */
 let admCurrent='';
+let _admSaveT=null;
+function admAutoSave(){
+  clearTimeout(_admSaveT);
+  _admSaveT=setTimeout(()=>{
+    const n=document.getElementById('admName').value.trim();
+    if(n)admSaveProgram();
+  },1500);
+}
 function openAdmin(){
   if(!IS_ADMIN)return;
+  if(!window._admBound){
+    window._admBound=true;
+    document.getElementById('adminModal').addEventListener('input',admAutoSave);
+    document.getElementById('adminModal').addEventListener('change',admAutoSave);
+  }
   admRefreshList();
   const first=Object.keys(PROGRAMS).sort()[0]||'';
   admCurrent=first; admLoadIntoForm(first);
@@ -3350,8 +3415,57 @@ function admResetExpDocs(){
   admFillLines('admExpDocs',DEFAULT_EXPENSE_DOCS[cat]||[],'Δικαιολογητικό');
   admStatus('Επαναφέρθηκαν οι προεπιλογές για «'+cat+'».');
 }
+/* ---- Πλήρης επεξεργασία checklists Φάσης 3 ---- */
+const P3_SECTIONS=[
+  {key:'accountant',lbl:'Ζήτα από τον Λογιστή'},
+  {key:'invoice',   lbl:'Αφορούν το Τιμολόγιο'},
+  {key:'bank',      lbl:'Δικαιολογητικά από Τράπεζα / Προμηθευτή'},
+  {key:'leasing',   lbl:'Ζήτα από Προμηθευτή Leasing'},
+  {key:'expense',   lbl:'Δικαιολογητικά για τη συγκεκριμένη δαπάνη'}
+];
+let _p3Full={},_p3Last='';
+function admFillP3Cats(){
+  const sel=document.getElementById('admP3Cat');if(!sel)return;
+  const cur=sel.value;sel.innerHTML='';
+  Object.keys(DEFAULT_EXPENSE_DOCS).forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=k;sel.appendChild(o);});
+  if(cur)sel.value=cur;
+}
+function admP3Defaults(cat,key){
+  if(key==='expense')return (DEFAULT_EXPENSE_DOCS[cat]||[]).slice();
+  return [];
+}
+function admStoreP3Full(){
+  if(!_p3Last)return;
+  _p3Full[_p3Last]=_p3Full[_p3Last]||{};
+  P3_SECTIONS.forEach(s=>{
+    const arr=[...document.querySelectorAll('#p3sec_'+s.key+' .adm-line')].map(i=>i.value.trim()).filter(Boolean);
+    _p3Full[_p3Last][s.key]=arr;
+  });
+}
+function admLoadP3Full(){
+  admStoreP3Full();
+  const cat=document.getElementById('admP3Cat').value;_p3Last=cat;
+  const box=document.getElementById('admP3Sections');box.innerHTML='';
+  P3_SECTIONS.forEach(s=>{
+    const d=document.createElement('div');
+    d.innerHTML='<strong style="font-size:13px;color:#4b2e6b;display:block;margin-top:12px;">'+s.lbl+'</strong>'+
+      '<div id="p3sec_'+s.key+'"></div>'+
+      '<button class="adm-addbtn" onclick="admAddLine(\'p3sec_'+s.key+'\')">+ Προσθήκη</button>';
+    box.appendChild(d);
+    const src=(_p3Full[cat]&&_p3Full[cat][s.key])?_p3Full[cat][s.key]:admP3Defaults(cat,s.key);
+    admFillLines('p3sec_'+s.key,src,'Δικαιολογητικό');
+  });
+}
+function admResetP3Full(){
+  const cat=document.getElementById('admP3Cat').value;
+  delete _p3Full[cat];_p3Last='';
+  admLoadP3Full();
+  admStatus('Επαναφέρθηκαν οι προεπιλογές για «'+cat+'».');
+}
 function admResetProc(){
   _admExpDocs=JSON.parse(JSON.stringify(t.p3_expense_docs||{}));
+  _p3Full=JSON.parse(JSON.stringify(t.p3_full||{}));_p3Last='';
+  admFillP3Cats();admLoadP3Full();
   admFillExpCats();admLoadExpDocs();
   admFillLines('admP3Acc',t.p3_extra_accountant,'Δικαιολογητικό λογιστή');
   admFillLines('admP3Bank',t.p3_extra_bank,'Δικαιολογητικό τράπεζας/προμηθευτή');
@@ -3362,6 +3476,14 @@ function admResetProc(){
 function admLoadIntoForm(name){
   const t=PROGRAMS[name]||{};
   document.getElementById('admName').value=name||'';
+  document.getElementById('admMetaType').value=t.meta_type||'';
+  document.getElementById('admMetaAction').value=t.meta_action||'';
+  document.getElementById('admMetaEval').value=t.meta_eval||'';
+  document.getElementById('admMetaBudMin').value=t.meta_bud_min||'';
+  document.getElementById('admMetaBudMax').value=t.meta_bud_max||'';
+  document.getElementById('admMetaAid').value=t.meta_aid||'';
+  document.getElementById('admMetaIndirect').checked=!!t.meta_indirect;
+  document.getElementById('admMetaIndirectPct').value=t.meta_indirect_pct||'7';
   admFixedLines('admBasic',t.p1_basic,2,'Βασική προϋπόθεση');
   admFixedLines('admMax',t.p1_maxscore,3,'Προϋπόθεση μέγ. βαθμ.');
   admFillLines('admElig',t.p2_elig,'Ειδική προϋπόθεση');
@@ -3381,6 +3503,14 @@ function admReadLines(cid){return [...document.querySelectorAll('#'+cid+' .adm-l
 function admReadFixed(cid){return [...document.querySelectorAll('#'+cid+' .adm-line')].map(i=>i.value.trim());}
 function admCollect(){
   return {
+    meta_type:document.getElementById('admMetaType').value.trim(),
+    meta_action:document.getElementById('admMetaAction').value,
+    meta_eval:document.getElementById('admMetaEval').value,
+    meta_bud_min:document.getElementById('admMetaBudMin').value.trim(),
+    meta_bud_max:document.getElementById('admMetaBudMax').value.trim(),
+    meta_aid:document.getElementById('admMetaAid').value.trim(),
+    meta_indirect:document.getElementById('admMetaIndirect').checked,
+    meta_indirect_pct:document.getElementById('admMetaIndirectPct').value.trim(),
     p1_basic:admReadFixed('admBasic'),
     p1_maxscore:admReadFixed('admMax'),
     p2_elig:admReadLines('admElig'),
@@ -3391,6 +3521,7 @@ function admCollect(){
     p3_stage2:admReadLines('admP3S2'),
     p3_final:admReadLines('admP3F'),
     p3_process:admReadLines('admP3Proc'),
+    p3_full:(function(){admStoreP3Full();const o={};Object.keys(_p3Full).forEach(k=>{const v=_p3Full[k];if(v&&Object.keys(v).some(x=>v[x]&&v[x].length))o[k]=v;});return o;})(),
     p3_expense_docs:(function(){admStoreExpDocs();const o={};Object.keys(_admExpDocs).forEach(k=>{const v=_admExpDocs[k];if(v&&v.length)o[k]=v;});return o;})(),
     p3_extra_accountant:admReadLines('admP3Acc'),
     p3_extra_bank:admReadLines('admP3Bank'),
