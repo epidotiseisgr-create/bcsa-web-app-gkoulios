@@ -742,6 +742,17 @@ header{padding-left:110px;padding-right:110px;}
         <div id="admP3F"></div><button class="adm-addbtn" onclick="admAddLine('admP3F')">+ Προσθήκη</button>
       </div></div>
 
+    <div class="adm-sec" id="admSecP3Extra"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 3 · Επιπλέον δικαιολογητικά ανά κατηγορία (για προγράμματα με παραστατικά)</span><span>▾</span></h4>
+      <div class="adm-body">
+        <p class="adm-hint">Προστίθενται σε <strong>κάθε</strong> παραστατικό, πέρα από τα προεπιλεγμένα του συστήματος.</p>
+        <strong style="font-size:13px;color:#4b2e6b;">Ζητά από τον Λογιστή</strong>
+        <div id="admP3Acc"></div><button class="adm-addbtn" onclick="admAddLine('admP3Acc')">+ Προσθήκη</button>
+        <strong style="font-size:13px;color:#4b2e6b;display:block;margin-top:12px;">Από Τράπεζα / Προμηθευτή</strong>
+        <div id="admP3Bank"></div><button class="adm-addbtn" onclick="admAddLine('admP3Bank')">+ Προσθήκη</button>
+        <strong style="font-size:13px;color:#4b2e6b;display:block;margin-top:12px;">Ανά δαπάνη (γενικά)</strong>
+        <div id="admP3Sup"></div><button class="adm-addbtn" onclick="admAddLine('admP3Sup')">+ Προσθήκη</button>
+      </div></div>
+
     <div class="adm-sec" id="admSecP3Proc"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 3 · Έλεγχοι διαδικασίας (εμφανίζονται στην αναφορά ελλείψεων)</span><span>▾</span></h4>
       <div class="adm-body">
         <p class="adm-hint">Αυτά τα σημεία θεωρούνται «διαδικασίες» και διαχωρίζονται στην αναφορά. Μπορείτε να προσθέσετε ή να διαγράψετε.</p>
@@ -1615,6 +1626,8 @@ function updateChecklist(index){
     bibliaItems=bibliaItems.filter(item=>!item.includes("Μητρώο Παγίων"));
     if(biblia==="Β κατηγορίας"&&bibliaItems.length>0){bibliaItems[0]="Λογιστική εγγραφή (στήλη εξόδων) Εσόδων Εξόδων με σφραγίδα & υπογραφή λογιστή ή/και του νόμιμου εκπροσώπου";}
   }
+  const _cfg=(typeof currentProgramCfg==='function')?currentProgramCfg():{};
+  bibliaItems=bibliaItems.concat(_cfg.p3_extra_accountant||[]);
   addSection("ΖΗΤΑ ΑΠΟ ΤΟΝ ΛΟΓΙΣΤΗ",bibliaItems,"accountant","accountant");
   let timItems=[];
   if(dapani!=="Νέος Υπάλληλος"){
@@ -1628,6 +1641,7 @@ function updateChecklist(index){
   else if(exoflisi==="Με τραπεζικό μέσο"){exItems=["__BANK_INSTRUMENT__","Extrait","Μεταφέρονται από τον εταιρικό λογαριασμό του δικαιούχου στον εταιρικό λογαριασμό του προμηθευτή;","Αν είναι έμβασμα εμφανίζονται και οι δύο λογαριασμοί Χρέωσης και Πίστωσης με αναφορά σε ποιον ανήκουν;"];
     if(dapani==="Νέος Υπάλληλος"){exItems=exItems.map(i=>i.replace("στον εταιρικό λογαριασμό του προμηθευτή","στον λογαριασμό του υπαλλήλου"));}
   }
+  exItems=exItems.concat(_cfg.p3_extra_bank||[]);
   addSection("ΔΙΚΑΙΟΛΟΓΗΤΙΚΑ ΑΠΟ ΤΡΑΠΕΖΑ / ΠΡΟΜΗΘΕΥΤΗ",exItems,"bank","bank");
   if(leasing==="Ναι"){
     addSection("ΖΗΤΑ ΑΠΟ ΠΡΟΜΗΘΕΥΤΗ LEASING",["Υπάρχει αγορά/μίσθωση με Leasing από προμηθευτή που έχει το δικαίωμα πώληση με Leasing;","Υπάρχει Συμφωνητικό κατατεθειμένο στη ΔΟΥ που να προβλέπει ότι με την ολοκλήρωση του Leasing το αντικείμενο αγορά θα περιέλθει στην κυριότητα του δικαιούχου της επένδυσης","Υπάρχει βεβαίωση προμηθευτή για καινουργίες - αμεταχείριστο του αντικειμένου με αναφορά στο s/n (εφόσον διαθέτει s/n το αντικείμενο);","Εφόσον υπάρχει απαλλαγή ΦΠΑ, υπάρχει σχετικό απαλλακτικό ΦΠΑ για το Leasing"],"leasing","leasing_provider");
@@ -1641,6 +1655,7 @@ function updateChecklist(index){
     case "Νέος Υπάλληλος":dapItems=["Αντίγραφο ταυτότητας νεοπροσλαμβανόμενου προσωπικού","Δελτίο ανεργίας από τον ΔΥΠΑ/ΟΑΕΔ με αναφορά στο διάστημα ανεργίας","Απογραφικό Δελτίο εισόδου του εργαζόμενου, εφόσον απαιτείται.","Απογραφικό Δελτίο εξόδου του εργαζόμενου, εφόσον απαιτείται.","Αναλυτική Περιοδική Δήλωση (ΑΠΔ) συνοδευόμενη από το αποδεικτικό υποβολής","Αναγγελία πρόσληψης","Έντυπο Ε4 ή Πίνακας Προσωπικού - Ετήσιος","Έντυπο Ε4 ή Πίνακας Προσωπικού - Αρχικός & Τροποποιητικοί","Γνωστοποίηση, του εργοδότη προς τον εργαζόμενο, ότι το μισθολογικό κόστος του νεοπροσλαμβανόμενου προσωπικού συγχρηματοδοτείται από το ΕΚΤ/ΕΤΠΑ","Ασφαλιστική Ενημερότητα, για την απόδειξη πληρωμής εισφορών ΕΦΚΑ","Φορολογική Ενημερότητα για την απόδειξη πληρωμής του ΦΜΥ, εφόσον υπάρχει ΦΜΥ","Μηνιαία Μισθοδοτική Κατάσταση με σφραγίδα & υπογραφή λογιστή","*SOS*Εφόσον απαιτείται, τηρείται η πρόσθετη ΕΜΕ;"];break;
     case "Μεταφορικά Μέσα":dapItems=["Αντίγραφο άδειας πρώτης κυκλοφορίας","Βεβαίωση προμηθευτή για το καινούργιες, αμεταχείριστο και περί μη παρακράτησης κυριότητας του μεταφορικού μέσου με αναφορά στον αριθμό πλαισίου","Φωτογραφικό Υλικό μεταφορικού μέσου από όλες τις πλευρές, αλλά και τον αριθμό πλαισίου"];break;
   }
+  dapItems=dapItems.concat(_cfg.p3_extra_supplier||[]);
   addSection("ΔΙΚΑΙΟΛΟΓΗΤΙΚΑ ΓΙΑ ΤΗΝ ΣΥΓΚΕΚΡΙΜΕΝΗ ΔΑΠΑΝΗ",dapItems,"expense","general");
   container.innerHTML=html;
 }
@@ -1979,6 +1994,7 @@ function applyData(data){
         const c=document.getElementById('ph3_docsList');c.innerHTML='';
         data.phase3_docs.forEach(d=>addPh3DocRow(d.k,d.v));
       }
+      syncProgramConfig();
       evaluateProgress(0);calculateTotalScore();evaluateAllExpenses();updateDynamicHeaders();calcFees();syncPhoneAutoFields();handlePhase3Gate();applyPhase3Mode();
     }
 }
@@ -2254,6 +2270,14 @@ function applyPhase3Mode(){
   if(doc)doc.classList.toggle('hidden',m!=='documents');
   if(m==='documents')renderPhase3Docs();
 }
+/* Συγχρονίζει ΜΟΝΟ τις ρυθμίσεις προγράμματος (όχι δεδομένα πελάτη).
+   Καλείται σε κάθε άνοιγμα φακέλου, ώστε ο κάθε πελάτης να χρησιμοποιεί
+   το πρότυπο του ΔΙΚΟΥ ΤΟΥ προγράμματος και όχι του προηγουμένου. */
+function syncProgramConfig(){
+  const cfg=currentProgramCfg();
+  processChecks=(cfg.p3_process&&cfg.p3_process.length)?cfg.p3_process.slice():DEFAULT_PROCESS_CHECKS.slice();
+  if(typeof applyPhase3Mode==='function')applyPhase3Mode();
+}
 function currentProgramCfg(){
   const p=(document.getElementById('gen_program')||{}).value||'';
   return (typeof PROGRAMS!=='undefined'&&PROGRAMS[p])?PROGRAMS[p]:{};
@@ -2270,14 +2294,24 @@ function addPh3DocRow(text,val){
 function renderPhase3Docs(){
   const c=document.getElementById('ph3_docsList');if(!c)return;
   const stage=(document.getElementById('ph3_stage')||{}).value||'';
-  document.getElementById('ph3_stageLbl').innerText=stage?('· '+stage):'';
+  const lbl=document.getElementById('ph3_stageLbl');if(lbl)lbl.innerText=stage?('· '+stage):'';
   if(!stage){c.innerHTML='<p style="color:#888;font-size:13px;">Επιλέξτε πρώτα στάδιο υλοποίησης.</p>';return;}
+  /* Διατηρούμε ό,τι έχει ήδη απαντηθεί (κλειδί: το λεκτικό του δικαιολογητικού). */
+  const prev={};
+  document.querySelectorAll('#ph3_docsList .dynamic-row').forEach(r=>{
+    const k=r.querySelector('.p3-key').value.trim();
+    if(k)prev[k]=r.querySelector('.p3-val').value;
+  });
   const cfg=currentProgramCfg();
   const key={'1η Ενδιάμεση':'p3_stage1','2η Ενδιάμεση':'p3_stage2','Τελική':'p3_final'}[stage];
-  const list=(cfg[key]||[]);
+  const list=(cfg[key]||[]).map(t=>typeof t==='string'?t:t.k).filter(Boolean);
   c.innerHTML='';
-  if(!list.length){c.innerHTML='<p style="color:#888;font-size:13px;">Δεν έχουν οριστεί δικαιολογητικά για αυτή τη δόση στο πρότυπο του προγράμματος. Προσθέστε χειροκίνητα ή ορίστε τα ως διαχειριστής.</p>';}
-  list.forEach(t=>addPh3DocRow(typeof t==='string'?t:t.k,''));
+  if(!list.length){
+    c.innerHTML='<p style="color:#888;font-size:13px;">Δεν έχουν οριστεί δικαιολογητικά για αυτή τη δόση στο πρότυπο του προγράμματος. Προσθέστε χειροκίνητα ή ορίστε τα ως διαχειριστής.</p>';
+  }
+  list.forEach(t=>addPh3DocRow(t,prev[t]||''));
+  /* Ό,τι είχε προστεθεί χειροκίνητα και δεν υπάρχει στο πρότυπο, δεν χάνεται. */
+  Object.keys(prev).forEach(k=>{if(!list.includes(k))addPh3DocRow(k,prev[k]);});
 }
 function getPh3Docs(){
   return [...document.querySelectorAll('#ph3_docsList .dynamic-row')].map(r=>({
@@ -2837,6 +2871,7 @@ function applyProgramTemplate(t){
   evaluateAllExpenses();
   if(t.p3_process&&t.p3_process.length)processChecks=t.p3_process.slice();
   else processChecks=DEFAULT_PROCESS_CHECKS.slice();
+  for(let i=1;i<=invoiceCount;i++){try{updateChecklist(i);}catch(e){}}
   if(typeof applyPhase3Mode==='function')applyPhase3Mode();
   setSaveStatus('Εφαρμόστηκε το πρότυπο «'+(document.getElementById('gen_program').value)+'».');
 }
@@ -2867,6 +2902,9 @@ function admExpHtml(o){o=o||{};return '<div class="adm-row"><input type="text" c
 function admAddExp(){document.getElementById('admExp').insertAdjacentHTML('beforeend',admExpHtml({}));}
 
 function admResetProc(){
+  admFillLines('admP3Acc',t.p3_extra_accountant,'Δικαιολογητικό λογιστή');
+  admFillLines('admP3Bank',t.p3_extra_bank,'Δικαιολογητικό τράπεζας/προμηθευτή');
+  admFillLines('admP3Sup',t.p3_extra_supplier,'Δικαιολογητικό δαπάνης');
   admFillLines('admP3Proc',DEFAULT_PROCESS_CHECKS,'Έλεγχος διαδικασίας');
   admStatus('Επαναφέρθηκαν οι προεπιλεγμένοι έλεγχοι διαδικασίας.');
 }
@@ -2902,6 +2940,9 @@ function admCollect(){
     p3_stage2:admReadLines('admP3S2'),
     p3_final:admReadLines('admP3F'),
     p3_process:admReadLines('admP3Proc'),
+    p3_extra_accountant:admReadLines('admP3Acc'),
+    p3_extra_bank:admReadLines('admP3Bank'),
+    p3_extra_supplier:admReadLines('admP3Sup'),
     p2_exp:[...document.querySelectorAll('#admExp .adm-row')].map(r=>({desc:r.querySelector('.adm-ed').value.trim(),just:r.querySelector('.adm-ej').value.trim(),ltype:r.querySelector('.adm-et').value,lval:r.querySelector('.adm-ev').value.trim()})).filter(o=>o.desc)
   };
 }
