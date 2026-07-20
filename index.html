@@ -727,7 +727,7 @@ header{padding-left:110px;padding-right:110px;}
         <h4>📎 Σύνδεσμοι δικαιολογητικών ανά τύπο επιχείρησης</h4>
         <p style="font-size:12px;color:#666;margin:-4px 0 10px 0;">Βάλτε τους συνδέσμους (π.χ. cloud) ώστε να βρίσκονται εύκολα και να αποστέλλονται στους πελάτες.</p>
         <div class="docs-links-row">
-          <div class="docs-links-col"><label>Υπό ίδρυση επιχείρηση</label><div style="display:flex;gap:5px;"><input type="text" id="doclink_new" class="save-data" placeholder="https://..." oninput="updateDocLink('new')" style="flex:1;"><button type="button" class="mini-btn" onclick="openLinkIn('doclink_new')">↗</button></div><a id="doclinka_new" class="disabled" target="_blank">Άνοιγμα ↗</a></div>
+          <div class="docs-links-col"><label>Υπό Σύσταση / Ίδρυση</label><div style="display:flex;gap:5px;"><input type="text" id="doclink_new" class="save-data" placeholder="https://..." oninput="updateDocLink('new')" style="flex:1;"><button type="button" class="mini-btn" onclick="openLinkIn('doclink_new')">↗</button></div><a id="doclinka_new" class="disabled" target="_blank">Άνοιγμα ↗</a></div>
           <div class="docs-links-col"><label>Νεοσύστατη</label><div style="display:flex;gap:5px;"><input type="text" id="doclink_recent" class="save-data" placeholder="https://..." oninput="updateDocLink('recent')" style="flex:1;"><button type="button" class="mini-btn" onclick="openLinkIn('doclink_recent')">↗</button></div><a id="doclinka_recent" class="disabled" target="_blank">Άνοιγμα ↗</a></div>
           <div class="docs-links-col"><label>Υφιστάμενη</label><div style="display:flex;gap:5px;"><input type="text" id="doclink_existing" class="save-data" placeholder="https://..." oninput="updateDocLink('existing')" style="flex:1;"><button type="button" class="mini-btn" onclick="openLinkIn('doclink_existing')">↗</button></div><a id="doclinka_existing" class="disabled" target="_blank">Άνοιγμα ↗</a></div>
         </div>
@@ -916,7 +916,7 @@ header{padding-left:110px;padding-right:110px;}
   <div class="modal-content" style="max-width:820px;max-height:90vh;overflow-y:auto;">
     <div class="modal-header">
       <h2 id="guideTitle" style="margin:0;color:#4b2e6b;font-size:18px;">🤖 ΑΥΤΟΜΑΤΗ ΣΥΜΠΛΗΡΩΣΗ ΑΠΟ ΟΔΗΓΟ</h2>
-      <span class="close-btn" onclick="document.getElementById('guideModal').style.display='none'">&times;</span>
+      <span class="close-btn" onclick="guideClose()">&times;</span>
     </div>
     <p id="guideSectionHint" style="font-size:12.5px;color:#4b2e6b;background:#f7f4fb;border-radius:4px;padding:8px 11px;margin:0 0 10px 0;"></p>
     <div class="si-tabs">
@@ -932,7 +932,10 @@ header{padding-left:110px;padding-right:110px;}
     <div class="sme-note">Ανεβάστε το PDF του οδηγού (ή επικολλήστε κείμενο). Το σύστημα εξάγει τα στοιχεία και <strong>σας τα προτείνει</strong> — τίποτα δεν εφαρμόζεται χωρίς τον έλεγχό σας.</div>
     <div class="adm-row" style="margin-top:12px;">
       <input type="file" id="guidePdf" accept=".pdf" onchange="guideReadPdf(event)" style="flex:1;padding:8px;border:1px dashed var(--border-color);border-radius:4px;">
+      <button class="btn" style="background:#fdeaea;color:#b02a37;padding:8px 12px;" title="Καθαρισμός αρχείου και κειμένου" onclick="guideClear()">✕</button>
     </div>
+    <label style="font-size:12.5px;color:#4b2e6b;font-weight:bold;display:block;margin:10px 0 4px;">Οδηγίες προς το AI (προαιρετικά)</label>
+    <textarea id="guideHint" rows="2" class="form-control" placeholder="π.χ. «Τα κριτήρια βρίσκονται στον πίνακα της σελίδας 12, όπου η πρώτη στήλη είναι η περιγραφή και η τρίτη η βαρύτητα.»" style="font-family:inherit;font-size:12.5px;"></textarea>
     <textarea id="guideText" rows="7" class="form-control" placeholder="…ή επικολλήστε εδώ το κείμενο του οδηγού" style="font-family:inherit;font-size:13px;"></textarea>
     <div class="adm-row" style="margin-top:10px;">
       <span style="font-size:12.5px;">Μηχανή:</span>
@@ -950,8 +953,18 @@ header{padding-left:110px;padding-right:110px;}
         <button class="btn" style="background:#eee;color:#444;padding:8px 12px;" onclick="guideTestKey()">🔌 Δοκιμή</button>
       </span>
       <button class="btn btn-blue" onclick="guideAnalyze()">🔍 Ανάλυση</button>
+      <button class="btn" style="background:#f3ecf9;color:#4b2e6b;" title="Αντιγραφή έτοιμης εντολής για χρήση σε δικό σας AI" onclick="guideCopyPrompt()">📋 Αντιγραφή prompt</button>
     </div>
     <div id="guideCost" style="font-size:11.5px;color:#777;margin-top:4px;"></div>
+    </div>
+    <div id="guideProgWrap" style="display:none;margin-top:10px;">
+      <div style="height:9px;background:#e8e6e0;border-radius:5px;overflow:hidden;">
+        <div id="guideProg" style="height:100%;width:0;background:linear-gradient(90deg,#4b2e6b,#7a52a3);transition:width .4s;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:5px;">
+        <span id="guideProgTxt" style="font-size:12px;color:#4b2e6b;font-weight:bold;"></span>
+        <button class="btn" style="background:#fdeaea;color:#b02a37;padding:4px 12px;font-size:12px;" onclick="guideCancel()">✕ Ακύρωση</button>
+      </div>
     </div>
     <div id="guideStatus" class="save-status" style="min-height:20px;margin-top:8px;"></div>
     <div id="guideResult" style="margin-top:12px;"></div>
@@ -1081,7 +1094,7 @@ header{padding-left:110px;padding-right:110px;}
         <div class="adm-row" style="align-items:flex-start;">
           <span style="min-width:150px;font-size:12.5px;padding-top:6px;">Καθεστώς επιχείρησης</span>
           <div class="chip-group" id="admMetaTypeChips">
-            <label class="chip"><input type="checkbox" value="Υπό ίδρυση"> Υπό ίδρυση</label>
+            <label class="chip"><input type="checkbox" value="Υπό Σύσταση / Ίδρυση"> Υπό Σύσταση / Ίδρυση</label>
             <label class="chip"><input type="checkbox" value="Νεοσύστατη"> Νεοσύστατη</label>
             <label class="chip"><input type="checkbox" value="Υφιστάμενη"> Υφιστάμενη</label>
           </div>
@@ -1210,7 +1223,7 @@ header{padding-left:110px;padding-right:110px;}
 
     <div class="adm-sec" id="admSecP3Extra"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 3 · Επιπλέον δικαιολογητικά ανά κατηγορία (για προγράμματα με παραστατικά)</span><span>▾</span></h4>
       <div class="adm-body">
-        <p class="adm-hint">Προστίθενται σε <strong>κάθε</strong> παραστατικό, πέρα από τα προεπιλεγμένα του συστήματος.</p>
+        <p class="adm-hint">Προστίθενται σε <strong>κάθε</strong> παραστατικό, ανεξαρτήτως κατηγορίας δαπάνης — πέρα από τα προεπιλεγμένα. Για επεξεργασία <strong>ανά κατηγορία</strong> (με δυνατότητα αφαίρεσης) χρησιμοποιήστε την ενότητα «Πλήρης επεξεργασία δικαιολογητικών ανά δαπάνη» παρακάτω.</p>
         <strong style="font-size:13px;color:#4b2e6b;">Ζητά από τον Λογιστή</strong>
         <div id="admP3Acc"></div><button class="adm-addbtn" onclick="admAddLine('admP3Acc')">+ Προσθήκη</button>
         <strong style="font-size:13px;color:#4b2e6b;display:block;margin-top:12px;">Από Τράπεζα / Προμηθευτή</strong>
@@ -1944,7 +1957,7 @@ function updateDocLink(key){
   if(v){a.href=v;a.classList.remove('disabled');}else{a.removeAttribute('href');a.classList.add('disabled');}
 }
 function getDocLinks(){
-  return [['Υπό ίδρυση επιχείρηση','doclink_new'],['Νεοσύστατη','doclink_recent'],['Υφιστάμενη','doclink_existing']]
+  return [['Υπό Σύσταση / Ίδρυση','doclink_new'],['Νεοσύστατη','doclink_recent'],['Υφιστάμενη','doclink_existing']]
     .map(([lbl,id])=>({label:lbl,url:(document.getElementById(id)?.value||'').trim()})).filter(x=>x.url);
 }
 function buildExpensesData(){
@@ -2580,8 +2593,9 @@ function collectData(){
   data.mailLog=MAIL_LOG;
   data.sme=(typeof smeCollect==='function')?smeCollect():null;
   data.bp4docs=(typeof getBp4Docs==='function')?getBp4Docs():[];
-  data.deminimis=[...document.querySelectorAll('#sub_q10_dm .dm-row')].filter(r=>r.querySelector('.d-nm')).map(r=>({
-    name:r.querySelector('.d-nm').value,years:[...r.querySelectorAll('.d-y')].map(i=>i.value)}));
+  data.deminimis=[...document.querySelectorAll('#sub_q10_dm .dm-row')]
+    .filter(r=>r.querySelector('input.d-nm'))
+    .map(r=>({name:r.querySelector('input.d-nm').value,years:[...r.querySelectorAll('input.d-y')].map(i=>i.value)}));
   data.phase2_dyn.indirect={active:document.getElementById('ind_active')?document.getElementById('ind_active').checked:false,
     pct:document.getElementById('ind_pct')?document.getElementById('ind_pct').value:'7',
     desc:document.getElementById('ind_desc')?document.getElementById('ind_desc').value:'',
@@ -3303,6 +3317,77 @@ function guideLocalParse(text){
     p2_score:sec(/κριτήρι\w*\s+(αξιολόγησ|βαθμολογ)/i).map(s=>({k:s,cw:'',gw:''}))
   };
 }
+let GUIDE_ABORT=false,GUIDE_BUSY=false,_gProgT=null;
+function guideProgress(pct,txt){
+  const w=document.getElementById('guideProgWrap');
+  if(!w)return;
+  if(pct===null){w.style.display='none';clearInterval(_gProgT);_gProgT=null;return;}
+  w.style.display='block';
+  document.getElementById('guideProg').style.width=Math.min(99,pct)+'%';
+  document.getElementById('guideProgTxt').innerText=txt||(Math.round(pct)+'%');
+}
+function guideStartProgress(label,expectSec){
+  let t=0;const step=0.5;
+  clearInterval(_gProgT);
+  _gProgT=setInterval(()=>{
+    t+=step;
+    /* Ασυμπτωτική πρόοδος: πλησιάζει το 95% χωρίς να το φτάνει */
+    const pct=95*(1-Math.exp(-t/(expectSec||25)));
+    guideProgress(pct,label+' · '+Math.round(pct)+'% (~'+Math.round(t)+'δ)');
+  },step*1000);
+}
+function guideCancel(){
+  GUIDE_ABORT=true;GUIDE_BUSY=false;
+  guideProgress(null);
+  document.getElementById('go').disabled=false;
+  document.getElementById('guideStatus').innerText='⛔ Η ανάλυση ακυρώθηκε.';
+}
+function guideClose(){
+  if(GUIDE_BUSY&&!confirm('Η ανάλυση βρίσκεται σε εξέλιξη.\n\nΑν κλείσετε το παράθυρο, η διαδικασία θα διακοπεί.\n\nΕίστε σίγουρος ότι θέλετε να βγείτε;'))return;
+  if(GUIDE_BUSY)guideCancel();
+  document.getElementById('guideModal').style.display='none';
+}
+function guideClear(){
+  document.getElementById('guidePdf').value='';
+  document.getElementById('guideText').value='';
+  document.getElementById('guideStatus').innerText='Καθαρίστηκε. Μπορείτε να επικολλήσετε κείμενο ή να επιλέξετε άλλο αρχείο.';
+}
+/* Έτοιμη εντολή για χρήση σε δικό σας AI (πληρωμένη έκδοση) */
+function guideBuildPrompt(){
+  const spec=SECTION_SPECS[GUIDE_SECTION]||SECTION_SPECS.all;
+  const hint=(document.getElementById('guideHint')||{}).value||'';
+  let p='Είσαι έμπειρος σύμβουλος διαχείρισης συγχρηματοδοτούμενων προγραμμάτων (ΕΣΠΑ).\n\n';
+  p+='ΕΡΓΟ: Διάβασε τον οδηγό της δράσης που σου επισυνάπτω και εξήγαγε δομημένα στοιχεία.\n\n';
+  if(hint)p+='ΕΙΔΙΚΕΣ ΟΔΗΓΙΕΣ: '+hint+'\n\n';
+  p+='ΚΑΝΟΝΕΣ:\n';
+  p+='1. Μην εφευρίσκεις τίποτα — μόνο ό,τι προκύπτει από το κείμενο.\n';
+  p+='2. Σύντομες, καθαρές φράσεις, χωρίς παραπομπές σε άρθρα, ΦΕΚ ή παραρτήματα.\n';
+  p+='3. Αν κάποιο πεδίο δεν προκύπτει, βάλε κενή λίστα ή κενό string.\n';
+  p+='4. Απάντησε ΜΟΝΟ με έγκυρο JSON, χωρίς markdown, χωρίς σχόλια.\n\n';
+  p+='ΜΟΡΦΗ ΑΠΑΝΤΗΣΗΣ — JSON με '+((GUIDE_SECTION==='all')?'τα πεδία':'το πεδίο')+':\n';
+  p+=(GUIDE_SECTION!=='all'&&spec.ask)?spec.ask:
+     '"meta_types", "regimes", "limits", "p2_elig", "p2_docs", "p2_score" ({k,cw,gw}), "p2_exp" ({title,cat,pct,amt}), "p2_bp"';
+  p+='\n\nΠαράδειγμα δομής:\n';
+  p+=JSON.stringify(GUIDE_EXAMPLES[GUIDE_SECTION]||GUIDE_EXAMPLES.all,null,2);
+  return p;
+}
+const GUIDE_EXAMPLES={
+  meta:{meta_types:["Υφιστάμενη"],regimes:["deminimis"],limits:{admDmBudMin:"20000",admDmBudMax:"200000",admDmAidMin:"40",admDmAidMax:"70"}},
+  elig:{p2_elig:["Εγκατάσταση στην ελληνική επικράτεια","Ιδιότητα ΜμΕ"]},
+  bp:{p2_bp:["Περιγραφή αγοράς-στόχου","Πρόβλεψη εσόδων τριετίας"]},
+  score:{p2_score:[{k:"Πληρότητα επιχειρηματικού σχεδίου",cw:"40",gw:"100"}]},
+  docs:{p2_docs:["Δελτίο ταυτότητας νόμιμου εκπροσώπου","Βεβαίωση έναρξης"]},
+  docsType:{docs_by_type:{"Υφιστάμενη":{docs:["Ε3 τελευταίας τριετίας"]}}},
+  expReg:{exp_by_regime:{deminimis:[{title:"Μηχανήματα & Εξοπλισμός",cat:"Παραγωγικός εξοπλισμός",pct:"100",amt:""}],gak:[]}},
+  p3:{p3_full:{"Εξοπλισμός":{accountant:["Μητρώο Παγίων"],invoice:["Τιμολόγιο"],bank:["Extrait"],leasing:[],expense:["Πιστοποιητικό CE"]}}},
+  all:{p2_elig:["…"],p2_docs:["…"]}
+};
+async function guideCopyPrompt(){
+  const p=guideBuildPrompt();
+  try{await navigator.clipboard.writeText(p);}
+  catch(e){const ta=document.createElement('textarea');ta.value=p;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}
+  document.getElementById('guideStatus').innerText='✔ Η εντολή αντιγράφηκε. Επικολλήστε την στο δικό σας AI μαζί με το PDF, και φέρτε πίσω το JSON στην καρτέλα «Επικόλληση JSON».';
+}
 async function guideAnalyze(){
   const text=document.getElementById('guideText').value.trim();
   const st=document.getElementById('guideStatus');
@@ -3317,7 +3402,9 @@ async function guideAnalyze(){
   localStorage.setItem('bcsa_key_'+prov,key);
   st.innerText='Επεξεργασία με '+prov+'... (ενδέχεται να διαρκέσει)';
   const spec=SECTION_SPECS[GUIDE_SECTION]||SECTION_SPECS.all;
-  const sys=(GUIDE_SECTION!=='all'&&spec.ask)
+  const userHint=(document.getElementById('guideHint')||{}).value.trim();
+  const hintTxt=userHint?('\nΕΙΔΙΚΕΣ ΟΔΗΓΙΕΣ ΑΠΟ ΤΟΝ ΧΡΗΣΤΗ: '+userHint+'\n'):'';
+  const sys=hintTxt+(GUIDE_SECTION!=='all'&&spec.ask)
     ? ('Είσαι βοηθός συμβούλου ΕΣΠΑ. Διάβασε το απόσπασμα οδηγού και επίστρεψε ΜΟΝΟ έγκυρο JSON με το πεδίο: '+spec.ask+
        '. Μην εφευρίσκεις τίποτα — μόνο ό,τι προκύπτει από το κείμενο. Σύντομες, καθαρές φράσεις χωρίς παραπομπές σε άρθρα ή παραρτήματα. Χωρίς markdown.')
     : 'Είσαι βοηθός συμβούλου ΕΣΠΑ. Διάβασε τον οδηγό δράσης και επίστρεψε ΜΟΝΟ έγκυρο JSON με τα πεδία: '+
@@ -3334,9 +3421,13 @@ async function guideAnalyze(){
   if(prov==='gemini'&&!detected.length){const d=await guideListModels();if(d)detected=d;}
   const models=[chosen,localStorage.getItem('bcsa_model_'+prov)].filter(Boolean).concat(detected,GUIDE_MODELS[prov]||[]);
   const tried=[];let lastErr='';
-  for(const m of [...new Set(models)]){
+  GUIDE_ABORT=false;GUIDE_BUSY=true;
+  const shortlist=[...new Set(models)].slice(0,4);   /* μέγιστο 4 δοκιμές */
+  for(const m of shortlist){
+    if(GUIDE_ABORT)break;
     try{
       st.innerText='Ανάλυση με «'+m+'»…';
+      guideStartProgress('Ανάλυση με '+m,28);
       let raw;
       if(prov==='gemini')raw=await siCallGemini(text.slice(0,120000),sys,key,m);
       else if(prov==='openai')raw=await siCallOpenAI(text.slice(0,120000),sys,key,m);
@@ -3347,12 +3438,18 @@ async function guideAnalyze(){
       GUIDE_RESULT=JSON.parse(mm?mm[0]:t);
       document.getElementById('guideModel').value=m;
       localStorage.setItem('bcsa_model_'+prov,m);
+      guideProgress(null);GUIDE_BUSY=false;
       guideRender(prov+' · '+m);
       document.getElementById('go').disabled=false;
       return;
-    }catch(e){tried.push(m);lastErr=String(e.message||e);console.error(m,e);}
+    }catch(e){
+      tried.push(m);lastErr=String(e.message||e);console.error(m,e);
+      /* Αν το μοντέλο απάντησε αλλά το JSON ήταν άκυρο, δεν έχει νόημα να δοκιμάσουμε άλλο. */
+      if(!/404|not found|not supported|no longer available/i.test(lastErr))break;
+    }
   }
-  st.innerText='⚠ Απέτυχε με τα μοντέλα: '+tried.join(', ')+'. Σφάλμα: '+lastErr.slice(0,160)+' — έγινε τοπική ανάλυση.';
+  guideProgress(null);GUIDE_BUSY=false;
+  st.innerText=GUIDE_ABORT?'⛔ Ακυρώθηκε.':('⚠ Απέτυχε με: '+tried.join(', ')+'. Σφάλμα: '+lastErr.slice(0,200)+' — έγινε τοπική ανάλυση.');
   GUIDE_RESULT=guideLocalParse(text);
   guideRender('τοπικός parser');
 }
@@ -4729,7 +4826,7 @@ function applyProgramTemplate(t){
   docList.forEach(v=>{addDocRow();dC.lastElementChild.querySelector('.dyn-key').value=(typeof v==='string'?v:v.k||'');});
   /* Σύνδεσμοι ανά καθεστώς */
   if(t.docs_by_type){
-    const map={'Υπό ίδρυση':'doclink_new','Νεοσύστατη':'doclink_recent','Υφιστάμενη':'doclink_existing'};
+    const map={'Υπό Σύσταση / Ίδρυση':'doclink_new','Νεοσύστατη':'doclink_recent','Υφιστάμενη':'doclink_existing'};
     Object.keys(map).forEach(k=>{
       const el=document.getElementById(map[k]);
       if(el&&t.docs_by_type[k]&&t.docs_by_type[k].link){el.value=t.docs_by_type[k].link;updateDocLink(map[k].replace('doclink_',''));}
@@ -5847,9 +5944,10 @@ async function loadProgramsFromCloud(){
   if(!cloudReady()){return;}
   const {data,error}=await SB.from('programs').select('*');
   if(error){console.error(error);return;}
-  PROGRAMS={};
+  /* Τα ενσωματωμένα πρότυπα παραμένουν πάντα διαθέσιμα ως βάση·
+     όσα υπάρχουν στη βάση τα υπερισχύουν. */
+  PROGRAMS=JSON.parse(JSON.stringify(EMBEDDED_PROGRAMS));
   (data||[]).forEach(r=>{PROGRAMS[r.name]=r.config||{};});
-  if(!Object.keys(PROGRAMS).length)PROGRAMS=JSON.parse(JSON.stringify(EMBEDDED_PROGRAMS));
   refreshProgramDropdown();
 }
 function initPrograms(){/* αντικαταστάθηκε από loadProgramsFromCloud */}
