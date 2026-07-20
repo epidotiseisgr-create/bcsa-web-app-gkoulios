@@ -441,6 +441,13 @@ header{padding-left:110px;padding-right:110px;}
 .tier-entry{background:#eef5ff;color:#1a56b0;}
 .tier-premium{background:#f3ecf9;color:#4b2e6b;}
 .locked-field{background:#f0f0f0 !important;cursor:not-allowed;}
+
+/* ===== v34 ===== */
+.key-lbl{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9.5px;color:#8a6d00;
+  background:#fdf9eb;border:1px solid #f1c232;border-radius:4px;padding:4px 6px;cursor:pointer;
+  white-space:nowrap;user-select:none;align-self:center;min-width:46px;}
+.key-lbl input{width:15px;height:15px;cursor:pointer;margin:0;}
+.key-lbl:hover{background:#fdf3d5;}
 </style>
 </head>
 <body>
@@ -937,7 +944,9 @@ header{padding-left:110px;padding-right:110px;}
       </select>
       <span id="guideKeyBox" style="display:none;">
         <input type="password" id="guideKey" placeholder="API key" style="width:190px;" title="Αποθηκεύεται μόνο στον browser σας — δεν γράφεται ποτέ στο αρχείο">
-        <input type="text" id="guideModel" placeholder="μοντέλο (προαιρετικό)" style="width:170px;" title="Αφήστε το κενό για αυτόματη επιλογή">
+        <input type="text" id="guideModel" list="guideModelList" placeholder="μοντέλο" style="width:190px;" title="Πατήστε «Μοντέλα» για αυτόματη ανίχνευση">
+        <datalist id="guideModelList"></datalist>
+        <button class="btn" style="background:#eef5ff;color:#1a56b0;padding:8px 12px;" onclick="guideListModels()">📋 Μοντέλα</button>
         <button class="btn" style="background:#eee;color:#444;padding:8px 12px;" onclick="guideTestKey()">🔌 Δοκιμή</button>
       </span>
       <button class="btn btn-blue" onclick="guideAnalyze()">🔍 Ανάλυση</button>
@@ -1661,10 +1670,48 @@ function generatePhoneReport(){
 }
 /* =================== ΦΑΣΗ 2: DYNAMIC ROWS =================== */
 let dynIds=0;
+/* Σήμανση «βασικό» σε προϋπόθεση ή κριτήριο -> μεταφέρεται στη Φάση 1 */
+function toggleKeyMark(el,kind){
+  const max=(kind==='elig')?2:3;
+  const sel='#'+((kind==='elig')?'eligibilityContainer':'scoringContainer')+' .key-mark';
+  const checked=[...document.querySelectorAll(sel)].filter(x=>x.checked);
+  if(el.checked&&checked.length>max){
+    el.checked=false;
+    alert('Μπορείτε να επιλέξετε έως '+max+(kind==='elig'?' βασικές προϋποθέσεις.':' κριτήρια μέγιστης βαθμολογίας.'));
+    return;
+  }
+  syncKeyToPhase1();
+  scheduleAutoSave();
+}
+function syncKeyToPhase1(){
+  /* Οι δύο βασικές προϋποθέσεις -> ερώτηση 5 της Φάσης 1 */
+  const elig=[...document.querySelectorAll('#eligibilityContainer .dynamic-row')]
+    .filter(r=>{const c=r.querySelector('.key-mark');return c&&c.checked;})
+    .map(r=>r.querySelector('.dyn-key').value.trim()).filter(Boolean);
+  for(let i=0;i<2;i++){
+    const el=document.getElementById('input_q5_text_'+i);
+    if(el&&elig[i]!==undefined)el.value=elig[i];
+  }
+  /* Τα τρία κριτήρια -> ερώτηση 6 της Φάσης 1 */
+  const sc=[...document.querySelectorAll('#scoringContainer .score-row')]
+    .filter(r=>{const c=r.querySelector('.key-mark');return c&&c.checked;})
+    .map(r=>r.querySelector('.dyn-key').value.trim()).filter(Boolean);
+  for(let i=0;i<3;i++){
+    const el=document.getElementById('input_q6_text_'+i);
+    if(el&&sc[i]!==undefined)el.value=sc[i];
+  }
+  if(typeof evaluateProgress==='function')evaluateProgress(0);
+}
+function getKeyMarks(){
+  const rd=(sel,rowSel)=>[...document.querySelectorAll(sel+' '+rowSel)].map(r=>{const c=r.querySelector('.key-mark');return c&&c.checked;});
+  return {elig:rd('#eligibilityContainer','.dynamic-row'),score:rd('#scoringContainer','.score-row')};
+}
 function addDynamicRow(containerId,placeholder,type){
   const c=document.getElementById(containerId);const rowId=`dyn_row_${dynIds++}`;const row=document.createElement('div');row.className='dynamic-row';row.id=rowId;
   let field=type==='select'?`<select class="form-control dyn-val save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select>`:`<textarea class="form-control dyn-val save-data" style="height:36px;"></textarea>`;
-  row.innerHTML=`<input type="text" class="form-control dyn-key save-data" placeholder="${placeholder}">${field}<button class="btn-remove" onclick="document.getElementById('${rowId}').remove()">×</button>`;
+  const keyBox=(containerId==='eligibilityContainer')
+    ? `<label class="key-lbl" title="Σήμανση ως βασική προϋπόθεση — μεταφέρεται στη Φάση 1"><input type="checkbox" class="key-mark" onchange="toggleKeyMark(this,'elig')">βασική</label>` : '';
+  row.innerHTML=keyBox+`<input type="text" class="form-control dyn-key save-data" placeholder="${placeholder}" oninput="syncKeyToPhase1()">${field}<button class="btn-remove" onclick="document.getElementById('${rowId}').remove();syncKeyToPhase1();">×</button>`;
   c.appendChild(row);
 }
 function addDocRow(){
@@ -1674,7 +1721,7 @@ function addDocRow(){
 }
 function addScoringRow(){
   const c=document.getElementById('scoringContainer');const rowId=`score_row_${dynIds++}`;const row=document.createElement('div');row.className='dynamic-row score-row';row.id=rowId;
-  row.innerHTML=`<textarea class="form-control dyn-key save-data" placeholder="Περιγραφή Κριτηρίου..." style="flex:2.5;" rows="2"></textarea><input type="text" class="form-control dyn-score save-data" placeholder="Βαθμός" oninput="calculateTotalScore()" style="flex:1;" title="Ο βαθμός που λαμβάνει το κριτήριο"><input type="text" class="form-control dyn-cw save-data" placeholder="Βαρύτητα Κριτ. (%)" oninput="calculateTotalScore()" style="flex:1.2;" title="Η ποσοστιαία βαρύτητα του κριτηρίου"><input type="text" class="form-control dyn-group save-data" placeholder="Βαρύτητα Ομάδας (%)" oninput="calculateTotalScore()" style="flex:1.2;" title="Η ποσοστιαία βαρύτητα της ομάδας"><select class="form-control dyn-val save-data bg-neutral" onchange="colorStandard(this);calculateTotalScore();" style="flex:1;"><option value="">Ενεργό;</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select><span class="row-res" style="flex:0.5;font-size:16px;">0.00</span><button class="btn-remove" onclick="document.getElementById('${rowId}').remove();calculateTotalScore();">×</button>`;
+  row.innerHTML=`<label class="key-lbl" title="Σήμανση ως κριτήριο μέγιστης βαθμολογίας — μεταφέρεται στη Φάση 1"><input type="checkbox" class="key-mark" onchange="toggleKeyMark(this,'score')">βασικό</label><textarea class="form-control dyn-key save-data" placeholder="Περιγραφή Κριτηρίου..." style="flex:2.5;" rows="2" oninput="syncKeyToPhase1()"></textarea><input type="text" class="form-control dyn-score save-data" placeholder="Βαθμός" oninput="calculateTotalScore()" style="flex:1;" title="Ο βαθμός που λαμβάνει το κριτήριο"><input type="text" class="form-control dyn-cw save-data" placeholder="Βαρύτητα Κριτ. (%)" oninput="calculateTotalScore()" style="flex:1.2;" title="Η ποσοστιαία βαρύτητα του κριτηρίου"><input type="text" class="form-control dyn-group save-data" placeholder="Βαρύτητα Ομάδας (%)" oninput="calculateTotalScore()" style="flex:1.2;" title="Η ποσοστιαία βαρύτητα της ομάδας"><select class="form-control dyn-val save-data bg-neutral" onchange="colorStandard(this);calculateTotalScore();" style="flex:1;"><option value="">Ενεργό;</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select><span class="row-res" style="flex:0.5;font-size:16px;">0.00</span><button class="btn-remove" onclick="document.getElementById('${rowId}').remove();calculateTotalScore();">×</button>`;
   c.appendChild(row);
 }
 function calculateTotalScore(){
@@ -2526,6 +2573,7 @@ function collectData(){
   ['gen_beneficiary','gen_projectCode','gen_program','gen_type','genActionType','genEvalType','gen_budget','gen_fee_total','gen_fee_submit','fee_pct_total','fee_pct_sub','gen_contact','gen_email','gen_phone'].forEach(id=>data.general[id]=document.getElementById(id).value);
   data.general.fee_manual={total:document.getElementById('gen_fee_total').dataset.manual||'0',submit:document.getElementById('gen_fee_submit').dataset.manual||'0'};
   data.phase2_dyn.kad=getKadSummary();
+  data.keyMarks=(typeof getKeyMarks==='function')?getKeyMarks():null;
   data.phase3_docs=(typeof getPh3Docs==='function')?getPh3Docs():[];
   data.lastTab=(typeof CURRENT_TAB!=='undefined')?CURRENT_TAB:1;
   data.contacts=(typeof getContacts==='function')?getContacts():[];
@@ -2799,6 +2847,12 @@ function applyData(data){
         const c=document.getElementById('ph3_docsList');c.innerHTML='';
         data.phase3_docs.forEach(d=>addPh3DocRow(d.k,d.v));
       }
+      if(data.keyMarks){
+        const put=(sel,rowSel,arr)=>{[...document.querySelectorAll(sel+' '+rowSel)].forEach((r,i)=>{
+          const c=r.querySelector('.key-mark');if(c&&arr&&arr[i])c.checked=true;});};
+        put('#eligibilityContainer','.dynamic-row',data.keyMarks.elig);
+        put('#scoringContainer','.score-row',data.keyMarks.score);
+      }
       syncProgramConfig();
       if(typeof syncBp4==='function')syncBp4();
       ['bp4_q4','bp4_q5','pre5_q7','pre5_q15'].forEach(id=>{const e=document.getElementById(id);if(!e)return;
@@ -3066,11 +3120,44 @@ const LOGO_PARTS=[
 function initLogo(){var el=document.getElementById('brandLogo');if(el)el.src='data:image/png;base64,'+LOGO_PARTS.join('');}
 /* =================== ΑΥΤΟΜΑΤΗ ΣΥΜΠΛΗΡΩΣΗ ΑΠΟ ΟΔΗΓΟ (v30) =================== */
 let GUIDE_RESULT=null;
+/* Τα ονόματα μοντέλων αλλάζουν συχνά. Τα «-latest» είναι σταθεροί δείκτες
+   που δείχνουν πάντα στην τρέχουσα γενιά — δοκιμάζονται πρώτα. */
 const GUIDE_MODELS={
-  gemini:['gemini-2.5-flash','gemini-2.0-flash','gemini-3-flash','gemini-2.5-flash-lite'],
+  gemini:['gemini-flash-latest','gemini-3.5-flash','gemini-3-flash','gemini-3.1-flash-lite','gemini-2.5-flash'],
   claude:['claude-haiku-4-5-20251001','claude-sonnet-5'],
   openai:['gpt-4o-mini','gpt-4.1-mini']
 };
+/* Ρωτά την ίδια την υπηρεσία ποια μοντέλα είναι διαθέσιμα στο κλειδί. */
+async function guideListModels(){
+  const prov=document.getElementById('guideProvider').value;
+  const key=document.getElementById('guideKey').value.trim();
+  const st=document.getElementById('guideStatus');
+  if(prov!=='gemini'){st.innerText='Η αυτόματη ανίχνευση υποστηρίζεται προς το παρόν για το Gemini.';return null;}
+  if(!key){st.innerText='⚠ Συμπληρώστε πρώτα το API key.';return null;}
+  st.innerText='Ανίχνευση διαθέσιμων μοντέλων…';
+  try{
+    const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models?key='+encodeURIComponent(key)+'&pageSize=200');
+    if(!r.ok)throw new Error('HTTP '+r.status+' — '+(await r.text()).slice(0,140));
+    const d=await r.json();
+    const list=(d.models||[])
+      .filter(m=>(m.supportedGenerationMethods||[]).includes('generateContent'))
+      .map(m=>String(m.name||'').replace(/^models\//,''))
+      .filter(n=>/flash|pro/i.test(n)&&!/image|tts|embedding|vision|live|audio/i.test(n));
+    if(!list.length)throw new Error('δεν επιστράφηκαν κατάλληλα μοντέλα');
+    /* Προτεραιότητα: latest → flash-lite → flash → υπόλοιπα */
+    const rank=n=>(/latest/.test(n)?0:/flash-lite/.test(n)?1:/flash/.test(n)?2:3);
+    list.sort((a,b)=>rank(a)-rank(b)||a.localeCompare(b));
+    const dl=document.getElementById('guideModelList');
+    if(dl)dl.innerHTML=list.map(n=>'<option value="'+n+'"></option>').join('');
+    document.getElementById('guideModel').value=list[0];
+    localStorage.setItem('bcsa_models_gemini',JSON.stringify(list));
+    st.innerText='✔ Βρέθηκαν '+list.length+' διαθέσιμα μοντέλα. Επιλέχθηκε «'+list[0]+'». Πατήστε «Δοκιμή» ή προχωρήστε σε ανάλυση.';
+    return list;
+  }catch(e){
+    st.innerText='⚠ Αποτυχία ανίχνευσης: '+String(e.message).slice(0,180);
+    return null;
+  }
+}
 async function guideTestKey(){
   const prov=document.getElementById('guideProvider').value;
   const key=document.getElementById('guideKey').value.trim();
@@ -3078,7 +3165,10 @@ async function guideTestKey(){
   if(prov==='local'){st.innerText='Ο τοπικός parser δεν χρειάζεται κλειδί.';return;}
   if(!key){st.innerText='⚠ Συμπληρώστε πρώτα το API key.';return;}
   st.innerText='Δοκιμή σύνδεσης…';
-  const models=[document.getElementById('guideModel').value.trim()].filter(Boolean).concat(GUIDE_MODELS[prov]||[]);
+  let detected=[];
+  try{detected=JSON.parse(localStorage.getItem('bcsa_models_'+prov)||'[]');}catch(e){}
+  if(prov==='gemini'&&!detected.length){const d=await guideListModels();if(d)detected=d;}
+  const models=[...new Set([document.getElementById('guideModel').value.trim()].filter(Boolean).concat(detected,GUIDE_MODELS[prov]||[]))];
   for(const m of models){
     try{
       let out;
@@ -3239,7 +3329,10 @@ async function guideAnalyze(){
     '"regimes" (λίστα από: deminimis, gak). '+
     'Μην εφευρίσκεις τίποτα — μόνο ό,τι προκύπτει από το κείμενο. Χωρίς markdown.';
   const chosen=document.getElementById('guideModel').value.trim();
-  const models=[chosen,localStorage.getItem('bcsa_model_'+prov)].filter(Boolean).concat(GUIDE_MODELS[prov]||[]);
+  let detected=[];
+  try{detected=JSON.parse(localStorage.getItem('bcsa_models_'+prov)||'[]');}catch(e){}
+  if(prov==='gemini'&&!detected.length){const d=await guideListModels();if(d)detected=d;}
+  const models=[chosen,localStorage.getItem('bcsa_model_'+prov)].filter(Boolean).concat(detected,GUIDE_MODELS[prov]||[]);
   const tried=[];let lastErr='';
   for(const m of [...new Set(models)]){
     try{
@@ -4598,6 +4691,11 @@ function qIndexById(id){return questions.findIndex(q=>q.id===id);}
 function applyProgramTemplate(t){
   t=t||{};
   /* Φάση 1: q5 (2 βασικές), q6 (3 μέγιστης βαθμολογίας) */
+  setTimeout(()=>{
+    [...document.querySelectorAll('#eligibilityContainer .key-mark')].slice(0,2).forEach(c=>c.checked=true);
+    [...document.querySelectorAll('#scoringContainer .key-mark')].slice(0,3).forEach(c=>c.checked=true);
+    if(typeof syncKeyToPhase1==='function')syncKeyToPhase1();
+  },60);
   const basics=((t.p1_basic||[]).filter(Boolean).length?t.p1_basic:(t.p2_elig||[]).map(v=>typeof v==='string'?v:v.k));
   (basics||[]).slice(0,2).forEach((txt,i)=>{const el=document.getElementById('input_q5_text_'+i);if(el)el.value=txt;});
   const maxes=((t.p1_maxscore||[]).filter(Boolean).length?t.p1_maxscore:(t.p2_score||[]).map(o=>o.k));
