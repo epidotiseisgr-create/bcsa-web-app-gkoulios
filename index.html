@@ -911,6 +911,16 @@ header{padding-left:110px;padding-right:110px;}
       <h2 style="margin:0;color:#4b2e6b;font-size:18px;">🤖 ΑΥΤΟΜΑΤΗ ΣΥΜΠΛΗΡΩΣΗ ΑΠΟ ΟΔΗΓΟ</h2>
       <span class="close-btn" onclick="document.getElementById('guideModal').style.display='none'">&times;</span>
     </div>
+    <div class="si-tabs">
+      <div class="si-tab active" id="gTabRead" onclick="guideTab('read')">📄 Ανάγνωση οδηγού</div>
+      <div class="si-tab" id="gTabJson" onclick="guideTab('json')">📋 Επικόλληση JSON</div>
+    </div>
+    <div id="gPaneJson" style="display:none;">
+      <div class="sme-note">Χρησιμοποιήστε τον <strong>Βοηθό Ανάγνωσης Οδηγού</strong> μέσα στο Claude.ai — δεν απαιτεί API key και δεν έχει κόστος. Επικολλήστε εδώ το JSON που θα σας δώσει.</div>
+      <textarea id="guideJson" rows="8" class="form-control" placeholder='{ "p2_elig": [...], "p2_docs": [...] }' style="font-family:monospace;font-size:12px;margin-top:10px;"></textarea>
+      <div style="text-align:right;margin-top:8px;"><button class="btn btn-blue" onclick="guideLoadJson()">📥 Φόρτωση JSON</button></div>
+    </div>
+    <div id="gPaneRead">
     <div class="sme-note">Ανεβάστε το PDF του οδηγού (ή επικολλήστε κείμενο). Το σύστημα εξάγει τα στοιχεία και <strong>σας τα προτείνει</strong> — τίποτα δεν εφαρμόζεται χωρίς τον έλεγχό σας.</div>
     <div class="adm-row" style="margin-top:12px;">
       <input type="file" id="guidePdf" accept=".pdf" onchange="guideReadPdf(event)" style="flex:1;padding:8px;border:1px dashed var(--border-color);border-radius:4px;">
@@ -924,10 +934,11 @@ header{padding-left:110px;padding-right:110px;}
         <option value="claude">🤖 Anthropic Claude — με χρέωση</option>
         <option value="openai">💬 OpenAI — με χρέωση</option>
       </select>
-      <span id="guideKeyBox" style="display:none;"><input type="password" id="guideKey" placeholder="API key" style="width:200px;"></span>
+      <span id="guideKeyBox" style="display:none;"><input type="password" id="guideKey" placeholder="API key" style="width:200px;" title="Αποθηκεύεται μόνο στον browser σας — δεν γράφεται ποτέ στο αρχείο"></span>
       <button class="btn btn-blue" onclick="guideAnalyze()">🔍 Ανάλυση</button>
     </div>
     <div id="guideCost" style="font-size:11.5px;color:#777;margin-top:4px;"></div>
+    </div>
     <div id="guideStatus" class="save-status" style="min-height:20px;margin-top:8px;"></div>
     <div id="guideResult" style="margin-top:12px;"></div>
     <div class="adm-foot">
@@ -3051,11 +3062,29 @@ function initLogo(){var el=document.getElementById('brandLogo');if(el)el.src='da
 /* =================== ΑΥΤΟΜΑΤΗ ΣΥΜΠΛΗΡΩΣΗ ΑΠΟ ΟΔΗΓΟ (v30) =================== */
 let GUIDE_RESULT=null;
 const GUIDE_PROVIDERS={
-  gemini:{model:'gemini-2.5-flash',cost:'Δωρεάν κλειδί από aistudio.google.com (χωρίς κάρτα). Στέλνεται μόνο το κείμενο του δημόσιου οδηγού.'},
+  gemini:{model:'gemini-3-flash',cost:'Δωρεάν κλειδί από aistudio.google.com — χωρίς κάρτα. Δωρεάν επίπεδο: μοντέλα Flash, 1.500 αιτήματα/ημέρα. Στέλνεται μόνο το κείμενο του δημόσιου οδηγού.'},
   claude:{model:'claude-haiku-4-5-20251001',cost:'Με χρέωση (console.anthropic.com). Τάξη μεγέθους λίγα λεπτά του δολαρίου ανά οδηγό.'},
   openai:{model:'gpt-4o-mini',cost:'Με χρέωση (platform.openai.com). Η συνδρομή ChatGPT Plus ΔΕΝ δίνει πρόσβαση στο API.'}
 };
+function guideTab(w){
+  document.getElementById('gTabRead').classList.toggle('active',w==='read');
+  document.getElementById('gTabJson').classList.toggle('active',w==='json');
+  document.getElementById('gPaneRead').style.display=(w==='read')?'block':'none';
+  document.getElementById('gPaneJson').style.display=(w==='json')?'block':'none';
+}
+function guideLoadJson(){
+  const t=document.getElementById('guideJson').value.trim();
+  const st=document.getElementById('guideStatus');
+  if(!t){st.innerText='⚠ Επικολλήστε πρώτα το JSON.';return;}
+  try{
+    const m=t.match(/\{[\s\S]*\}/);
+    GUIDE_RESULT=JSON.parse(m?m[0]:t);
+    guideRender('Βοηθός Ανάγνωσης Οδηγού');
+  }catch(e){st.innerText='⚠ Μη έγκυρο JSON: '+e.message;}
+}
 function openGuideImport(){
+  guideTab('read');
+  const gj=document.getElementById('guideJson');if(gj)gj.value='';
   document.getElementById('guideText').value='';
   document.getElementById('guideResult').innerHTML='';
   document.getElementById('guideStatus').innerText='';
@@ -3069,7 +3098,9 @@ function guideProviderChange(){
   localStorage.setItem('bcsa_guide_prov',p);
   const box=document.getElementById('guideKeyBox');
   box.style.display=(p==='local')?'none':'inline';
-  document.getElementById('guideCost').innerText=(p==='local')?'Χωρίς κόστος, χωρίς σύνδεση. Εντοπίζει λίστες με ✓ • - και αριθμήσεις.':(GUIDE_PROVIDERS[p]||{}).cost||'';
+  document.getElementById('guideCost').innerHTML=(p==='local')
+    ?'Χωρίς κόστος, χωρίς σύνδεση. Εντοπίζει λίστες με ✓ • - και αριθμήσεις.'
+    :((GUIDE_PROVIDERS[p]||{}).cost||'')+' <strong style="color:#1e7e46;">Το κλειδί αποθηκεύεται μόνο στον browser σας — δεν γράφεται ποτέ μέσα στο αρχείο, άρα δεν εκτίθεται στο GitHub.</strong>';
   if(p!=='local')document.getElementById('guideKey').value=localStorage.getItem('bcsa_key_'+p)||'';
 }
 async function guideReadPdf(ev){
@@ -3161,6 +3192,7 @@ function guideRender(method){
     ['p2_score','Βαθμολογούμενα κριτήρια',v=>(v.k||v)+(v.cw?(' — '+v.cw+'%'):'')],
     ['p2_exp','Δαπάνες',v=>(v.title||v)+(v.cat?(' / '+v.cat):'')+(v.pct?(' — '+v.pct+'%'):'')+(v.amt?(' — '+v.amt+'€'):'')],
     ['meta_types','Καθεστώς επιχείρησης',v=>v],
+    ['p2_bp','Ερωτήσεις business plan',v=>v],
     ['regimes','Καθεστώς ενίσχυσης',v=>(v==='deminimis'?'De minimis':'ΓΑΚ')]
   ];
   let total=0,h='';
@@ -3186,6 +3218,8 @@ function guideApply(){
     (r.p2_score||[]).forEach(o=>sc.insertAdjacentHTML('beforeend',admScoreHtml(typeof o==='string'?{k:o}:o)));
   }
   if(on('meta_types'))chipSet('admMetaTypeChips',r.meta_types||[]);
+  if(r.limits)Object.keys(r.limits).forEach(k=>{const e=document.getElementById(k);if(e&&r.limits[k])e.value=r.limits[k];});
+  if(r.p2_bp&&r.p2_bp.length)admFillLines('admBp',r.p2_bp,'Ερώτηση BP');
   if(on('regimes')){chipSet('admRegimeChips',r.regimes||[]);admToggleRegime();}
   if(on('p2_exp')){
     const regs=chipVals('admRegimeChips');
@@ -4991,8 +5025,8 @@ function siSwitchPane(p){
 }
 const SI_PROVIDERS={
   gemini:{
-    models:['gemini-2.5-flash','gemini-2.5-flash-lite','gemini-3-flash'],
-    def:'gemini-2.5-flash',
+    models:['gemini-3-flash','gemini-3.1-flash-lite','gemini-2.5-flash'],
+    def:'gemini-3-flash',
     cost:'Δωρεάν επίπεδο: κλειδί από aistudio.google.com χωρίς κάρτα (όρια ~15 αιτήματα/λεπτό). Στέλνεται μόνο το κείμενο του οδηγού — ποτέ στοιχεία πελάτη.'
   },
   claude:{
