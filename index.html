@@ -1204,7 +1204,7 @@ header{padding-left:110px;padding-right:110px;}
         <div id="admExpRegimes"></div>
       </div></div>
 
-    <div class="adm-sec" id="admSecP3"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 3 · Δικαιολογητικά ανά δόση (για προγράμματα χωρίς παραστατικά)</span><span>▾</span></h4>
+    <div class="adm-sec" id="admSecP3"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 5 · Δικαιολογητικά ανά δόση (για προγράμματα χωρίς παραστατικά)</span><span>▾</span></h4>
       <div class="adm-body">
         <p class="adm-hint">Ισχύει για Voucher, Κεφάλαιο Κίνησης και Επιδότηση Προσωπικού 100% (ΔΥΠΑ), όπου δεν συλλέγονται τιμολόγια αλλά συγκεκριμένα δικαιολογητικά ανά δόση.</p>
         <strong style="font-size:13px;color:#4b2e6b;">1η Ενδιάμεση Δόση</strong>
@@ -1215,16 +1215,7 @@ header{padding-left:110px;padding-right:110px;}
         <div id="admP3F"></div><button class="adm-addbtn" onclick="admAddLine('admP3F')">+ Προσθήκη</button>
       </div></div>
 
-    <div class="adm-sec" id="admSecExpDocs"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 3 · Δικαιολογητικά ανά κατηγορία δαπάνης</span><span>▾</span></h4>
-      <div class="adm-body">
-        <p class="adm-hint">Επιλέξτε κατηγορία και προσαρμόστε τη λίστα για το συγκεκριμένο πρόγραμμα. Οι αλλαγές ισχύουν μόνο για αυτό το πρόγραμμα — οι προεπιλογές του συστήματος παραμένουν ανέπαφες.</p>
-        <div class="adm-row">
-          <select id="admExpCat" class="grow" onchange="admLoadExpDocs()"></select>
-          <button class="adm-addbtn" onclick="admResetExpDocs()">↻ Επαναφορά προεπιλογών</button>
-        </div>
-        <div id="admExpDocs"></div>
-        <button class="adm-addbtn" onclick="admAddLine('admExpDocs')">+ Προσθήκη δικαιολογητικού</button>
-      </div></div>
+    
 
     <div class="adm-sec" id="admSecP3Full"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 5 · Δικαιολογητικά υλοποίησης ανά δαπάνη <button class="adm-addbtn" style="background:#4b2e6b;color:#fff;border-style:solid;margin-left:8px;" onclick="openSectionImport('p3')">🤖 Από οδηγό</button></span><span>▾</span></h4>
       <div class="adm-body">
@@ -1237,7 +1228,7 @@ header{padding-left:110px;padding-right:110px;}
         <div id="admP3All"></div>
       </div></div>
 
-    <div class="adm-sec" id="admSecP3Proc"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 3 · Έλεγχοι διαδικασίας (εμφανίζονται στην αναφορά ελλείψεων)</span><span>▾</span></h4>
+    <div class="adm-sec" id="admSecP3Proc"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 5 · Έλεγχοι διαδικασίας (εμφανίζονται στην αναφορά ελλείψεων)</span><span>▾</span></h4>
       <div class="adm-body">
         <p class="adm-hint">Αυτά τα σημεία θεωρούνται «διαδικασίες» και διαχωρίζονται στην αναφορά. Μπορείτε να προσθέσετε ή να διαγράψετε.</p>
         <div id="admP3Proc"></div><button class="adm-addbtn" onclick="admAddLine('admP3Proc')">+ Προσθήκη ελέγχου</button>
@@ -3494,15 +3485,40 @@ function guideRender(method){
     ['__p3','Δικαιολογητικά Φάσης 3',v=>v]
   ];
   /* Επίπεδη προβολή για τα σύνθετα αντικείμενα */
-  if(r.docs_by_type)r.__docsType=Object.keys(r.docs_by_type).map(k=>k+': '+((r.docs_by_type[k].docs||[]).length)+' δικαιολογητικά'+(r.docs_by_type[k].link?' + σύνδεσμος':''));
-  if(r.exp_by_regime)r.__expReg=Object.keys(r.exp_by_regime).map(k=>(k==='deminimis'?'De minimis':'ΓΑΚ')+': '+((r.exp_by_regime[k]||[]).length)+' δαπάνες');
-  if(r.p3_full)r.__p3=Object.keys(r.p3_full).map(k=>k+': '+Object.keys(r.p3_full[k]||{}).map(s=>s+' '+((r.p3_full[k][s]||[]).length)).join(', '));
+  if(r.docs_by_type){
+    r.__docsType=[];
+    Object.keys(r.docs_by_type).forEach(k=>{
+      r.__docsType.push('▣ '+k+(r.docs_by_type[k].link?' — σύνδεσμος: '+r.docs_by_type[k].link:''));
+      (r.docs_by_type[k].docs||[]).forEach(d=>r.__docsType.push('   • '+d));
+    });
+  }
+  if(r.exp_by_regime){
+    r.__expReg=[];
+    Object.keys(r.exp_by_regime).forEach(k=>{
+      const arr=r.exp_by_regime[k]||[];
+      if(!arr.length)return;
+      r.__expReg.push('▣ '+(k==='deminimis'?'DE MINIMIS':'ΓΑΚ')+' ('+arr.length+' δαπάνες)');
+      arr.forEach(o=>{
+        const lim=[o.pct?o.pct+'%':'',o.amt?(Number(String(o.amt).replace(/\D/g,'')).toLocaleString('el-GR')+' €'):''].filter(Boolean).join(' / ');
+        r.__expReg.push('   • '+(o.title||'—')+(o.cat&&o.cat!==o.title?(' › '+o.cat):'')+(lim?('  [όριο: '+lim+']'):''));
+      });
+    });
+  }
+  if(r.p3_full){
+    r.__p3=[];
+    Object.keys(r.p3_full).forEach(k=>{
+      r.__p3.push('▣ '+k);
+      Object.keys(r.p3_full[k]||{}).forEach(s=>{
+        (r.p3_full[k][s]||[]).forEach(d=>r.__p3.push('   • ['+s+'] '+d));
+      });
+    });
+  }
   let total=0,h='';
   secs.forEach(([k,lbl,fmt])=>{
     const arr=r[k]||[];
     if(!arr.length)return;
     total+=arr.length;
-    h+='<div class="regime-box"><h6><label style="cursor:pointer;"><input type="checkbox" class="gsec" data-k="'+k+'" checked> '+lbl+' ('+arr.length+')</label></h6><ul style="margin:0;font-size:12.5px;max-height:150px;overflow-y:auto;">';
+    h+='<div class="regime-box"><h6><label style="cursor:pointer;"><input type="checkbox" class="gsec" data-k="'+k+'" checked> '+lbl+' ('+arr.length+')</label></h6><ul style="margin:0;font-size:12.5px;max-height:300px;overflow-y:auto;list-style:none;padding-left:4px;">';
     arr.forEach(v=>{h+='<li>'+String(fmt(v)).replace(/</g,'&lt;')+'</li>';});
     h+='</ul></div>';
   });
@@ -5033,18 +5049,21 @@ function admStoreDocTypes(){
   });
 }
 function admLoadExpDocs(){
+  const sel=document.getElementById('admExpCat');if(!sel)return;
   if(_admExpLast){const prev=_admExpLast;_admExpDocs[prev]=admReadLines('admExpDocs');}
-  const cat=document.getElementById('admExpCat').value;_admExpLast=cat;
+  const cat=sel.value;_admExpLast=cat;
   const list=_admExpDocs[cat]||DEFAULT_EXPENSE_DOCS[cat]||[];
   admFillLines('admExpDocs',list,'Δικαιολογητικό');
 }
 function admStoreExpDocs(){
-  const cat=document.getElementById('admExpCat').value;
+  const sel=document.getElementById('admExpCat');if(!sel)return;
+  const cat=sel.value;
   if(!cat)return;
   _admExpDocs[cat]=admReadLines('admExpDocs');
 }
 function admResetExpDocs(){
-  const cat=document.getElementById('admExpCat').value;
+  const sel=document.getElementById('admExpCat');if(!sel)return;
+  const cat=sel.value;
   delete _admExpDocs[cat];
   admFillLines('admExpDocs',DEFAULT_EXPENSE_DOCS[cat]||[],'Δικαιολογητικό');
   admStatus('Επαναφέρθηκαν οι προεπιλογές για «'+cat+'».');
@@ -5140,10 +5159,6 @@ function admBuildP3All(){
   });
 }
 function admResetProc(){
-  _admExpDocs=JSON.parse(JSON.stringify(t.p3_expense_docs||{}));
-  _p3Full=JSON.parse(JSON.stringify(t.p3_full||{}));_p3Last='';
-  admBuildP3All();
-  admFillExpCats();admLoadExpDocs();
   admFillLines('admP3Proc',DEFAULT_PROCESS_CHECKS,'Έλεγχος διαδικασίας');
   admStatus('Επαναφέρθηκαν οι προεπιλεγμένοι έλεγχοι διαδικασίας.');
 }
@@ -5152,6 +5167,9 @@ function admLoadIntoForm(name){
   document.getElementById('admName').value=name||'';
   _docTypes=JSON.parse(JSON.stringify(t.docs_by_type||{}));
   _expReg=JSON.parse(JSON.stringify(t.exp_by_regime||{deminimis:[],gak:[]}));
+  _admExpDocs=JSON.parse(JSON.stringify(t.p3_expense_docs||{}));
+  _p3Full=JSON.parse(JSON.stringify(t.p3_full||{}));
+  admBuildP3All();
   chipSet('admMetaTypeChips',t.meta_types||[]);
   chipSet('admRegimeChips',t.regimes||[]);
   ['admDmBudMin','admDmBudMax','admDmAidMin','admDmAidMax','admGakBudMin','admGakBudMax','admGakAidMin','admGakAidMax']
