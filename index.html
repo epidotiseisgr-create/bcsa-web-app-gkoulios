@@ -460,6 +460,15 @@ header{padding-left:110px;padding-right:110px;}
 .p3sub{padding:10px 12px;border-bottom:1px dashed #e8e2f0;}
 .p3sub:last-child{border-bottom:none;}
 .p3sub>strong{display:block;font-size:12.5px;color:#4b2e6b;margin-bottom:6px;}
+
+/* ===== v38 ===== */
+.cat-x{float:right;background:#fdeaea;color:#b02a37;border:1px solid #f5c2c2;border-radius:4px;
+  width:26px;height:22px;font-size:12px;line-height:1;cursor:pointer;font-weight:bold;margin-left:8px;}
+.cat-x:hover{background:#b02a37;color:#fff;}
+#admP3All details.cat-off{opacity:.45;background:#f0f0f0;}
+#admP3All details.cat-off>summary{color:#888;text-decoration:line-through;}
+#admP3All details.cat-off .p3sub{pointer-events:none;}
+#admP3All details.cat-off .cat-x{background:#e8f0e8;color:#1e7e46;border-color:#b7e4c7;text-decoration:none;pointer-events:auto;}
 </style>
 </head>
 <body>
@@ -1195,8 +1204,7 @@ header{padding-left:110px;padding-right:110px;}
     <div class="adm-sec" id="admSecScore"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 2 · Βαθμολογούμενα κριτήρια (ενότητα 5) <button class="adm-addbtn" style="background:#4b2e6b;color:#fff;border-style:solid;margin-left:8px;" onclick="openSectionImport('score')">🤖 Από οδηγό</button></span><span>▾</span></h4>
       <div class="adm-body"><p class="adm-hint">Ορίστε περιγραφή + βαρύτητες. Ο χρήστης βάζει μόνο τον βαθμό και το «ενεργό».</p><div id="admScore"></div><button class="adm-addbtn" onclick="admAddScore()">+ Προσθήκη κριτηρίου</button></div></div>
 
-    <div class="adm-sec" id="admSecDocs"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 2 · Απαιτούμενα δικαιολογητικά (ενότητα 6) <button class="adm-addbtn" style="background:#4b2e6b;color:#fff;border-style:solid;margin-left:8px;" onclick="openSectionImport('docs')">🤖 Από οδηγό</button></span><span>▾</span></h4>
-      <div class="adm-body"><div id="admDocs"></div><button class="adm-addbtn" onclick="admAddLine('admDocs')">+ Προσθήκη</button></div></div>
+    
 
     <div class="adm-sec" id="admSecExpReg"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 2 · Δαπάνες ανά καθεστώς ενίσχυσης (De minimis / ΓΑΚ) <button class="adm-addbtn" style="background:#4b2e6b;color:#fff;border-style:solid;margin-left:8px;" onclick="openSectionImport('expReg')">🤖 Από οδηγό</button></span><span>▾</span></h4>
       <div class="adm-body">
@@ -1226,6 +1234,10 @@ header{padding-left:110px;padding-right:110px;}
           <button class="adm-addbtn" style="background:#eee;color:#555;border-style:solid;" onclick="admResetP3All()">↻ Επαναφορά προεπιλογών</button>
         </div>
         <div id="admP3All"></div>
+        <div class="adm-row" style="margin-top:10px;">
+          <input type="text" id="admNewCat" class="grow" placeholder="Ονομασία νέας κατηγορίας δαπάνης (π.χ. Πιστοποιήσεις)">
+          <button class="adm-addbtn" onclick="admAddP3Cat()">+ Προσθήκη κατηγορίας δαπάνης</button>
+        </div>
       </div></div>
 
     <div class="adm-sec" id="admSecP3Proc"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 5 · Έλεγχοι διαδικασίας (εμφανίζονται στην αναφορά ελλείψεων)</span><span>▾</span></h4>
@@ -1235,8 +1247,7 @@ header{padding-left:110px;padding-right:110px;}
         <button class="adm-addbtn" style="margin-left:8px;background:#eee;color:#555;border-style:solid;" onclick="admResetProc()">↻ Επαναφορά προεπιλογών</button>
       </div></div>
 
-    <div class="adm-sec" id="admSecExp"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 2 · Δαπάνες επενδυτικού σχεδίου (ενότητα 7)</span><span>▾</span></h4>
-      <div class="adm-body"><div id="admExp"></div><button class="adm-addbtn" onclick="admAddExp()">+ Προσθήκη δαπάνης</button></div></div>
+    
 
     <div class="adm-foot">
       <button class="btn btn-green" onclick="admSaveProgram()">✔ Αποθήκευση προγράμματος</button>
@@ -2270,6 +2281,7 @@ const optionsData={
   exoflisi:["","Με μετρητά","Με κατάθεση","Με τραπεζικό μέσο"],
   leasing:["","Ναι","Όχι"],
   dapani:["","Κτίρια","Εξοπλισμός","Εξοπλισμός Green","Ιστοσελίδα","Λογισμικό","Διαφήμιση","Συμμετοχή σε Εκθέσεις","Νέος Υπάλληλος","Μεταφορικά Μέσα"]
+  /* Οι διαθέσιμες κατηγορίες φιλτράρονται ανά πρόγραμμα από τη activeDapaniList() */
 };
 const BANK_INSTRUMENTS=['Έμβασμα','Πληρωμή με χρεωστική κάρτα','Πληρωμή με πιστωτική κάρτα','Πληρωμή με κωδικό RF','Τραπεζική επιταγή','Επιταγή επιχείρησης'];
 let processChecks=[
@@ -2302,6 +2314,13 @@ function initPhase3(){
   fc.innerHTML='';cc.innerHTML='';
   for(let i=1;i<=invoiceCount;i++)buildInvoiceCard(i);
 }
+function activeDapaniList(){
+  const cfg=(typeof currentProgramCfg==='function')?currentProgramCfg():{};
+  const off=cfg.p3_off||{};
+  const base=(typeof optionsData!=='undefined'&&optionsData.dapani)?optionsData.dapani:[''];
+  const extra=Object.keys(cfg.p3_full||{}).filter(k=>!base.includes(k));
+  return base.concat(extra).filter(d=>!d||!off[d]);
+}
 function buildInvoiceCard(i){
   const fc=document.getElementById('formsContainer');
   const cc=document.getElementById('checklistsContainer');
@@ -2315,7 +2334,7 @@ function buildInvoiceCard(i){
       <div class="form-group"><label>Χώρα Έκδοσης</label><select id="inv_timologio_${i}" onchange="updateChecklist(${i})">${optionsData.timologio.map(o=>`<option value="${o}">${o||'Επιλέξτε...'}</option>`).join('')}</select></div>
       <div class="form-group"><label>Εξόφληση</label><select id="inv_exoflisi_${i}" onchange="updateChecklist(${i})">${optionsData.exoflisi.map(o=>`<option value="${o}">${o||'Επιλέξτε...'}</option>`).join('')}</select></div>
       <div class="form-group"><label>Leasing</label><select id="inv_leasing_${i}" onchange="updateChecklist(${i})">${optionsData.leasing.map(o=>`<option value="${o}">${o||'Επιλέξτε...'}</option>`).join('')}</select></div>
-      <div class="form-group"><label>Δαπάνη</label><select id="inv_dapani_${i}" onchange="updateChecklist(${i})">${optionsData.dapani.map(o=>`<option value="${o}">${o||'Επιλέξτε...'}</option>`).join('')}</select></div>`;
+      <div class="form-group"><label>Δαπάνη</label><select id="inv_dapani_${i}" onchange="updateChecklist(${i})">${activeDapaniList().map(o=>`<option value="${o}">${o||'Επιλέξτε...'}</option>`).join('')}</select></div>`;
     const mailBar=document.createElement('div');
     mailBar.className='mail-bar';
     mailBar.innerHTML=`<span class="mail-bar-lbl">📧 Αποστολή:</span>
@@ -3532,31 +3551,35 @@ function guideApply(){
   const on=k=>{const c=document.querySelector('.gsec[data-k="'+k+'"]');return c&&c.checked;};
   /* --- ενότητες που δεν καλύπτονται από τον γενικό χειρισμό --- */
   if(r.docs_by_type){
-    Object.keys(r.docs_by_type).forEach(k=>{
-      const rec=r.docs_by_type[k];
-      _docTypes[k]=_docTypes[k]||{};
-      if(rec.docs&&rec.docs.length)_docTypes[k].docs=rec.docs;
-      if(rec.link)_docTypes[k].link=rec.link;
-    });
     const cur=chipVals('admMetaTypeChips');
     const found=Object.keys(r.docs_by_type);
     chipSet('admMetaTypeChips',[...new Set(cur.concat(found))]);
+    Object.keys(r.docs_by_type).forEach(k=>{
+      const rec=r.docs_by_type[k];
+      _docTypes[k]=_docTypes[k]||{};
+      if(rec.docs&&rec.docs.length)_docTypes[k].docs=rec.docs.slice();
+      if(rec.link)_docTypes[k].link=rec.link;
+    });
+    admFillDocTypes(true);
+    const s=document.getElementById('admSecDocsByType');if(s)s.classList.add('open');
   }
   if(r.exp_by_regime){
-    ['deminimis','gak'].forEach(rg=>{
-      if((r.exp_by_regime[rg]||[]).length)_expReg[rg]=r.exp_by_regime[rg];
-    });
     const cur=chipVals('admRegimeChips');
     const found=Object.keys(r.exp_by_regime).filter(k=>(r.exp_by_regime[k]||[]).length);
     chipSet('admRegimeChips',[...new Set(cur.concat(found))]);
-    admToggleRegime();
+    /* Πρώτα ενημερώνουμε τη μνήμη, μετά ανανεώνουμε ΧΩΡΙΣ ανάγνωση της οθόνης. */
+    ['deminimis','gak'].forEach(rg=>{
+      if((r.exp_by_regime[rg]||[]).length)_expReg[rg]=JSON.parse(JSON.stringify(r.exp_by_regime[rg]));
+    });
+    admToggleRegime(true);
+    const s=document.getElementById('admSecExpReg');if(s)s.classList.add('open');
   }
   if(r.p3_full){
     Object.keys(r.p3_full).forEach(cat=>{_p3Full[cat]=Object.assign(_p3Full[cat]||{},r.p3_full[cat]);});
     if(typeof admBuildP3All==='function')admBuildP3All();
   }
   if(on('p2_elig'))admFillLines('admElig',r.p2_elig,'Ειδική προϋπόθεση');
-  if(on('p2_docs'))admFillLines('admDocs',r.p2_docs,'Δικαιολογητικό');
+  if(on('p2_docs')&&document.getElementById('admDocs'))admFillLines('admDocs',r.p2_docs,'Δικαιολογητικό');
   if(on('p2_score')){
     const sc=document.getElementById('admScore');sc.innerHTML='';
     (r.p2_score||[]).forEach(o=>sc.insertAdjacentHTML('beforeend',admScoreHtml(typeof o==='string'?{k:o}:o)));
@@ -3571,7 +3594,6 @@ function guideApply(){
     _expReg[target]=(r.p2_exp||[]).map(o=>typeof o==='string'?{title:o,cat:'',pct:'',amt:''}:o);
     admFillExpRegimes();
   }
-  admFillDocTypes();
   document.getElementById('guideModal').style.display='none';
   admStatus('✔ Εφαρμόστηκαν τα στοιχεία του οδηγού. Ελέγξτε τα και αποθηκεύστε.');
 }
@@ -4955,12 +4977,12 @@ function chipSet(id,arr){
 document.addEventListener('change',e=>{
   if(e.target.closest&&e.target.closest('.chip'))e.target.closest('.chip').classList.toggle('on',e.target.checked);
 });
-function admToggleRegime(){
+function admToggleRegime(skipStore){
   const r=chipVals('admRegimeChips');
   document.getElementById('admRegDeminimis').classList.toggle('hidden',!r.includes('deminimis'));
   document.getElementById('admRegGak').classList.toggle('hidden',!r.includes('gak'));
-  if(typeof admFillDocTypes==='function')admFillDocTypes();
-  if(typeof admFillExpRegimes==='function')admFillExpRegimes();
+  if(typeof admFillDocTypes==='function')admFillDocTypes(skipStore);
+  if(typeof admFillExpRegimes==='function')admFillExpRegimes(skipStore);
 }
 function admLineHtml(val,ph){return '<div class="adm-row"><input type="text" class="grow adm-line" value="'+String(val||'').replace(/"/g,'&quot;')+'" placeholder="'+(ph||'')+'"><button class="adm-xbtn" onclick="this.parentElement.remove()">×</button></div>';}
 function admFillLines(cid,arr,ph){const c=document.getElementById(cid);c.innerHTML='';(arr||[]).forEach(v=>{c.insertAdjacentHTML('beforeend',admLineHtml(typeof v==='string'?v:v.k,ph));});}
@@ -4992,9 +5014,9 @@ function expRegRowHtml(o){
     '<input type="text" class="w80 er-amt" placeholder="όριο €" value="'+String(o.amt||'').replace(/"/g,'&quot;')+'">'+
     '<button class="adm-xbtn" onclick="this.parentElement.remove()">×</button></div>';
 }
-function admFillExpRegimes(){
+function admFillExpRegimes(skipStore){
   const box=document.getElementById('admExpRegimes');if(!box)return;
-  admStoreExpRegimes();
+  if(!skipStore)admStoreExpRegimes();
   const regs=chipVals('admRegimeChips');
   box.innerHTML='';
   if(!regs.length){box.innerHTML='<p class="adm-hint" style="color:#b02a37;">Επιλέξτε πρώτα καθεστώς ενίσχυσης στα «Στοιχεία Προγράμματος».</p>';return;}
@@ -5019,9 +5041,9 @@ function admStoreExpRegimes(){
     })).filter(o=>o.title);
   });
 }
-function admFillDocTypes(){
+function admFillDocTypes(skipStore){
   const box=document.getElementById('admDocTypes');if(!box)return;
-  admStoreDocTypes();
+  if(!skipStore)admStoreDocTypes();
   const types=chipVals('admMetaTypeChips');
   document.getElementById('admDocTypesEmpty').style.display=types.length?'none':'block';
   box.innerHTML='';
@@ -5076,7 +5098,7 @@ const P3_SECTIONS=[
   {key:'leasing',   lbl:'Ζήτα από Προμηθευτή Leasing'},
   {key:'expense',   lbl:'Δικαιολογητικά για τη συγκεκριμένη δαπάνη'}
 ];
-let _p3Full={},_p3Last='';
+let _p3Full={},_p3Last='',_p3Off={};
 const P3_BASE={
   accountant:[
     "Λογιστική εγγραφή (στήλη παγίων) Εσόδων Εξόδων με σφραγίδα & υπογραφή λογιστή ή/και του νόμιμου εκπροσώπου",
@@ -5118,8 +5140,8 @@ function admP3ExpandAll(on){
   document.querySelectorAll('#admP3All details').forEach(d=>d.open=!!on);
 }
 function admResetP3All(){
-  if(!confirm('Επαναφορά όλων των κατηγοριών στις προεπιλογές του συστήματος;'))return;
-  _p3Full={};admBuildP3All();
+  if(!confirm('Επαναφορά όλων των κατηγοριών στις προεπιλογές του συστήματος;\n\nΟι απενεργοποιημένες κατηγορίες θα ενεργοποιηθούν ξανά.'))return;
+  _p3Full={};_p3Off={};admBuildP3All();
   admStatus('Επαναφέρθηκαν οι προεπιλογές σε όλες τις κατηγορίες.');
 }
 function admStoreP3Full(){
@@ -5133,10 +5155,38 @@ function admStoreP3Full(){
     });
   });
 }
+function p3AllCats(){
+  const base=Object.keys(DEFAULT_EXPENSE_DOCS);
+  const extra=Object.keys(_p3Full||{}).filter(k=>!base.includes(k));
+  return base.concat(extra);
+}
+function admAddP3Cat(){
+  const inp=document.getElementById('admNewCat');
+  const name=(inp.value||'').trim();
+  if(!name){admStatus('⚠ Δώστε ονομασία κατηγορίας.');return;}
+  if(p3AllCats().includes(name)){admStatus('⚠ Η κατηγορία υπάρχει ήδη.');return;}
+  admStoreP3Full();
+  _p3Full[name]={accountant:P3_BASE.accountant.slice(),invoice:P3_BASE.invoice.slice(),
+                 bank:P3_BASE.bank.slice(),leasing:P3_BASE.leasing.slice(),expense:[]};
+  inp.value='';
+  admBuildP3All();
+  admStatus('✔ Προστέθηκε η κατηγορία «'+name+'».');
+}
+function admToggleP3Cat(btn,cat){
+  const d=btn.closest('details');
+  const off=!d.classList.contains('cat-off');
+  d.classList.toggle('cat-off',off);
+  _p3Off=_p3Off||{};_p3Off[cat]=off;
+  btn.textContent=off?'↺':'✕';
+  btn.title=off?'Επαναφορά κατηγορίας':'Απενεργοποίηση κατηγορίας';
+  if(off)d.open=false;
+  admStatus(off?('Η κατηγορία «'+cat+'» απενεργοποιήθηκε — δεν θα εμφανίζεται στον σύμβουλο.')
+               :('Η κατηγορία «'+cat+'» ενεργοποιήθηκε ξανά.'));
+}
 function admBuildP3All(){
   const box=document.getElementById('admP3All');if(!box)return;
   box.innerHTML='';
-  Object.keys(DEFAULT_EXPENSE_DOCS).forEach(cat=>{
+  p3AllCats().forEach(cat=>{
     const d=document.createElement('details');
     d.className='p3cat';d.dataset.cat=cat;
     let inner='';
@@ -5147,7 +5197,10 @@ function admBuildP3All(){
              '<div id="'+id+'" data-sec="'+s.key+'"></div>'+
              '<button class="adm-addbtn" onclick="admAddLine(\''+id+'\')">+ Προσθήκη</button></div>';
     });
-    d.innerHTML='<summary>'+cat+' <span class="p3count"></span></summary>'+inner;
+    const isOff=!!(_p3Off&&_p3Off[cat]);
+    if(isOff)d.classList.add('cat-off');
+    d.innerHTML='<summary>'+cat+' <span class="p3count"></span>'+
+      '<button class="cat-x" title="'+(isOff?'Επαναφορά κατηγορίας':'Απενεργοποίηση κατηγορίας')+'" onclick="event.preventDefault();event.stopPropagation();admToggleP3Cat(this,\''+cat.replace(/'/g,"\\'")+'\')">'+(isOff?'↺':'✕')+'</button></summary>'+inner;
     box.appendChild(d);
     P3_SECTIONS.forEach(s=>{
       const src=(_p3Full[cat]&&_p3Full[cat][s.key])?_p3Full[cat][s.key]:admP3Defaults(cat,s.key);
@@ -5169,6 +5222,7 @@ function admLoadIntoForm(name){
   _expReg=JSON.parse(JSON.stringify(t.exp_by_regime||{deminimis:[],gak:[]}));
   _admExpDocs=JSON.parse(JSON.stringify(t.p3_expense_docs||{}));
   _p3Full=JSON.parse(JSON.stringify(t.p3_full||{}));
+  _p3Off=JSON.parse(JSON.stringify(t.p3_off||{}));
   admBuildP3All();
   chipSet('admMetaTypeChips',t.meta_types||[]);
   chipSet('admRegimeChips',t.regimes||[]);
@@ -5188,12 +5242,12 @@ function admLoadIntoForm(name){
   admFillLines('admElig',t.p2_elig,'Ειδική προϋπόθεση');
   admFillLines('admBp',t.p2_bp,'Ερώτηση BP');
   const sc=document.getElementById('admScore');sc.innerHTML='';(t.p2_score||[]).forEach(o=>sc.insertAdjacentHTML('beforeend',admScoreHtml(o)));
-  admFillLines('admDocs',t.p2_docs,'Δικαιολογητικό');
+  if(document.getElementById('admDocs'))admFillLines('admDocs',t.p2_docs,'Δικαιολογητικό');
   admFillLines('admP3S1',t.p3_stage1,'Δικαιολογητικό 1ης δόσης');
   admFillLines('admP3S2',t.p3_stage2,'Δικαιολογητικό 2ης δόσης');
   admFillLines('admP3F',t.p3_final,'Δικαιολογητικό τελικής δόσης');
   admFillLines('admP3Proc',(t.p3_process&&t.p3_process.length)?t.p3_process:DEFAULT_PROCESS_CHECKS,'Έλεγχος διαδικασίας');
-  const xc=document.getElementById('admExp');xc.innerHTML='';(t.p2_exp||[]).forEach(o=>xc.insertAdjacentHTML('beforeend',admExpHtml(o)));
+  {const xc=document.getElementById('admExp');if(xc){xc.innerHTML='';(t.p2_exp||[]).forEach(o=>xc.insertAdjacentHTML('beforeend',admExpHtml(o)));}}
 }
 function admSelectProgram(){const n=document.getElementById('admProgList').value;admCurrent=n;admLoadIntoForm(n);}
 function admNewProgram(){admCurrent='';admLoadIntoForm('');document.getElementById('admName').value='';document.getElementById('admName').focus();admStatus('Νέο πρόγραμμα — συμπληρώστε ονομασία και αποθηκεύστε.');}
@@ -5220,14 +5274,15 @@ function admCollect(){
     p2_elig:admReadLines('admElig'),
     p2_bp:admReadLines('admBp'),
     p2_score:[...document.querySelectorAll('#admScore .adm-row')].map(r=>({k:r.querySelector('.adm-sk').value.trim(),cw:r.querySelector('.adm-scw').value.trim(),gw:r.querySelector('.adm-sgw').value.trim()})).filter(o=>o.k),
-    p2_docs:admReadLines('admDocs'),
+    p2_docs:(document.getElementById('admDocs')?admReadLines('admDocs'):(PROGRAMS[admCurrent]||{}).p2_docs||[]),
     p3_stage1:admReadLines('admP3S1'),
     p3_stage2:admReadLines('admP3S2'),
     p3_final:admReadLines('admP3F'),
     p3_process:admReadLines('admP3Proc'),
+    p3_off:JSON.parse(JSON.stringify(_p3Off||{})),
     p3_full:(function(){admStoreP3Full();const o={};Object.keys(_p3Full).forEach(k=>{const v=_p3Full[k];if(v&&Object.keys(v).some(x=>v[x]&&v[x].length))o[k]=v;});return o;})(),
     p3_expense_docs:(function(){admStoreExpDocs();const o={};Object.keys(_admExpDocs).forEach(k=>{const v=_admExpDocs[k];if(v&&v.length)o[k]=v;});return o;})(),
-    p2_exp:[...document.querySelectorAll('#admExp .adm-row')].map(r=>({desc:r.querySelector('.adm-ed').value.trim(),just:r.querySelector('.adm-ej').value.trim(),ltype:r.querySelector('.adm-et').value,lval:r.querySelector('.adm-ev').value.trim()})).filter(o=>o.desc)
+    p2_exp:(document.getElementById('admExp')?[...document.querySelectorAll('#admExp .adm-row')].map(r=>({desc:r.querySelector('.adm-ed').value.trim(),just:r.querySelector('.adm-ej').value.trim(),ltype:r.querySelector('.adm-et').value,lval:r.querySelector('.adm-ev').value.trim()})).filter(o=>o.desc):((PROGRAMS[admCurrent]||{}).p2_exp||[]))
   };
 }
 function admSaveProgram(){
