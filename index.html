@@ -1189,7 +1189,7 @@ header{padding-left:110px;padding-right:110px;}
       <div class="adm-body"><div id="admMax"></div></div></div>
 
     <div class="adm-sec" id="admSecElig"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 2 · Ειδικές προϋποθέσεις επιλεξιμότητας (ενότητα 3) <button class="adm-addbtn" style="background:#4b2e6b;color:#fff;border-style:solid;margin-left:8px;" onclick="openSectionImport('elig')">🤖 Από οδηγό</button></span><span>▾</span></h4>
-      <div class="adm-body"><div id="admElig"></div><button class="adm-addbtn" onclick="admAddLine('admElig')">+ Προσθήκη</button></div></div>
+      <div class="adm-body"><p class="adm-hint">Σημειώστε με ✓ τις <strong>δύο</strong> προϋποθέσεις που θα εμφανίζονται ως «βασικές» στη Φάση 1.</p><div id="admElig"></div><button class="adm-addbtn" onclick="admAddLine('admElig')">+ Προσθήκη</button></div></div>
 
     <div class="adm-sec" id="admSecBp"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 2 · Ερωτήσεις Business Plan (ενότητα 4) <button class="adm-addbtn" style="background:#4b2e6b;color:#fff;border-style:solid;margin-left:8px;" onclick="openSectionImport('bp')">🤖 Από οδηγό</button></span><span>▾</span></h4>
       <div class="adm-body"><div id="admBp"></div><button class="adm-addbtn" onclick="admAddLine('admBp')">+ Προσθήκη</button></div></div>
@@ -1202,7 +1202,7 @@ header{padding-left:110px;padding-right:110px;}
       </div></div>
 
     <div class="adm-sec" id="admSecScore"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 2 · Βαθμολογούμενα κριτήρια (ενότητα 5) <button class="adm-addbtn" style="background:#4b2e6b;color:#fff;border-style:solid;margin-left:8px;" onclick="openSectionImport('score')">🤖 Από οδηγό</button></span><span>▾</span></h4>
-      <div class="adm-body"><p class="adm-hint">Ορίστε περιγραφή + βαρύτητες. Ο χρήστης βάζει μόνο τον βαθμό και το «ενεργό».</p><div id="admScore"></div><button class="adm-addbtn" onclick="admAddScore()">+ Προσθήκη κριτηρίου</button></div></div>
+      <div class="adm-body"><p class="adm-hint">Ορίστε περιγραφή + βαρύτητες. Ο χρήστης βάζει μόνο τον βαθμό και το «ενεργό». Σημειώστε με ✓ τα <strong>τρία</strong> κριτήρια που θα εμφανίζονται στη Φάση 1.</p><div id="admScore"></div><button class="adm-addbtn" onclick="admAddScore()">+ Προσθήκη κριτηρίου</button></div></div>
 
     
 
@@ -1582,10 +1582,42 @@ function getQ3Kads(){
 }
 function addQ11Row(type,index){
   const c=document.getElementById('sub_q11_container');const row=document.createElement('div');row.className='q11-row';
-  let inner=`<div style="flex:2"><input type="text" class="form-control q11-name" placeholder="ΑΦΜ/Επωνυμία" oninput="evaluateProgress(${index})"></div>`;
-  if(type.includes('Συνδεδεμένη'))inner+=`<div class="input-group" style="flex:1.5"><input type="text" class="form-control q11-dem" placeholder="Deminimis" oninput="formatCurrencyInput(event,${index})"><span class="addon">€</span></div>`;
-  inner+=`<div style="flex:1.5"><select class="form-control q11-size" onchange="evaluateProgress(${index})">${companySizes.map(o=>`<option value="${o==='Επιλέξτε Μέγεθος'?'':o}">${o}</option>`).join('')}</select></div><button type="button" class="btn-icon" onclick="addQ11Row('${type}',${index})">+</button>`;
-  row.innerHTML=inner;c.appendChild(row);evaluateProgress(index);
+  const both=(type.includes('Συνδεδεμένη')&&type.includes('Συνεργαζόμενη'));
+  let inner='';
+  /* Όταν συνυπάρχουν και οι δύο σχέσεις, χαρακτηρίζεται η κάθε επιχείρηση χωριστά. */
+  if(both){
+    inner+=`<div style="flex:1.4"><select class="form-control q11-rel" onchange="onQ11RelChange(this,${index})">
+      <option value="Συνδεδεμένη">Συνδεδεμένη</option><option value="Συνεργαζόμενη">Συνεργαζόμενη</option></select></div>`;
+  }else{
+    const fixed=type.includes('Συνδεδεμένη')?'Συνδεδεμένη':(type.includes('Συνεργαζόμενη')?'Συνεργαζόμενη':'');
+    inner+=`<input type="hidden" class="q11-rel" value="${fixed}">`;
+  }
+  inner+=`<div style="flex:2"><input type="text" class="form-control q11-name" placeholder="ΑΦΜ / Επωνυμία" oninput="evaluateProgress(${index});renderDeMinimis();"></div>`;
+  const showDem=both||type.includes('Συνδεδεμένη');
+  inner+=`<div class="input-group q11-demwrap" style="flex:1.8;${showDem?'':'display:none;'}"><input type="text" class="form-control q11-dem" placeholder="De minimis τελευταίου έτους" oninput="formatCurrencyInput(event,${index})"><span class="addon">€</span></div>`;
+  inner+=`<div style="flex:1.5"><select class="form-control q11-size" onchange="evaluateProgress(${index})">${companySizes.map(o=>`<option value="${o==='Επιλέξτε Μέγεθος'?'':o}">${o}</option>`).join('')}</select></div>`;
+  inner+=`<button type="button" class="btn-icon" title="Προσθήκη επιχείρησης" onclick="addQ11Row('${type}',${index})">+</button>`;
+  inner+=`<button type="button" class="btn-remove" title="Αφαίρεση" onclick="this.closest('.q11-row').remove();renderDeMinimis();scheduleAutoSave();">×</button>`;
+  row.innerHTML=inner;c.appendChild(row);
+  onQ11RelChange(row.querySelector('.q11-rel'),index);
+  evaluateProgress(index);
+}
+function onQ11RelChange(sel,index){
+  if(!sel)return;
+  const row=sel.closest?sel.closest('.q11-row'):null;
+  if(!row)return;
+  const w=row.querySelector('.q11-demwrap');
+  if(w)w.style.display=(sel.value==='Συνδεδεμένη')?'':'none';
+  if(typeof renderDeMinimis==='function')renderDeMinimis();
+  if(typeof evaluateProgress==='function')evaluateProgress(index||0);
+}
+function getQ11Companies(){
+  return [...document.querySelectorAll('#sub_q11_container .q11-row')].map(r=>({
+    rel:(r.querySelector('.q11-rel')||{}).value||'',
+    name:(r.querySelector('.q11-name')||{}).value.trim()||'',
+    dem:(r.querySelector('.q11-dem')||{}).value||'',
+    size:(r.querySelector('.q11-size')||{}).value||''
+  })).filter(x=>x.name);
 }
 function formatCurrencyInput(e,index){
   let val=e.target.value.replace(/[^0-9,]/g,'');let parts=val.split(',');
@@ -1729,8 +1761,7 @@ function getKeyMarks(){
 function addDynamicRow(containerId,placeholder,type){
   const c=document.getElementById(containerId);const rowId=`dyn_row_${dynIds++}`;const row=document.createElement('div');row.className='dynamic-row';row.id=rowId;
   let field=type==='select'?`<select class="form-control dyn-val save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select>`:`<textarea class="form-control dyn-val save-data" style="height:36px;"></textarea>`;
-  const keyBox=(containerId==='eligibilityContainer')
-    ? `<label class="key-lbl" title="Σήμανση ως βασική προϋπόθεση — μεταφέρεται στη Φάση 1"><input type="checkbox" class="key-mark" onchange="toggleKeyMark(this,'elig')">βασική</label>` : '';
+  const keyBox='';
   row.innerHTML=keyBox+`<input type="text" class="form-control dyn-key save-data" placeholder="${placeholder}" oninput="syncKeyToPhase1()">${field}<button class="btn-remove" onclick="document.getElementById('${rowId}').remove();syncKeyToPhase1();">×</button>`;
   c.appendChild(row);
 }
@@ -1741,7 +1772,7 @@ function addDocRow(){
 }
 function addScoringRow(){
   const c=document.getElementById('scoringContainer');const rowId=`score_row_${dynIds++}`;const row=document.createElement('div');row.className='dynamic-row score-row';row.id=rowId;
-  row.innerHTML=`<label class="key-lbl" title="Σήμανση ως κριτήριο μέγιστης βαθμολογίας — μεταφέρεται στη Φάση 1"><input type="checkbox" class="key-mark" onchange="toggleKeyMark(this,'score')">βασικό</label><textarea class="form-control dyn-key save-data" placeholder="Περιγραφή Κριτηρίου..." style="flex:2.5;" rows="2" oninput="syncKeyToPhase1()"></textarea><input type="text" class="form-control dyn-score save-data" placeholder="Βαθμός" oninput="calculateTotalScore()" style="flex:1;" title="Ο βαθμός που λαμβάνει το κριτήριο"><input type="text" class="form-control dyn-cw save-data" placeholder="Βαρύτητα Κριτ. (%)" oninput="calculateTotalScore()" style="flex:1.2;" title="Η ποσοστιαία βαρύτητα του κριτηρίου"><input type="text" class="form-control dyn-group save-data" placeholder="Βαρύτητα Ομάδας (%)" oninput="calculateTotalScore()" style="flex:1.2;" title="Η ποσοστιαία βαρύτητα της ομάδας"><select class="form-control dyn-val save-data bg-neutral" onchange="colorStandard(this);calculateTotalScore();" style="flex:1;"><option value="">Ενεργό;</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select><span class="row-res" style="flex:0.5;font-size:16px;">0.00</span><button class="btn-remove" onclick="document.getElementById('${rowId}').remove();calculateTotalScore();">×</button>`;
+  row.innerHTML=`<textarea class="form-control dyn-key save-data" placeholder="Περιγραφή Κριτηρίου..." style="flex:2.5;" rows="2" oninput="syncKeyToPhase1()"></textarea><input type="text" class="form-control dyn-score save-data" placeholder="Βαθμός" oninput="calculateTotalScore()" style="flex:1;" title="Ο βαθμός που λαμβάνει το κριτήριο"><input type="text" class="form-control dyn-cw save-data" placeholder="Βαρύτητα Κριτ. (%)" oninput="calculateTotalScore()" style="flex:1.2;" title="Η ποσοστιαία βαρύτητα του κριτηρίου"><input type="text" class="form-control dyn-group save-data" placeholder="Βαρύτητα Ομάδας (%)" oninput="calculateTotalScore()" style="flex:1.2;" title="Η ποσοστιαία βαρύτητα της ομάδας"><select class="form-control dyn-val save-data bg-neutral" onchange="colorStandard(this);calculateTotalScore();" style="flex:1;"><option value="">Ενεργό;</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select><span class="row-res" style="flex:0.5;font-size:16px;">0.00</span><button class="btn-remove" onclick="document.getElementById('${rowId}').remove();calculateTotalScore();">×</button>`;
   c.appendChild(row);
 }
 function calculateTotalScore(){
@@ -2625,7 +2656,7 @@ function collectData(){
       if(q.id==='q11'){
         data.phase1['q11_rows']=[];
         document.querySelectorAll('#sub_q11_container .q11-row').forEach(row=>{
-          data.phase1['q11_rows'].push({name:row.querySelector('.q11-name').value,dem:row.querySelector('.q11-dem')?row.querySelector('.q11-dem').value:'',size:row.querySelector('.q11-size').value});
+          data.phase1['q11_rows'].push({rel:(row.querySelector('.q11-rel')||{}).value||'',name:row.querySelector('.q11-name').value,dem:row.querySelector('.q11-dem')?row.querySelector('.q11-dem').value:'',size:row.querySelector('.q11-size').value});
         });
       }
     } else if(q.type==='currency-percent'||q.type==='double-currency'){
@@ -2728,7 +2759,7 @@ function applyData(data){
                 const cont=document.getElementById('sub_q11_container');cont.dataset.type=ans;cont.innerHTML='';
                 if(ans.includes('Συνδεδεμένη')||ans.includes('Συνεργαζόμενη')){
                   cont.classList.add('active');
-                  if(data.phase1['q11_rows']){data.phase1['q11_rows'].forEach(r=>{addQ11Row(ans,index);const lastR=cont.lastElementChild;lastR.querySelector('.q11-name').value=r.name||'';lastR.querySelector('.q11-size').value=r.size||'';if(lastR.querySelector('.q11-dem')&&r.dem)lastR.querySelector('.q11-dem').value=r.dem;});}
+                  if(data.phase1['q11_rows']){data.phase1['q11_rows'].forEach(r=>{addQ11Row(ans,index);const lastR=cont.lastElementChild;const rl=lastR.querySelector('.q11-rel');if(rl&&r.rel){rl.value=r.rel;onQ11RelChange(rl,index);}lastR.querySelector('.q11-name').value=r.name||'';lastR.querySelector('.q11-size').value=r.size||'';if(lastR.querySelector('.q11-dem')&&r.dem)lastR.querySelector('.q11-dem').value=r.dem;});}
                 } else{cont.classList.remove('active');}
               }
             }
@@ -3848,12 +3879,35 @@ function sendSmeRequestEmail(){
 }
 
 /* =================== DE MINIMIS (v26) =================== */
+/* Τα τρία έτη μετρώνται ΑΠΟ ΤΗΝ ΗΜΕΡΟΜΗΝΙΑ ΥΠΟΒΟΛΗΣ και πίσω, όχι ημερολογιακά. */
+function dmYearLabels(){
+  const d=new Date();
+  const y=d.getFullYear();
+  const mm=String(d.getMonth()+1).padStart(2,'0');
+  return [
+    {key:String(y),   label:'Τρέχον έτος ('+y+')'},
+    {key:String(y-1), label:String(y-1)},
+    {key:String(y-2), label:'έως '+mm+'/'+(y-3)}
+  ];
+}
 function dmCompanies(){
   /* Δικαιούχος + ΜΟΝΟ συνδεδεμένες (όχι συνεργαζόμενες) */
   const list=[{name:(document.getElementById('gen_beneficiary')||{}).value||'Δικαιούχος',tag:'Δικαιούχος'}];
+  const seen={};
+  /* Πηγή 1: οι επιχειρήσεις της ερώτησης 11 */
+  if(typeof getQ11Companies==='function'){
+    getQ11Companies().forEach(c=>{
+      if(c.rel!=='Συνδεδεμένη')return;
+      if(seen[c.name])return;seen[c.name]=1;
+      list.push({name:c.name,tag:'Συνδεδεμένη'});
+    });
+  }
+  /* Πηγή 2: οι επιχειρήσεις της ενότητας ΜμΕ (Φάση 2) */
   document.querySelectorAll('#smeLinkedContainer .sme-co').forEach(co=>{
     if(co.querySelector('.c-rel').value!=='Συνδεδεμένη')return;
-    list.push({name:co.querySelector('.c-nm').value.trim()||'(χωρίς επωνυμία)',tag:'Συνδεδεμένη'});
+    const n=co.querySelector('.c-nm').value.trim()||'(χωρίς επωνυμία)';
+    if(seen[n])return;seen[n]=1;
+    list.push({name:n,tag:'Συνδεδεμένη'});
   });
   return list;
 }
@@ -3864,14 +3918,14 @@ function renderDeMinimis(){
     const n=r.querySelector('.d-nm').value.trim();
     if(n)prev[n]=[...r.querySelectorAll('.d-y')].map(i=>i.value);
   });
-  const years=smeYears();
-  let h='<p style="margin:0 0 8px 0;font-size:12.5px;color:#555;">Ενισχύσεις ήσσονος σημασίας (de minimis) που έχουν ληφθεί τα <strong>τελευταία 3 έτη</strong> από την ημερομηνία υποβολής. Περιλαμβάνονται ο δικαιούχος και οι <strong>συνδεδεμένες</strong> επιχειρήσεις (όχι οι συνεργαζόμενες).</p>';
-  h+='<div class="dm-row" style="font-size:11.5px;color:#777;font-weight:bold;"><span class="d-nm" style="flex:2.2;">Επιχείρηση</span>'+years.map(y=>'<span class="d-y" style="flex:1;">'+y+'</span>').join('')+'<span style="width:120px;">Σύνολο</span></div>';
+  const years=dmYearLabels();
+  let h='<p style="margin:0 0 8px 0;font-size:12.5px;color:#555;">Ενισχύσεις ήσσονος σημασίας (de minimis) που έχουν ληφθεί την <strong>τελευταία τριετία</strong>. <strong>Προσοχή:</strong> η τριετία <u>δεν είναι ημερολογιακή</u> — μετράει από την <strong>ημερομηνία υποβολής</strong> στο σύστημα και τρία έτη πίσω. Τα έτη που εμφανίζονται είναι ενδεικτικά και μεταβάλλονται ανάλογα με τον χρόνο υποβολής. Περιλαμβάνονται ο δικαιούχος και οι <strong>συνδεδεμένες</strong> επιχειρήσεις (όχι οι συνεργαζόμενες).</p>';
+  h+='<div class="dm-row" style="font-size:11.5px;color:#777;font-weight:bold;"><span class="d-nm" style="flex:2.2;">Επιχείρηση</span>'+years.map(y=>'<span class="d-y" style="flex:1;">'+y.label+'</span>').join('')+'<span style="width:120px;">Σύνολο</span></div>';
   dmCompanies().forEach(c=>{
     const vals=prev[c.name]||['','',''];
     h+='<div class="dm-row"><input type="text" class="form-control d-nm" value="'+c.name.replace(/"/g,'&quot;')+'" readonly style="background:#f7f7f7;">'+
       '<span class="dm-tag">'+c.tag+'</span>'+
-      years.map((y,i)=>'<input type="text" class="form-control d-y" placeholder="€" value="'+(vals[i]||'')+'" oninput="calcDeMinimis()" onblur="formatField(this,\'currency\')">').join('')+
+      years.map((y,i)=>'<input type="text" class="form-control d-y" placeholder="€" title="'+y.label+'" value="'+(vals[i]||'')+'" oninput="calcDeMinimis()" onblur="formatField(this,\'currency\')">').join('')+
       '<span class="dm-sum" style="width:120px;text-align:right;font-weight:bold;">0,00 €</span></div>';
   });
   h+='<div class="dm-total" id="dmTotal"></div>';
@@ -3952,11 +4006,11 @@ async function mailOpen(kind){
       ta.select();copied=document.execCommand('copy');document.body.removeChild(ta);
     }catch(e2){}
   }
-  alert(copied
-    ? 'Το κείμενο είναι μεγάλο για να μεταφερθεί μέσω συνδέσμου.\n\n✔ Αντιγράφηκε στο πρόχειρο.\n\nΘα ανοίξει νέο μήνυμα με συμπληρωμένους παραλήπτη και θέμα — επικολλήστε το κείμενο με Ctrl+V.'
-    : 'Το κείμενο είναι μεγάλο για να μεταφερθεί μέσω συνδέσμου.\n\nΘα ανοίξει νέο μήνυμα με παραλήπτη και θέμα. Αντιγράψτε το κείμενο από το παράθυρο προεπισκόπησης με το κουμπί «Αντιγραφή Κειμένου».');
   const short=build('');
-  if(kind==='default')window.location.href=short;else window.open(short,'_blank');
+  const names={gmail:'Gmail',yahoo:'Yahoo Mail',outlook:'Outlook',default:'πρόγραμμα υπολογιστή'};
+  showLongMailNotice(copied,names[kind]||'',()=>{
+    if(kind==='default')window.location.href=short;else window.open(short,'_blank');
+  });
 }
 /* Μετατροπή HTML προεπισκόπησης σε απλό κείμενο για το σώμα του email */
 function htmlToPlain(html){
@@ -4133,6 +4187,31 @@ function renderMailLog(index){
   if(!rows.length){box.innerHTML='';return;}
   box.innerHTML='<div class="maillog"><strong>Απεσταλμένα:</strong> '+
     rows.map(m=>'<span class="ml-item">'+m.label+' · '+m.date+' <em>(προθεσμία '+m.deadline+')</em></span>').join(' ')+'</div>';
+}
+function showLongMailNotice(copied,provName,openFn){
+  const m=document.getElementById('mailPickModal');
+  const info=document.getElementById('mailPickInfo');
+  m.style.display='block';
+  info.innerHTML='<div style="background:#fff8e6;border-left:4px solid #f1c232;padding:11px;border-radius:0 4px 4px 0;">'+
+    '<strong style="color:#8a6d00;">Το κείμενο είναι μεγάλο για να μεταφερθεί μέσω συνδέσμου.</strong><br>'+
+    (copied?'<span style="color:#1e7e46;font-weight:bold;">✔ Αντιγράφηκε στο πρόχειρο.</span> Θα ανοίξει νέο μήνυμα με παραλήπτη και θέμα — επικολλήστε με <strong>Ctrl+V</strong>.'
+           :'Αντιγράψτε το κείμενο με το κουμπί «Αντιγραφή Κειμένου» από το παράθυρο προεπισκόπησης.')+
+    '</div>';
+  let bar=document.getElementById('mailLongBar');
+  if(!bar){
+    bar=document.createElement('div');bar.id='mailLongBar';bar.style.marginTop='12px';
+    info.parentNode.insertBefore(bar,info.nextSibling);
+  }
+  bar.innerHTML='';
+  const b=document.createElement('button');
+  b.className='btn btn-green';b.style.width='100%';
+  b.innerText='✉ Άνοιγμα σύνθεσης μηνύματος στο '+provName;
+  b.onclick=()=>{
+    bar.innerHTML='';info.innerHTML='';
+    document.getElementById('mailPickModal').style.display='none';
+    openFn();
+  };
+  bar.appendChild(b);
 }
 function showMailPreview(to,cc,subject,body,label){
   const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
@@ -4850,14 +4929,15 @@ function qIndexById(id){return questions.findIndex(q=>q.id===id);}
 function applyProgramTemplate(t){
   t=t||{};
   /* Φάση 1: q5 (2 βασικές), q6 (3 μέγιστης βαθμολογίας) */
-  setTimeout(()=>{
-    [...document.querySelectorAll('#eligibilityContainer .key-mark')].slice(0,2).forEach(c=>c.checked=true);
-    [...document.querySelectorAll('#scoringContainer .key-mark')].slice(0,3).forEach(c=>c.checked=true);
-    if(typeof syncKeyToPhase1==='function')syncKeyToPhase1();
-  },60);
-  const basics=((t.p1_basic||[]).filter(Boolean).length?t.p1_basic:(t.p2_elig||[]).map(v=>typeof v==='string'?v:v.k));
+  const eligAll=(t.p2_elig||[]).map(v=>typeof v==='string'?v:v.k);
+  const kE=t.key_elig||[];
+  const eligKeys=eligAll.filter((v,i)=>kE.length?kE[i]:i<2);
+  const basics=((t.p1_basic||[]).filter(Boolean).length?t.p1_basic:eligKeys);
   (basics||[]).slice(0,2).forEach((txt,i)=>{const el=document.getElementById('input_q5_text_'+i);if(el)el.value=txt;});
-  const maxes=((t.p1_maxscore||[]).filter(Boolean).length?t.p1_maxscore:(t.p2_score||[]).map(o=>o.k));
+  const scAll=(t.p2_score||[]).map(o=>o.k);
+  const kS=t.key_score||[];
+  const scKeys=scAll.filter((v,i)=>kS.length?kS[i]:i<3);
+  const maxes=((t.p1_maxscore||[]).filter(Boolean).length?t.p1_maxscore:scKeys);
   (maxes||[]).slice(0,3).forEach((txt,i)=>{const el=document.getElementById('input_q6_text_'+i);if(el)el.value=txt;});
   const i5=qIndexById('q5'),i6=qIndexById('q6');
   if(i5>=0)evaluateProgress(i5); if(i6>=0)evaluateProgress(i6);
@@ -4984,11 +5064,32 @@ function admToggleRegime(skipStore){
   if(typeof admFillDocTypes==='function')admFillDocTypes(skipStore);
   if(typeof admFillExpRegimes==='function')admFillExpRegimes(skipStore);
 }
-function admLineHtml(val,ph){return '<div class="adm-row"><input type="text" class="grow adm-line" value="'+String(val||'').replace(/"/g,'&quot;')+'" placeholder="'+(ph||'')+'"><button class="adm-xbtn" onclick="this.parentElement.remove()">×</button></div>';}
-function admFillLines(cid,arr,ph){const c=document.getElementById(cid);c.innerHTML='';(arr||[]).forEach(v=>{c.insertAdjacentHTML('beforeend',admLineHtml(typeof v==='string'?v:v.k,ph));});}
+function admLineHtml(val,ph,mark){
+  const box=(mark!==undefined)
+    ? '<label class="key-lbl" title="Εμφάνιση στη Φάση 1"><input type="checkbox" class="adm-key" '+(mark?'checked':'')+' onchange="admLimitKeys(this)">Φάση 1</label>' : '';
+  return '<div class="adm-row">'+box+'<input type="text" class="grow adm-line" value="'+String(val||'').replace(/"/g,'&quot;')+'" placeholder="'+(ph||'')+'"><button class="adm-xbtn" onclick="this.parentElement.remove()">×</button></div>';
+}
+function admLimitKeys(el){
+  const wrap=el.closest('.adm-body');if(!wrap)return;
+  const isScore=!!wrap.querySelector('#admScore');
+  const max=isScore?3:2;
+  const all=[...wrap.querySelectorAll('.adm-key')].filter(x=>x.checked);
+  if(el.checked&&all.length>max){
+    el.checked=false;
+    alert('Μπορείτε να επιλέξετε έως '+max+(isScore?' κριτήρια.':' προϋποθέσεις.'));
+  }
+}
+function admReadKeys(cid){return [...document.querySelectorAll('#'+cid+' .adm-key')].map(i=>i.checked);}
+function admFillLines(cid,arr,ph,marks){
+  const c=document.getElementById(cid);if(!c)return;
+  c.innerHTML='';
+  (arr||[]).forEach((v,i)=>{c.insertAdjacentHTML('beforeend',admLineHtml(typeof v==='string'?v:v.k,ph,marks?!!marks[i]:undefined));});
+}
 function admFixedLines(cid,arr,n,ph){const c=document.getElementById(cid);c.innerHTML='';for(let i=0;i<n;i++)c.insertAdjacentHTML('beforeend',admLineHtml((arr||[])[i]||'',ph+' '+(i+1)));}
 function admAddLine(cid){document.getElementById(cid).insertAdjacentHTML('beforeend',admLineHtml('',''));}
-function admScoreHtml(o){o=o||{};return '<div class="adm-row"><input type="text" class="grow adm-sk" value="'+String(o.k||'').replace(/"/g,'&quot;')+'" placeholder="Περιγραφή κριτηρίου"><input type="text" class="w80 adm-scw" value="'+(o.cw||'')+'" placeholder="Βαρ.Κριτ%"><input type="text" class="w80 adm-sgw" value="'+(o.gw||'')+'" placeholder="Βαρ.Ομ%"><button class="adm-xbtn" onclick="this.parentElement.remove()">×</button></div>';}
+function admScoreHtml(o,mark){o=o||{};return '<div class="adm-row">'+
+  '<label class="key-lbl" title="Εμφάνιση στη Φάση 1"><input type="checkbox" class="adm-key" '+(mark?'checked':'')+' onchange="admLimitKeys(this)">Φάση 1</label>'+
+  '<input type="text" class="grow adm-sk" value="'+String(o.k||'').replace(/"/g,'&quot;')+'" placeholder="Περιγραφή κριτηρίου"><input type="text" class="w80 adm-scw" value="'+(o.cw||'')+'" placeholder="Βαρ.Κριτ%"><input type="text" class="w80 adm-sgw" value="'+(o.gw||'')+'" placeholder="Βαρ.Ομ%"><button class="adm-xbtn" onclick="this.parentElement.remove()">×</button></div>';}
 function admAddScore(){document.getElementById('admScore').insertAdjacentHTML('beforeend',admScoreHtml({}));}
 function admExpHtml(o){o=o||{};return '<div class="adm-row"><input type="text" class="grow adm-ed" value="'+String(o.desc||'').replace(/"/g,'&quot;')+'" placeholder="Περιγραφή δαπάνης"><input type="text" class="grow adm-ej" value="'+String(o.just||'').replace(/"/g,'&quot;')+'" placeholder="Τεκμηρίωση"><select class="adm-et" style="width:60px;"><option value="%"'+(o.ltype==='%'?' selected':'')+'>%</option><option value="€"'+(o.ltype==='€'?' selected':'')+'>€</option></select><input type="text" class="w80 adm-ev" value="'+String(o.lval||'').replace(/"/g,'&quot;')+'" placeholder="Όριο"><button class="adm-xbtn" onclick="this.parentElement.remove()">×</button></div>';}
 function admAddExp(){document.getElementById('admExp').insertAdjacentHTML('beforeend',admExpHtml({}));}
@@ -5239,9 +5340,10 @@ function admLoadIntoForm(name){
   document.getElementById('admMetaIndirectPct').value=t.meta_indirect_pct||'7';
   admFixedLines('admBasic',t.p1_basic,2,'Βασική προϋπόθεση');
   admFixedLines('admMax',t.p1_maxscore,3,'Προϋπόθεση μέγ. βαθμ.');
-  admFillLines('admElig',t.p2_elig,'Ειδική προϋπόθεση');
+  admFillLines('admElig',t.p2_elig,'Ειδική προϋπόθεση',t.key_elig||[true,true]);
   admFillLines('admBp',t.p2_bp,'Ερώτηση BP');
-  const sc=document.getElementById('admScore');sc.innerHTML='';(t.p2_score||[]).forEach(o=>sc.insertAdjacentHTML('beforeend',admScoreHtml(o)));
+  const sc=document.getElementById('admScore');sc.innerHTML='';
+  (t.p2_score||[]).forEach((o,i)=>sc.insertAdjacentHTML('beforeend',admScoreHtml(o,(t.key_score||[true,true,true])[i])));
   if(document.getElementById('admDocs'))admFillLines('admDocs',t.p2_docs,'Δικαιολογητικό');
   admFillLines('admP3S1',t.p3_stage1,'Δικαιολογητικό 1ης δόσης');
   admFillLines('admP3S2',t.p3_stage2,'Δικαιολογητικό 2ης δόσης');
@@ -5272,6 +5374,8 @@ function admCollect(){
     p1_basic:admReadFixed('admBasic'),
     p1_maxscore:admReadFixed('admMax'),
     p2_elig:admReadLines('admElig'),
+    key_elig:admReadKeys('admElig'),
+    key_score:admReadKeys('admScore'),
     p2_bp:admReadLines('admBp'),
     p2_score:[...document.querySelectorAll('#admScore .adm-row')].map(r=>({k:r.querySelector('.adm-sk').value.trim(),cw:r.querySelector('.adm-scw').value.trim(),gw:r.querySelector('.adm-sgw').value.trim()})).filter(o=>o.k),
     p2_docs:(document.getElementById('admDocs')?admReadLines('admDocs'):(PROGRAMS[admCurrent]||{}).p2_docs||[]),
