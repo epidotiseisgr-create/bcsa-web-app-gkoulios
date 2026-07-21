@@ -469,6 +469,28 @@ header{padding-left:110px;padding-right:110px;}
 #admP3All details.cat-off>summary{color:#888;text-decoration:line-through;}
 #admP3All details.cat-off .p3sub{pointer-events:none;}
 #admP3All details.cat-off .cat-x{background:#e8f0e8;color:#1e7e46;border-color:#b7e4c7;text-decoration:none;pointer-events:auto;}
+
+/* ===== v40 ===== */
+.bulk-dyn{display:flex;gap:7px;align-items:center;margin-bottom:9px;flex-wrap:wrap;
+  background:#f7f7f7;border:1px solid #e6e6e6;border-radius:5px;padding:6px 10px;}
+.bulk-dyn span{font-size:11.5px;color:#777;font-weight:bold;}
+.bulk-dyn .bulk-btn{padding:4px 11px;}
+.dyn-wide{min-height:52px;resize:vertical;line-height:1.4;font-family:inherit;font-size:13.5px;padding:7px;}
+.dynamic-row{align-items:flex-start !important;}
+.dynamic-row .dyn-val{align-self:center;}
+.dynamic-row .btn-remove{align-self:center;}
+.score-row .dyn-key{min-height:56px;}
+
+/* ===== v41 ΚΑΔ ===== */
+.kad-status{display:inline-flex;flex-direction:column;gap:3px;margin-left:6px;}
+.kad-badge{display:inline-block;border-radius:10px;padding:3px 10px;font-size:11px;font-weight:bold;white-space:nowrap;}
+.kad-yes{background:#eafaf1;color:#1e7e46;border:1px solid #b7e4c7;}
+.kad-no{background:#fdeaea;color:#b02a37;border:1px solid #f5c2c2;}
+.kad-warn{background:#fff8e6;color:#8a6d00;border:1px solid #f1c232;}
+.kad-na{background:#f0f0f0;color:#999;border:1px solid #ddd;}
+.kad-hint{font-size:11px;color:#8a6d00;background:#fffdf5;border-left:3px solid #f1c232;
+  padding:4px 8px;border-radius:0 3px 3px 0;max-width:420px;line-height:1.4;}
+.kad-row,.kad3-row{align-items:flex-start !important;}
 </style>
 </head>
 <body>
@@ -674,6 +696,12 @@ header{padding-left:110px;padding-right:110px;}
       <div class="form-row form-row-inline"><label>Μπορεί να επιχορηγηθεί από επενδυτικό πρόγραμμα;</label><div><select id="elig_s2" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
       <div class="form-row form-row-inline"><label>Θα μεριμνήσει για προσβασιμότητα ΑμεΑ;</label><div><select id="elig_s3" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option><option value="ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ">ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ</option></select></div></div>
       <div class="form-row form-row-inline"><label>Ο/Οι ΚΑΔ επένδυσης, είναι επιλέξιμος/οι;</label><div><select id="elig_s4" class="form-control save-data bg-neutral" onchange="handleKadList(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
+      <div id="kadBox" class="hidden" style="background:#f0f7f0;border:1px solid #d6e9c6;border-radius:4px;padding:15px;margin-bottom:15px;">
+        <h4 style="margin:0 0 5px 0;color:var(--green);">ΚΑΔ Επένδυσης</h4>
+        <p style="font-size:12.5px;color:#666;margin:0 0 12px 0;">Ένας ΚΑΔ ορίζεται ως <strong>Κύριος</strong>· όλοι οι υπόλοιποι είναι αυτομάτως Δευτερεύοντες.</p>
+        <div id="kadContainer"></div>
+        <button class="btn-add" style="color:var(--green);border-color:var(--green);background:#eafaf1;" onclick="addKadRow()">+ Προσθήκη ΚΑΔ</button>
+      </div>
       <div id="smeBox" style="background:#f7f4fb;border:2px solid #d6c9e8;border-radius:8px;padding:16px;margin-bottom:16px;">
         <h4 style="margin:0 0 4px 0;color:#4b2e6b;font-size:15px;">ΙΔΙΟΤΗΤΑ ΜμΕ — ΟΙ ΤΡΕΙΣ ΠΥΛΩΝΕΣ ΜΕΓΕΘΟΥΣ</h4>
         <p style="font-size:12.5px;color:#666;margin:0 0 10px 0;">Σχέση επιχείρησης (από Φάση 1): <strong id="smeRelation" style="color:#4b2e6b;">—</strong></p>
@@ -700,16 +728,12 @@ header{padding-left:110px;padding-right:110px;}
           <button class="btn btn-blue" onclick="sendSmeRequestEmail()">📧 Αποστολή αιτήματος στοιχείων στον λογιστή</button>
         </div>
       </div>
-      <div id="kadBox" class="hidden" style="background:#f0f7f0;border:1px solid #d6e9c6;border-radius:4px;padding:15px;margin-bottom:15px;">
-        <h4 style="margin:0 0 5px 0;color:var(--green);">ΚΑΔ Επένδυσης</h4>
-        <p style="font-size:12.5px;color:#666;margin:0 0 12px 0;">Ένας ΚΑΔ ορίζεται ως <strong>Κύριος</strong>· όλοι οι υπόλοιποι είναι αυτομάτως Δευτερεύοντες.</p>
-        <div id="kadContainer"></div>
-        <button class="btn-add" style="color:var(--green);border-color:var(--green);background:#eafaf1;" onclick="addKadRow()">+ Προσθήκη ΚΑΔ</button>
-      </div>
+      
       <div class="form-row form-row-inline"><label>Επιθυμεί να έχει και τρίτους ΚΑΔ;</label><div><select id="elig_s5" class="form-control save-data bg-neutral" onchange="handleKAD(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option><option value="ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ">ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ</option></select></div></div>
       <div id="row_elig_s6" class="form-row form-row-inline hidden" style="background-color:#f0f7f0;border-color:#d6e9c6;"><label>Είναι επιτρεπτό από το πρόγραμμα να διαθέτει και άλλους ΚΑΔ;</label><div><select id="elig_s6" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option><option value="ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ">ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ</option></select></div></div>
       <p style="font-size:13px;color:#666;margin-top:20px;">*Προσθέστε χειροκίνητα τυχόν επιπλέον ειδικές προϋποθέσεις:</p>
-      <div id="eligibilityContainer"></div>
+      <div class="bulk-holder" data-for="eligibilityContainer"></div>
+        <div id="eligibilityContainer"></div>
       <button class="btn-add" onclick="addDynamicRow('eligibilityContainer','Προϋπόθεση...','select')">+ Προσθήκη Ειδικής Προϋπόθεσης</button>
     </div>
 
@@ -718,6 +742,7 @@ header{padding-left:110px;padding-right:110px;}
       <div class="form-row form-row-inline"><label>Απαιτείται Δημιουργία Business Plan;</label><div><select id="bp_req" class="form-control save-data bg-neutral" onchange="handleBP(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
       <div id="bp_section" class="hidden">
         <div class="form-row form-row-inline" style="background:#f4f0fa;border-color:#d2b4de;"><label>Έγιναν οι στοχευμένες ερωτήσεις για να συντάξουμε το στοχευμένο Business Plan;</label><div><select id="bp_qdone" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΝΑΙ ΑΛΛΑ ΟΧΙ ΟΛΕΣ">ΝΑΙ, ΑΛΛΑ ΟΧΙ ΟΛΕΣ</option><option value="ΕΚΚΡΕΜΕΙ">ΕΚΚΡΕΜΕΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
+        <div class="bulk-holder" data-for="bpContainer"></div>
         <div id="bpContainer"></div>
         <button class="btn-add" style="color:var(--purple);border-color:var(--purple);background:#f9f2fc;" onclick="addDynamicRow('bpContainer','Ερώτηση BP...','text')">+ Προσθήκη Ερώτησης BP</button>
         <button class="btn btn-blue" style="margin-top:8px;" onclick="exportBpQuestions()">📤 Εξαγωγή ερωτήσεων &amp; απαντήσεων / Αποστολή στον πελάτη</button>
@@ -727,7 +752,8 @@ header{padding-left:110px;padding-right:110px;}
     <div class="card-section" style="border-left-color:var(--secondary-blue);">
       <h3>5. ΒΑΘΜΟΛΟΓΟΥΜΕΝΑ ΚΡΙΤΗΡΙΑ (ΚΛΕΙΣΤΟΥ ΤΥΠΟΥ)</h3>
       <p style="font-size:14px;color:#555;">Εισάγετε τα κριτήρια συμπληρώνοντας τον Βαθμό, τη Βαρύτητα Κριτηρίου (%) και τη Βαρύτητα Ομάδας (%) για τον αυτόματο υπολογισμό του γινομένου.</p>
-      <div id="scoringContainer"></div>
+      <div class="bulk-holder" data-for="scoringContainer"></div>
+        <div id="scoringContainer"></div>
       <button class="btn-add" onclick="addScoringRow()">+ Προσθήκη Βαθμολογούμενου Κριτηρίου</button>
       <div class="total-score-box">Εκτιμώμενη Συνολική Βαθμολογία: <span id="finalScoreDisplay" style="color:var(--primary-blue);font-size:22px;">0.00</span></div>
     </div>
@@ -739,7 +765,8 @@ header{padding-left:110px;padding-right:110px;}
       <div class="form-row form-row-inline"><label>Στείλαμε email ευγενικής υπενθύμισης;</label><div><select id="doc_8" class="form-control save-data bg-neutral" onchange="handleReminder(this,'email_dates')"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option><option value="ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ">ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ</option></select></div></div>
       <div id="email_dates" class="form-row form-row-inline hidden" style="background:#fefbf2;border-color:#f1c232;"><label style="font-weight:normal;">Ημερομηνίες Email:</label><div><input type="text" id="doc_8_d1" class="form-control save-data" placeholder="1η Υπενθύμιση"><input type="text" id="doc_8_d2" class="form-control save-data" placeholder="2η Υπενθύμιση"></div></div>
       <h4 style="margin-top:25px;color:#b58900;border-bottom:1px solid #eee;padding-bottom:5px;">Λίστα Απαιτούμενων Δικαιολογητικών</h4>
-      <div id="docsContainer"></div>
+      <div class="bulk-holder" data-for="docsContainer"></div>
+        <div id="docsContainer"></div>
       <button class="btn-add" style="color:#b58900;border-color:#b58900;background:#fdf9eb;" onclick="addDocRow()">+ Προσθήκη Δικαιολογητικού</button>
       <div style="text-align:right;margin-bottom:10px;">
         <button class="btn btn-blue" onclick="sendDocsLinksEmail()">📧 Αποστολή μόνο δικαιολογητικών (σύνδεσμοι)</button>
@@ -782,7 +809,7 @@ header{padding-left:110px;padding-right:110px;}
     <div class="bottom-actions">
       <button class="btn btn-green" onclick="generateMeetingReport('client')">📧 Email: Meeting Πελάτη</button>
       <button class="btn" onclick="generateMeetingReport('manager')">📧 Εσωτερική Αναφορά</button>
-      <button class="btn btn-outline" onclick="switchTab(5)">➡ ΜΕΤΑΒΑΣΗ ΣΤΗ ΦΑΣΗ 3 · BUSINESS PLAN</button>
+      <button class="btn btn-outline" onclick="switchTab(3)">➡ ΜΕΤΑΒΑΣΗ ΣΤΗ ΦΑΣΗ 3 · BUSINESS PLAN</button>
     </div>
   </div>
 
@@ -812,6 +839,9 @@ header{padding-left:110px;padding-right:110px;}
           </div>
         </div>
       </div>
+    </div>
+    <div style="text-align:center;margin:22px 0;">
+      <button class="btn btn-outline" onclick="switchTab(4)">➡ ΜΕΤΑΒΑΣΗ ΣΤΗ ΦΑΣΗ 4 · ΠΡΟ-ΥΠΟΒΟΛΗ</button>
     </div>
   </div>
 
@@ -852,6 +882,9 @@ header{padding-left:110px;padding-right:110px;}
         <div class="form-row form-row-inline"><label>Αποθήκευσα την εκτύπωση μέσα στον φάκελο του πελάτη;</label><div><select id="pre5_q17" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
         <div class="form-row form-row-inline"><label>Έστειλα στον πελάτη το έγγραφο που παρουσιάζει την επένδυση οριστικοποιημένη στο σύστημα;</label><div><select id="pre5_q18" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
       </div>
+    </div>
+    <div style="text-align:center;margin:22px 0;">
+      <button class="btn btn-outline" onclick="switchTab(5)">➡ ΜΕΤΑΒΑΣΗ ΣΤΗ ΦΑΣΗ 5 · ΥΛΟΠΟΙΗΣΗ</button>
     </div>
   </div>
 
@@ -1194,6 +1227,18 @@ header{padding-left:110px;padding-right:110px;}
     <div class="adm-sec" id="admSecBp"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 2 · Ερωτήσεις Business Plan (ενότητα 4) <button class="adm-addbtn" style="background:#4b2e6b;color:#fff;border-style:solid;margin-left:8px;" onclick="openSectionImport('bp')">🤖 Από οδηγό</button></span><span>▾</span></h4>
       <div class="adm-body"><div id="admBp"></div><button class="adm-addbtn" onclick="admAddLine('admBp')">+ Προσθήκη</button></div></div>
 
+    <div class="adm-sec" id="admSecKad"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 2 · Επιλέξιμοι ΚΑΔ επένδυσης <button class="adm-addbtn" style="background:#4b2e6b;color:#fff;border-style:solid;margin-left:8px;" onclick="openSectionImport('kad')">🤖 Από οδηγό</button></span><span>▾</span></h4>
+      <div class="adm-body">
+        <p class="adm-hint">Καταχωρήστε τους επιλέξιμους ΚΑΔ του προγράμματος, έναν ανά γραμμή. Ισχύει <strong>ιεραρχική κάλυψη</strong>: ο <code>10.71</code> καλύπτει αυτόματα τους <code>10.71.11</code>, <code>10.71.11.01</code> κ.ο.κ. Ο σύμβουλος βλέπει αυτόματα ✓ / ✕ / ⚠ σε κάθε ΚΑΔ που καταχωρεί.</p>
+        <div class="adm-row">
+          <textarea id="admKadBulk" rows="4" class="grow" placeholder="Επικόλληση πολλών ΚΑΔ μαζί (ένας ανά γραμμή ή χωρισμένοι με κόμμα)…" style="font-family:monospace;font-size:12.5px;"></textarea>
+          <button class="adm-addbtn" onclick="admKadBulkAdd()">➕ Εισαγωγή</button>
+        </div>
+        <div id="admKad"></div>
+        <button class="adm-addbtn" onclick="admAddLine('admKad')">+ Προσθήκη ΚΑΔ</button>
+        <span id="admKadCount" style="font-size:12px;color:#777;margin-left:10px;"></span>
+      </div></div>
+
     <div class="adm-sec" id="admSecDocsByType"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 2 · Δικαιολογητικά &amp; σύνδεσμοι ανά καθεστώς επιχείρησης <button class="adm-addbtn" style="background:#4b2e6b;color:#fff;border-style:solid;margin-left:8px;" onclick="openSectionImport('docsType')">🤖 Από οδηγό</button></span><span>▾</span></h4>
       <div class="adm-body">
         <p class="adm-hint">Εμφανίζονται μόνο τα καθεστώτα που επιλέξατε στα «Στοιχεία Προγράμματος». Για καθένα ορίζετε τη λίστα δικαιολογητικών <strong>και</strong> τον σύνδεσμο όπου θα τα βρίσκει ο πελάτης.</p>
@@ -1209,6 +1254,7 @@ header{padding-left:110px;padding-right:110px;}
     <div class="adm-sec" id="admSecExpReg"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 2 · Δαπάνες ανά καθεστώς ενίσχυσης (De minimis / ΓΑΚ) <button class="adm-addbtn" style="background:#4b2e6b;color:#fff;border-style:solid;margin-left:8px;" onclick="openSectionImport('expReg')">🤖 Από οδηγό</button></span><span>▾</span></h4>
       <div class="adm-body">
         <p class="adm-hint">Ορίστε χωριστά τις δαπάνες κάθε καθεστώτος: <strong>τίτλος ομάδας</strong>, <strong>υποκατηγορία/τεκμηρίωση</strong> και <strong>όριο</strong> (ποσοστό ή/και ποσό επί του επιχορηγούμενου Π/Υ).</p>
+        <div class="sme-note" style="margin-bottom:10px;">⚠ <strong>Μη συμπεριλάβετε τις έμμεσες δαπάνες.</strong> Ορίζονται μία φορά στα «Στοιχεία Προγράμματος» (με το ποσοστό τους) και υπολογίζονται αυτόματα από το σύστημα. Αν εντοπιστούν στη λίστα, αφαιρούνται.</p></div>
         <div id="admExpRegimes"></div>
       </div></div>
 
@@ -1570,10 +1616,11 @@ function handleQ11Change(index){
 function addQ3Kad(){
   const c=document.getElementById('q3KadRows');if(!c)return;
   const d=document.createElement('div');d.className='kad3-row';
-  d.innerHTML='<input type="text" class="form-control k3-code" placeholder="Κωδικός ΚΑΔ (προαιρετικό)">'+
+  d.innerHTML='<input type="text" class="form-control k3-code" placeholder="Κωδικός ΚΑΔ (προαιρετικό)" oninput="renderKadStatus(this.closest(\'.kad3-row\'))">'+
               '<input type="text" class="form-control k3-desc" placeholder="Περιγραφή δραστηριότητας">'+
               '<button type="button" class="btn-remove" onclick="this.parentElement.remove()">×</button>';
   c.appendChild(d);
+  renderKadStatus(d);
 }
 function getQ3Kads(){
   return [...document.querySelectorAll('#q3KadRows .kad3-row')].map(r=>({
@@ -1758,11 +1805,37 @@ function getKeyMarks(){
   const rd=(sel,rowSel)=>[...document.querySelectorAll(sel+' '+rowSel)].map(r=>{const c=r.querySelector('.key-mark');return c&&c.checked;});
   return {elig:rd('#eligibilityContainer','.dynamic-row'),score:rd('#scoringContainer','.score-row')};
 }
+/* Μαζική συμπλήρωση σε δυναμική λίστα */
+function initBulkBars(){
+  document.querySelectorAll('.bulk-holder[data-for]').forEach(h=>{
+    if(h.dataset.done)return;
+    h.dataset.done='1';
+    h.innerHTML=bulkBarHtml(h.dataset.for);
+  });
+}
+function bulkDyn(containerId,val){
+  const c=document.getElementById(containerId);if(!c)return;
+  c.querySelectorAll('select').forEach(s=>{
+    if([...s.options].some(o=>o.value===val)){s.value=val;colorStandard(s);}
+  });
+  if(containerId==='scoringContainer'&&typeof calculateTotalScore==='function')calculateTotalScore();
+  scheduleAutoSave();
+}
+function bulkBarHtml(containerId){
+  return '<div class="bulk-dyn"><span>Μαζική συμπλήρωση:</span>'+
+    '<button type="button" class="bulk-btn bulk-yes" onclick="bulkDyn(\''+containerId+'\',\'ΝΑΙ\')">✓ Όλα ΝΑΙ</button>'+
+    '<button type="button" class="bulk-btn bulk-no" onclick="bulkDyn(\''+containerId+'\',\'ΟΧΙ\')">✕ Όλα ΟΧΙ</button>'+
+    '<button type="button" class="bulk-btn" onclick="bulkDyn(\''+containerId+'\',\'ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ\')">— Δεν απαιτείται</button></div>';
+}
 function addDynamicRow(containerId,placeholder,type){
   const c=document.getElementById(containerId);const rowId=`dyn_row_${dynIds++}`;const row=document.createElement('div');row.className='dynamic-row';row.id=rowId;
-  let field=type==='select'?`<select class="form-control dyn-val save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select>`:`<textarea class="form-control dyn-val save-data" style="height:36px;"></textarea>`;
+  let field=type==='select'?`<select class="form-control dyn-val save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option><option value="ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ">ΔΕΝ ΑΠΑΙΤΕΙΤΑΙ</option></select>`:`<textarea class="form-control dyn-val save-data dyn-wide" placeholder="Απάντηση / Σχόλιο" rows="2"></textarea>`;
   const keyBox='';
-  row.innerHTML=keyBox+`<input type="text" class="form-control dyn-key save-data" placeholder="${placeholder}" oninput="syncKeyToPhase1()">${field}<button class="btn-remove" onclick="document.getElementById('${rowId}').remove();syncKeyToPhase1();">×</button>`;
+  const isWide=(containerId==='eligibilityContainer'||containerId==='bpContainer'||containerId==='docsContainer');
+  const keyEl=isWide
+    ? `<textarea class="form-control dyn-key save-data dyn-wide" placeholder="${placeholder}" rows="2"></textarea>`
+    : `<input type="text" class="form-control dyn-key save-data" placeholder="${placeholder}">`;
+  row.innerHTML=keyBox+keyEl+`${field}<button class="btn-remove" onclick="document.getElementById('${rowId}').remove();">×</button>`;
   c.appendChild(row);
 }
 function addDocRow(){
@@ -3298,7 +3371,12 @@ const SECTION_SPECS={
   docsType:{label:'Δικαιολογητικά ανά καθεστώς επιχείρησης',
     ask:'"docs_by_type" (αντικείμενο με κλειδιά «Υπό ίδρυση», «Νεοσύστατη», «Υφιστάμενη» και τιμή {docs:[λίστα δικαιολογητικών]})',keys:['docs_by_type']},
   expReg:{label:'Δαπάνες ανά καθεστώς ενίσχυσης',
-    ask:'"exp_by_regime" ({deminimis:[{title,cat,pct,amt}], gak:[{title,cat,pct,amt}]} — title=ομάδα δαπάνης, cat=υποκατηγορία, pct=όριο %, amt=όριο €)',keys:['exp_by_regime']},
+    ask:'"exp_by_regime" ({deminimis:[{title,cat,pct,amt}], gak:[{title,cat,pct,amt}]} — title=ομάδα δαπάνης, cat=υποκατηγορία, pct=όριο %, amt=όριο €). '+
+        'ΠΡΟΣΟΧΗ: ΜΗΝ συμπεριλάβεις τις ΕΜΜΕΣΕΣ ΔΑΠΑΝΕΣ (ή «λοιπές έμμεσες δαπάνες», «indirect costs», το σταθερό ποσοστό 7% επί των λοιπών δαπανών) — υπολογίζονται αυτόματα από το σύστημα και δεν πρέπει να εμφανιστούν στη λίστα.',
+    keys:['exp_by_regime']},
+  kad:{label:'Επιλέξιμοι ΚΑΔ επένδυσης',
+    ask:'"kad_list" (λίστα επιλέξιμων Κωδικών Αριθμών Δραστηριότητας, ακριβώς όπως αναγράφονται στον οδηγό, π.χ. "10.71" ή "10.71.11.01" — μόνο οι κωδικοί, χωρίς περιγραφές)',
+    keys:['kad_list']},
   p3:{label:'Δικαιολογητικά Φάσης 3 (υλοποίηση)',
     ask:'"p3_full" (αντικείμενο με κλειδί την κατηγορία δαπάνης και τιμή {accountant:[],invoice:[],bank:[],leasing:[],expense:[]})',keys:['p3_full']},
   all:{label:'Όλα τα στοιχεία',ask:'',keys:[]}
@@ -3595,6 +3673,18 @@ function guideApply(){
     const s=document.getElementById('admSecDocsByType');if(s)s.classList.add('open');
   }
   if(r.exp_by_regime){
+    /* Οι έμμεσες δαπάνες αφαιρούνται — υπολογίζονται αυτόματα από το σύστημα. */
+    let removed=0;
+    ['deminimis','gak'].forEach(rg=>{
+      if(!Array.isArray(r.exp_by_regime[rg]))return;
+      const before=r.exp_by_regime[rg].length;
+      r.exp_by_regime[rg]=r.exp_by_regime[rg].filter(o=>{
+        const t=((o.title||'')+' '+(o.cat||'')).toLowerCase();
+        return !/έμμεσ|εμμεσ|indirect/.test(t);
+      });
+      removed+=before-r.exp_by_regime[rg].length;
+    });
+    if(removed)admStatus('ℹ Αφαιρέθηκαν αυτόματα '+removed+' εγγραφές «έμμεσων δαπανών» — υπολογίζονται από το σύστημα με το αντίστοιχο ποσοστό.');
     const cur=chipVals('admRegimeChips');
     const found=Object.keys(r.exp_by_regime).filter(k=>(r.exp_by_regime[k]||[]).length);
     chipSet('admRegimeChips',[...new Set(cur.concat(found))]);
@@ -4313,6 +4403,7 @@ function applyPhase3Mode(){
    Καλείται σε κάθε άνοιγμα φακέλου, ώστε ο κάθε πελάτης να χρησιμοποιεί
    το πρότυπο του ΔΙΚΟΥ ΤΟΥ προγράμματος και όχι του προηγουμένου. */
 function syncProgramConfig(){
+  if(typeof refreshAllKadStatus==='function')setTimeout(refreshAllKadStatus,40);
   const cfg=currentProgramCfg();
   processChecks=(cfg.p3_process&&cfg.p3_process.length)?cfg.p3_process.slice():DEFAULT_PROCESS_CHECKS.slice();
   if(typeof applyPhase3Mode==='function')applyPhase3Mode();
@@ -4560,7 +4651,7 @@ function resetForm(){
   document.getElementById('gen_fee_total').dataset.manual='0';
   document.getElementById('gen_fee_submit').dataset.manual='0';
   ['eligibilityContainer','bpContainer','scoringContainer','docsContainer','expensesContainer','kadContainer','expGroupsContainer','smeLinkedContainer','smeSelfBody','bp4DocsContainer'].forEach(id=>{const c=document.getElementById(id);if(c)c.innerHTML='';});
-  initPhoneForm();initPhase3();initIndirect();initContacts();refreshExpGroupOptions();initSme();syncBp4();handlePhase3Gate();applyPhase3Mode();renderLifeline();if(document.getElementById('ind_active'))document.getElementById('ind_active').checked=false;calcIndirect();
+  initPhoneForm();initPhase3();initIndirect();initContacts();refreshExpGroupOptions();initSme();syncBp4();initBulkBars();handlePhase3Gate();applyPhase3Mode();renderLifeline();if(document.getElementById('ind_active'))document.getElementById('ind_active').checked=false;calcIndirect();
   if(typeof refreshProgramDropdown==='function')refreshProgramDropdown();
   calcFees();evaluateProgress(0);calculateTotalScore();updateDynamicHeaders();
 }
@@ -5010,6 +5101,7 @@ function applyProgramTemplate(t){
     if(t.meta_indirect_pct)document.getElementById('ind_pct').value=t.meta_indirect_pct;
   }
   evaluateAllExpenses();
+  if(typeof refreshAllKadStatus==='function')setTimeout(refreshAllKadStatus,50);
   if(t.p3_process&&t.p3_process.length)processChecks=t.p3_process.slice();
   else processChecks=DEFAULT_PROCESS_CHECKS.slice();
   for(let i=1;i<=invoiceCount;i++){try{updateChecklist(i);}catch(e){}}
@@ -5068,6 +5160,22 @@ function admLineHtml(val,ph,mark){
   const box=(mark!==undefined)
     ? '<label class="key-lbl" title="Εμφάνιση στη Φάση 1"><input type="checkbox" class="adm-key" '+(mark?'checked':'')+' onchange="admLimitKeys(this)">Φάση 1</label>' : '';
   return '<div class="adm-row">'+box+'<input type="text" class="grow adm-line" value="'+String(val||'').replace(/"/g,'&quot;')+'" placeholder="'+(ph||'')+'"><button class="adm-xbtn" onclick="this.parentElement.remove()">×</button></div>';
+}
+function admKadBulkAdd(){
+  const ta=document.getElementById('admKadBulk');
+  const raw=(ta.value||'').split(/[\n,;]+/).map(s=>s.trim()).filter(Boolean);
+  if(!raw.length){admStatus('⚠ Επικολλήστε πρώτα κωδικούς.');return;}
+  const cur=[...document.querySelectorAll('#admKad .adm-line')].map(i=>i.value.trim()).filter(Boolean);
+  const all=[...new Set(cur.concat(raw))];
+  admFillLines('admKad',all,'ΚΑΔ');
+  ta.value='';
+  admKadCount();
+  admStatus('✔ Καταχωρήθηκαν '+all.length+' ΚΑΔ.');
+}
+function admKadCount(){
+  const n=[...document.querySelectorAll('#admKad .adm-line')].filter(i=>i.value.trim()).length;
+  const e=document.getElementById('admKadCount');
+  if(e)e.textContent=n?(n+' κωδικοί'):'';
 }
 function admLimitKeys(el){
   const wrap=el.closest('.adm-body');if(!wrap)return;
@@ -5340,6 +5448,7 @@ function admLoadIntoForm(name){
   document.getElementById('admMetaIndirectPct').value=t.meta_indirect_pct||'7';
   admFixedLines('admBasic',t.p1_basic,2,'Βασική προϋπόθεση');
   admFixedLines('admMax',t.p1_maxscore,3,'Προϋπόθεση μέγ. βαθμ.');
+  admFillLines('admKad',t.kad_list||[],'ΚΑΔ');admKadCount();
   admFillLines('admElig',t.p2_elig,'Ειδική προϋπόθεση',t.key_elig||[true,true]);
   admFillLines('admBp',t.p2_bp,'Ερώτηση BP');
   const sc=document.getElementById('admScore');sc.innerHTML='';
@@ -5373,6 +5482,7 @@ function admCollect(){
     meta_indirect_pct:document.getElementById('admMetaIndirectPct').value.trim(),
     p1_basic:admReadFixed('admBasic'),
     p1_maxscore:admReadFixed('admMax'),
+    kad_list:admReadLines('admKad'),
     p2_elig:admReadLines('admElig'),
     key_elig:admReadKeys('admElig'),
     key_score:admReadKeys('admScore'),
@@ -5483,12 +5593,61 @@ function handleKadList(el){
   box.classList.toggle('hidden',!show);
   if(show&&document.getElementById('kadContainer').children.length===0)addKadRow();
 }
+/* --- Έλεγχος επιλεξιμότητας ΚΑΔ με ιεραρχική κάλυψη --- */
+function kadNorm(s){return String(s||'').replace(/[^0-9]/g,'');}
+function kadFmt(s){
+  const d=kadNorm(s);
+  return d.replace(/(\d{2})(?=\d)/g,'$1.').replace(/\.$/,'');
+}
+function eligibleKadList(){
+  const cfg=(typeof currentProgramCfg==='function')?currentProgramCfg():{};
+  return (cfg.kad_list||[]).map(x=>String(x).trim()).filter(Boolean);
+}
+function checkKad(code){
+  const list=eligibleKadList();
+  if(!list.length)return {status:'none'};
+  const c=kadNorm(code);
+  if(!c)return {status:'empty'};
+  const norm=list.map(x=>({raw:x,n:kadNorm(x)})).filter(x=>x.n);
+  /* 1) Ο κωδικός καλύπτεται από επιλέξιμο (ίδιος ή γονέας του) */
+  const covered=norm.filter(x=>c.startsWith(x.n));
+  if(covered.length)return {status:'ok',by:covered.map(x=>x.raw)};
+  /* 2) Ο χρήστης έδωσε ευρύτερο κωδικό — κάποια υπο-επίπεδα είναι επιλέξιμα */
+  const children=norm.filter(x=>x.n.startsWith(c));
+  if(children.length)return {status:'partial',children:children.map(x=>x.raw)};
+  return {status:'no'};
+}
+function renderKadStatus(row){
+  const inp=row.querySelector('.k3-code')||row.querySelector('.kad-code');
+  if(!inp)return;
+  let box=row.querySelector('.kad-status');
+  if(!box){
+    box=document.createElement('span');box.className='kad-status';
+    inp.parentNode.insertBefore(box,inp.nextSibling);
+  }
+  const r=checkKad(inp.value);
+  if(r.status==='none'){box.innerHTML='<span class="kad-badge kad-na" title="Δεν έχει οριστεί λίστα επιλέξιμων ΚΑΔ στο πρότυπο">—</span>';return;}
+  if(r.status==='empty'){box.innerHTML='';return;}
+  if(r.status==='ok'){
+    box.innerHTML='<span class="kad-badge kad-yes" title="Επιλέξιμος — καλύπτεται από: '+r.by.join(', ')+'">✓ Επιλέξιμος</span>';
+  }else if(r.status==='partial'){
+    const list=r.children.slice(0,12).join(', ')+(r.children.length>12?' …':'');
+    box.innerHTML='<span class="kad-badge kad-warn" title="Επιλέξιμα υπο-επίπεδα: '+list+'">⚠ Μερικώς</span>'+
+      '<div class="kad-hint">Επιλέξιμοι υπο-κωδικοί: <strong>'+list+'</strong></div>';
+  }else{
+    box.innerHTML='<span class="kad-badge kad-no" title="Δεν περιλαμβάνεται στη λίστα επιλέξιμων ΚΑΔ">✕ Μη επιλέξιμος</span>';
+  }
+}
+function refreshAllKadStatus(){
+  document.querySelectorAll('#kadContainer .kad-row').forEach(renderKadStatus);
+  document.querySelectorAll('#q3KadRows .kad3-row').forEach(renderKadStatus);
+}
 function addKadRow(){
   const c=document.getElementById('kadContainer');
   const id='kad_row_'+(dynIds++);
   const row=document.createElement('div');row.className='kad-row';row.id=id;
   const first=(c.children.length===0);
-  row.innerHTML='<input type="text" class="form-control kad-code save-data" placeholder="ΚΑΔ (π.χ. 62.01.11)">'+
+  row.innerHTML='<input type="text" class="form-control kad-code save-data" placeholder="ΚΑΔ (π.χ. 62.01.11)" oninput="renderKadStatus(this.closest(\'.kad-row\'))">'+
     '<input type="text" class="form-control kad-desc save-data" placeholder="Περιγραφή δραστηριότητας">'+
     '<select class="form-control kad-role save-data" onchange="setKadRole(this)">'+
       '<option value="Κύριος"'+(first?' selected':'')+'>Κύριος</option>'+
@@ -5497,6 +5656,7 @@ function addKadRow(){
     '<button class="btn-remove" onclick="document.getElementById(\''+id+'\').remove();ensureOneMainKad();">×</button>';
   c.appendChild(row);
   colorKadRow(row);
+  renderKadStatus(row);
 }
 function setKadRole(sel){
   const row=sel.closest('.kad-row');
@@ -5939,6 +6099,7 @@ window.onload=function(){
   initIndirect();
   initContacts();
   initSme();
+  initBulkBars();
   renderLifeline();
   calcFees();
   initPrograms();
