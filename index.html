@@ -3522,6 +3522,7 @@ const GUIDE_EXAMPLES={
   docs:{p2_docs:["Δελτίο ταυτότητας νόμιμου εκπροσώπου","Βεβαίωση έναρξης"]},
   docsType:{docs_by_type:{"Υφιστάμενη":{docs:["Ε3 τελευταίας τριετίας"]}}},
   expReg:{exp_by_regime:{deminimis:[{title:"Μηχανήματα & Εξοπλισμός",cat:"Παραγωγικός εξοπλισμός",pct:"100",amt:""}],gak:[]}},
+  kad:{kad_list:["10.71","10.71.11.01","56.10.11"]},
   p3:{p3_full:{"Εξοπλισμός":{accountant:["Μητρώο Παγίων"],invoice:["Τιμολόγιο"],bank:["Extrait"],leasing:[],expense:["Πιστοποιητικό CE"]}}},
   all:{p2_elig:["…"],p2_docs:["…"]}
 };
@@ -3596,11 +3597,25 @@ async function guideAnalyze(){
   GUIDE_RESULT=guideLocalParse(text);
   guideRender('τοπικός parser');
 }
+/* Το AI μπορεί να επιστρέψει το πεδίο με άλλη ονομασία — το κανονικοποιούμε. */
+function guideNormalizeKeys(r){
+  if(!r||typeof r!=='object')return r;
+  const alias={kad:'kad_list',kads:'kad_list',kad_codes:'kad_list',eligible_kad:'kad_list',
+    kadList:'kad_list',elig:'p2_elig',docs:'p2_docs',score:'p2_score',exp:'p2_exp',bp:'p2_bp'};
+  Object.keys(alias).forEach(k=>{
+    if(r[k]&&!r[alias[k]])r[alias[k]]=r[k];
+  });
+  /* Αν οι ΚΑΔ ήρθαν ως αντικείμενα {code,desc}, κρατάμε τον κωδικό. */
+  if(Array.isArray(r.kad_list))r.kad_list=r.kad_list.map(x=>typeof x==='string'?x:(x.code||x.kad||x.k||'')).filter(Boolean);
+  return r;
+}
 function guideRender(method){
+  GUIDE_RESULT=guideNormalizeKeys(GUIDE_RESULT);
   const box=document.getElementById('guideResult');
   const st=document.getElementById('guideStatus');
   const r=GUIDE_RESULT||{};
   const secs=[
+    ['kad_list','Επιλέξιμοι ΚΑΔ',v=>v],
     ['p2_elig','Προϋποθέσεις συμμετοχής',v=>v],
     ['p2_docs','Απαιτούμενα δικαιολογητικά',v=>v],
     ['p2_score','Βαθμολογούμενα κριτήρια',v=>(v.k||v)+(v.cw?(' — '+v.cw+'%'):'')],
@@ -3610,7 +3625,7 @@ function guideRender(method){
     ['regimes','Καθεστώς ενίσχυσης',v=>(v==='deminimis'?'De minimis':'ΓΑΚ')],
     ['__docsType','Δικαιολογητικά ανά καθεστώς',v=>v],
     ['__expReg','Δαπάνες ανά καθεστώς ενίσχυσης',v=>v],
-    ['__p3','Δικαιολογητικά Φάσης 3',v=>v]
+    ['__p3','Δικαιολογητικά Φάσης 5',v=>v]
   ];
   /* Επίπεδη προβολή για τα σύνθετα αντικείμενα */
   if(r.docs_by_type){
@@ -3698,6 +3713,12 @@ function guideApply(){
   if(r.p3_full){
     Object.keys(r.p3_full).forEach(cat=>{_p3Full[cat]=Object.assign(_p3Full[cat]||{},r.p3_full[cat]);});
     if(typeof admBuildP3All==='function')admBuildP3All();
+  }
+  if(on('kad_list')&&document.getElementById('admKad')){
+    const cur=[...document.querySelectorAll('#admKad .adm-line')].map(i=>i.value.trim()).filter(Boolean);
+    const merged=[...new Set(cur.concat((r.kad_list||[]).map(x=>String(x).trim()).filter(Boolean)))];
+    admFillLines('admKad',merged,'ΚΑΔ');admKadCount();
+    const s=document.getElementById('admSecKad');if(s)s.classList.add('open');
   }
   if(on('p2_elig'))admFillLines('admElig',r.p2_elig,'Ειδική προϋπόθεση');
   if(on('p2_docs')&&document.getElementById('admDocs'))admFillLines('admDocs',r.p2_docs,'Δικαιολογητικό');
