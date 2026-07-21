@@ -491,6 +491,10 @@ header{padding-left:110px;padding-right:110px;}
 .kad-hint{font-size:11px;color:#8a6d00;background:#fffdf5;border-left:3px solid #f1c232;
   padding:4px 8px;border-radius:0 3px 3px 0;max-width:420px;line-height:1.4;}
 .kad-row,.kad3-row{align-items:flex-start !important;}
+
+/* ===== v43 ===== */
+.grp-sum tr.ungrouped td{background:#fff8e6;color:#8a6d00;font-weight:bold;}
+.kad-near{border-left-color:#b02a37 !important;background:#fff6f6 !important;color:#8a2b26 !important;}
 </style>
 </head>
 <body>
@@ -738,11 +742,10 @@ header{padding-left:110px;padding-right:110px;}
     </div>
 
     <div class="card-section" style="border-left-color:var(--purple);">
-      <h3 style="color:var(--purple);">4. ΣΤΟΧΕΥΜΕΝΟ BUSINESS PLAN (ΑΝΟΙΧΤΟΥ ΤΥΠΟΥ)</h3>
+      <h3 style="color:var(--purple);">4. ΣΤΟΧΕΥΜΕΝΟ BUSINESS PLAN</h3>
       <div class="form-row form-row-inline"><label>Απαιτείται Δημιουργία Business Plan;</label><div><select id="bp_req" class="form-control save-data bg-neutral" onchange="handleBP(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
       <div id="bp_section" class="hidden">
         <div class="form-row form-row-inline" style="background:#f4f0fa;border-color:#d2b4de;"><label>Έγιναν οι στοχευμένες ερωτήσεις για να συντάξουμε το στοχευμένο Business Plan;</label><div><select id="bp_qdone" class="form-control save-data bg-neutral" onchange="colorStandard(this)"><option value="">Επιλέξτε</option><option value="ΝΑΙ">ΝΑΙ</option><option value="ΝΑΙ ΑΛΛΑ ΟΧΙ ΟΛΕΣ">ΝΑΙ, ΑΛΛΑ ΟΧΙ ΟΛΕΣ</option><option value="ΕΚΚΡΕΜΕΙ">ΕΚΚΡΕΜΕΙ</option><option value="ΟΧΙ">ΟΧΙ</option></select></div></div>
-        <div class="bulk-holder" data-for="bpContainer"></div>
         <div id="bpContainer"></div>
         <button class="btn-add" style="color:var(--purple);border-color:var(--purple);background:#f9f2fc;" onclick="addDynamicRow('bpContainer','Ερώτηση BP...','text')">+ Προσθήκη Ερώτησης BP</button>
         <button class="btn btn-blue" style="margin-top:8px;" onclick="exportBpQuestions()">📤 Εξαγωγή ερωτήσεων &amp; απαντήσεων / Αποστολή στον πελάτη</button>
@@ -2012,6 +2015,17 @@ function evaluateAllExpenses(){
     g.rows.forEach(r=>r.classList.toggle('grp-over',over));
     sumHtml+='<tr class="'+(over?'over':'')+'"><td>'+g.name+'</td><td class="num">'+expFmt(sum)+'</td><td>'+lim+'</td><td>'+(lval>0?(over?'❌ Υπέρβαση':'✅ Εντός ορίου'):'')+'</td></tr>';
   });
+  /* Γραμμές χωρίς όνομα ομάδας: προσμετρώνται κανονικά στο σύνολο. */
+  let ungrouped=0,ungCount=0;
+  document.querySelectorAll('#expensesContainer .expense-row').forEach(r=>{
+    if((r.querySelector('.exp-grp')||{}).value.trim())return;
+    const t=subRowTotal(r);
+    if(t>0||(r.querySelector('.exp-cat')||{}).value.trim()){ungrouped+=t;ungCount++;}
+  });
+  if(ungCount){
+    grand+=ungrouped;
+    sumHtml+='<tr class="ungrouped"><td>⚠ Χωρίς ομάδα ('+ungCount+' γραμμές)</td><td class="num">'+expFmt(ungrouped)+'</td><td>—</td><td>Συμπληρώστε ομάδα για έλεγχο ορίου</td></tr>';
+  }
   /* ΦΠΑ ανά ομάδα */
   let grandGross=0;
   document.querySelectorAll('#expensesContainer .sub-gross').forEach(n=>grandGross+=parseGreekNumber(n.value));
@@ -5636,7 +5650,14 @@ function checkKad(code){
   /* 2) Ο χρήστης έδωσε ευρύτερο κωδικό — κάποια υπο-επίπεδα είναι επιλέξιμα */
   const children=norm.filter(x=>x.n.startsWith(c));
   if(children.length)return {status:'partial',children:children.map(x=>x.raw)};
-  return {status:'no'};
+  /* Δεν είναι επιλέξιμος — προτείνονται κοντινοί κωδικοί του ίδιου κλάδου */
+  let near=[];
+  for(let len=Math.min(4,c.length);len>=2;len-=2){
+    const pre=c.slice(0,len);
+    near=norm.filter(x=>x.n.startsWith(pre)).map(x=>x.raw);
+    if(near.length)break;
+  }
+  return {status:'no',near:near.slice(0,10)};
 }
 function renderKadStatus(row){
   const inp=row.querySelector('.k3-code')||row.querySelector('.kad-code');
@@ -5656,7 +5677,10 @@ function renderKadStatus(row){
     box.innerHTML='<span class="kad-badge kad-warn" title="Επιλέξιμα υπο-επίπεδα: '+list+'">⚠ Μερικώς</span>'+
       '<div class="kad-hint">Επιλέξιμοι υπο-κωδικοί: <strong>'+list+'</strong></div>';
   }else{
-    box.innerHTML='<span class="kad-badge kad-no" title="Δεν περιλαμβάνεται στη λίστα επιλέξιμων ΚΑΔ">✕ Μη επιλέξιμος</span>';
+    box.innerHTML='<span class="kad-badge kad-no" title="Δεν περιλαμβάνεται στη λίστα επιλέξιμων ΚΑΔ">✕ Μη επιλέξιμος</span>'+
+      ((r.near&&r.near.length)
+        ? '<div class="kad-hint kad-near">Κοντινοί επιλέξιμοι του ίδιου κλάδου: <strong>'+r.near.join(', ')+'</strong></div>'
+        : '');
   }
 }
 function refreshAllKadStatus(){
