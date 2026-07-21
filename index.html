@@ -688,7 +688,7 @@ header{padding-left:110px;padding-right:110px;}
 
       <div class="att-block">
         <h4>👤 Στοιχεία Φυσικού Προσώπου (εκτύπωση TAXIS)</h4>
-        <p class="att-hint">Ένα αρχείο ανά πρόσωπο. Συμπληρώνει επώνυμο, όνομα, ΑΦΜ, διεύθυνση και ΤΚ στη «Μετοχική Σύνθεση».</p>
+        <p class="att-hint">Ένα αρχείο ανά πρόσωπο. Το σύστημα <strong>αναγνωρίζει μόνο του τον τύπο του εγγράφου</strong> — μπορείτε να ανεβάσετε οποιοδήποτε από τα τέσσερα σε οποιαδήποτε υποδοχή. Συμπληρώνει επώνυμο, όνομα, ΑΦΜ, ΔΟΥ, Α.Δ.Τ., διεύθυνση και ΤΚ.</p>
         <div id="attPersons"></div>
         <button class="btn-add" onclick="addAttPerson()">+ Προσθήκη προσώπου</button>
       </div>
@@ -5899,24 +5899,20 @@ function getPartners(){
 }
 
 
-/* =================== ΕΠΙΣΥΝΑΨΗ & ΑΝΑΓΝΩΣΗ ΔΙΚΑΙΟΛΟΓΗΤΙΚΩΝ (v45) =================== */
-/* Η ανάγνωση γίνεται τοπικά με αναγνώριση μοτίβων — χωρίς AI, χωρίς αποστολή αρχείου. */
+/* =================== ΕΠΙΣΥΝΑΨΗ & ΑΝΑΓΝΩΣΗ ΔΙΚΑΙΟΛΟΓΗΤΙΚΩΝ (v47) =================== */
+/* Ανάγνωση τοπικά στον browser, με αναγνώριση μοτίβων ΑΑΔΕ. Χωρίς AI, χωρίς αποστολή αρχείου. */
 
-function e3Years(){
-  const y=new Date().getFullYear();
-  return [y-1,y-2,y-3,y-4];
-}
+function e3Years(){const y=new Date().getFullYear();return [y-1,y-2,y-3,y-4];}
 function initAttachments(){
   const pc=document.getElementById('attPersons');
   if(pc&&!pc.children.length)addAttPerson();
   const ec=document.getElementById('attE3');
   if(ec&&!ec.children.length){
-    ec.innerHTML='';
     e3Years().forEach(y=>{
       ec.insertAdjacentHTML('beforeend',
         '<div class="att-row"><span class="att-lbl">Έντυπο Ε3 · '+y+'</span>'+
-        '<input type="file" class="att-file" accept=".pdf" onchange="readAttachment(event,\'e3\','+y+')">'+
-        '<span class="att-status" id="att_st_e3_'+y+'"></span></div>');
+        '<input type="file" class="att-file" accept=".pdf" onchange="readAttachment(event,\'auto\')">'+
+        '<span class="att-status"></span></div>');
     });
   }
 }
@@ -5925,215 +5921,233 @@ function addAttPerson(){
   const n=c.children.length+1;
   c.insertAdjacentHTML('beforeend',
     '<div class="att-row"><span class="att-lbl">Πρόσωπο '+n+'</span>'+
-    '<input type="file" class="att-file" accept=".pdf" onchange="readAttachment(event,\'person\','+n+')">'+
-    '<span class="att-status" id="att_st_person_'+n+'"></span>'+
+    '<input type="file" class="att-file" accept=".pdf" onchange="readAttachment(event,\'auto\')">'+
+    '<span class="att-status"></span>'+
     '<button class="btn-remove" onclick="this.parentElement.remove()">×</button></div>');
 }
 
-/* ---------- Εξαγωγή κειμένου από PDF ---------- */
+/* ---------- Εξαγωγή κειμένου ---------- */
 async function pdfText(file){
   const lib=await siLoadPdfJs();
   const pdf=await lib.getDocument({data:await file.arrayBuffer()}).promise;
-  let out='';
+  const pages=[];
   for(let i=1;i<=pdf.numPages;i++){
     const tc=await (await pdf.getPage(i)).getTextContent();
     const rows={};
-    tc.items.forEach(it=>{const y=Math.round(it.transform[5]);(rows[y]=rows[y]||[]).push(it.str);});
+    tc.items.forEach(it=>{const y=Math.round(it.transform[5]);(rows[y]=rows[y]||[]).push({x:it.transform[4],s:it.str});});
+    let t='';
     Object.keys(rows).map(Number).sort((a,b)=>b-a).forEach(y=>{
-      const l=rows[y].join(' ').replace(/\s+/g,' ').trim();
-      if(l)out+=l+'\n';
+      const l=rows[y].sort((a,b)=>a.x-b.x).map(o=>o.s).join(' ').replace(/\s+/g,' ').trim();
+      if(l)t+=l+'\n';
     });
-    out+='\n';
+    pages.push(t);
   }
-  return out;
+  return {full:pages.join('\n'),pages:pages};
 }
 
-/* ---------- Βοηθητικά μοτίβων ---------- */
-function grab(txt,patterns){
-  for(const re of patterns){
-    const m=txt.match(re);
-    if(m&&m[1])return m[1].trim().replace(/\s{2,}/g,' ');
-  }
-  return '';
+/* ---------- Βοηθητικά ---------- */
+function kadFmt(s){const d=String(s||'').replace(/\D/g,'');return d.replace(/(\d{2})(?=\d)/g,'$1.');}
+function g1(t,re){const m=t.match(re);return m&&m[1]?m[1].trim().replace(/\s{2,}/g,' '):'';}
+function splitAddr(t,label){
+  const m=t.match(new RegExp(label+'[ \\t]+(.+?)\\s*ΤΚ\\s*:\\s*(\\d{5})\\s*([^\\n]*)'));
+  if(!m)return null;
+  return {addr:m[1].trim(),zip:m[2],city:(m[3]||'').trim()};
 }
-const RX_AFM=[/Α\.?Φ\.?Μ\.?\s*[:\-]?\s*(\d{9})/i,/ΑΦΜ\s*(\d{9})/i,/\bVAT\s*[:\-]?\s*(?:EL)?(\d{9})/i];
-const RX_ZIP=[/Τ\.?Κ\.?\s*[:\-]?\s*(\d{5})/i,/Ταχ\.?\s*Κώδικας\s*[:\-]?\s*(\d{5})/i,/\b(\d{5})\s*[-–]\s*[Α-Ω]/];
-function grabAllKad(txt){
-  const out=[];
-  const re=/\b(\d{2}\.\d{2}(?:\.\d{2}){0,2})\b/g;
-  let m;
-  while((m=re.exec(txt))){if(!out.includes(m[1]))out.push(m[1]);}
-  return out;
-}
-function grabMoney(txt,codes){
-  for(const c of codes){
-    const re=new RegExp('(?:^|[^0-9])'+c+'\\s*[:\\-\\|]?\\s*([0-9][0-9\\.\\,]{2,})','m');
-    const m=txt.match(re);
-    if(m&&m[1])return m[1].trim();
-  }
+function detectDocType(t){
+  if(/Βασικών Στοιχείων Φυσικού Προσώπου|ΣΤΟΙΧΕΙΑ ΦΥΣΙΚΟΥ ΠΡΟΣΩΠΟΥ/i.test(t))return 'person';
+  if(/Εικόνας Δραστηριοτήτων|ΔΡΑΣΤΗΡΙΟΤΗΤΕΣ ΕΠΙΧΕΙΡΗΣΗΣ/i.test(t))return 'business';
+  if(/Φορολογικό έτος|ΚΑΤΑΣΤΑΣΗ ΟΙΚΟΝΟΜΙΚΩΝ ΣΤΟΙΧΕΙΩΝ|ΠΙΝΑΚΑΣ Α['’]\s*\.?\s*ΣΤΟΙΧΕΙΑ ΦΟΡΟΛΟΓΟΥΜΕΝΟΥ/i.test(t))return 'e3';
+  if(/ΜΕΤΟΧΙΚΗ ΣΥΝΘΕΣΗ|Στοιχεία Μετόχων/i.test(t))return 'shares';
   return '';
 }
 
 /* ---------- Κύρια ρουτίνα ---------- */
-async function readAttachment(ev,kind,idx){
+async function readAttachment(ev,kind){
   const f=ev.target.files[0];if(!f)return;
-  const stId=(kind==='e3')?('att_st_e3_'+idx):(kind==='person'?('att_st_person_'+idx):('att_st_'+kind));
-  const st=document.getElementById(stId);
+  const st=ev.target.parentElement.querySelector('.att-status');
   const setSt=(cls,txt)=>{if(st){st.className='att-status '+cls;st.textContent=txt;}};
   setSt('att-work','Ανάγνωση…');
   try{
-    const txt=await pdfText(f);
-    if(!txt.trim()){setSt('att-err','⚠ Χωρίς εξαγώγιμο κείμενο (σαρωμένο PDF)');return;}
+    const {full,pages}=await pdfText(f);
+    if(!full.trim()){setSt('att-err','⚠ Σαρωμένο PDF — χωρίς κείμενο');return;}
+    const type=(kind&&kind!=='auto')?kind:detectDocType(full);
+    if(!type){setSt('att-err','⚠ Άγνωστος τύπος εγγράφου');logAtt(f.name,[],true);return;}
     let found=[];
-    if(kind==='person')found=applyPersonDoc(txt,idx);
-    else if(kind==='business')found=applyBusinessDoc(txt);
-    else if(kind==='shares')found=applySharesDoc(txt);
-    else if(kind==='e3')found=applyE3Doc(txt,idx);
+    if(type==='person')found=applyPersonDoc(full);
+    else if(type==='business')found=applyBusinessDoc(full);
+    else if(type==='e3')found=applyE3Doc(full,pages);
+    else if(type==='shares')found=applySharesDoc(full);
+    const names={person:'Φυσικό πρόσωπο',business:'Στοιχεία επιχείρησης & ΚΑΔ',e3:'Έντυπο Ε3',shares:'Μετοχική σύνθεση'};
     if(!found.length){setSt('att-err','⚠ Δεν αναγνωρίστηκαν στοιχεία');logAtt(f.name,[],true);return;}
-    setSt('att-ok','✔ '+found.length+' πεδία');
-    logAtt(f.name,found);
+    setSt('att-ok','✔ '+names[type]+' · '+found.length+' πεδία');
+    logAtt(f.name+'  ('+names[type]+')',found);
     scheduleAutoSave();
   }catch(e){console.error(e);setSt('att-err','⚠ '+String(e.message).slice(0,60));}
   ev.target.value='';
 }
 function logAtt(name,found,fail){
   const box=document.getElementById('attLog');if(!box)return;
-  const d=document.createElement('div');
-  d.className='att-found';
+  const d=document.createElement('div');d.className='att-found';
   if(fail){
     d.style.background='#fdeaea';d.style.borderColor='#f5c2c2';d.style.color='#b02a37';
-    d.innerHTML='<strong>'+name+'</strong> — δεν αναγνωρίστηκαν στοιχεία. Ελέγξτε ότι το PDF δεν είναι σαρωμένο ή συμπληρώστε χειροκίνητα.';
+    d.innerHTML='<strong>'+name+'</strong> — δεν αναγνωρίστηκαν στοιχεία. Ελέγξτε ότι το PDF δεν είναι σαρωμένο.';
   }else{
-    d.innerHTML='<strong>✔ '+name+'</strong> — συμπληρώθηκαν:<ul>'+found.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
+    d.innerHTML='<strong>✔ '+name+'</strong><ul>'+found.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
   }
   box.insertBefore(d,box.firstChild);
-  while(box.children.length>6)box.removeChild(box.lastChild);
+  while(box.children.length>8)box.removeChild(box.lastChild);
 }
 
-/* ---------- Φυσικό πρόσωπο -> Μετοχική Σύνθεση ---------- */
-function applyPersonDoc(txt,idx){
-  const afm=grab(txt,RX_AFM);
-  const last=grab(txt,[/Επών[υι]μο[ \t]*[:\-]?[ \t]*([Α-ΩΪΫA-Z][^\n]{1,40})/,/Επωνυμία[ \t]*[:\-]?[ \t]*([^\n]{3,60})/]);
-  const first=grab(txt,[/(?:^|\n)[ \t]*Όνομα[ \t]*[:\-]?[ \t]*([Α-ΩΪΫA-Z][^\n]{1,30})/,/(?:^|\n)[ \t]*Ονομα[ \t]*[:\-]?[ \t]*([Α-Ω][^\n]{1,30})/]);
-  const zip=grab(txt,RX_ZIP);
-  const addr=grab(txt,[/Δ\/νση\s*[:\-]?\s*([^\n]{5,70})/,/Διεύθυνση\s*[:\-]?\s*([^\n]{5,70})/,/Οδός\s*[:\-]?\s*([^\n]{3,60})/]);
-  if(!afm&&!last)return [];
+/* ---------- Φυσικό πρόσωπο → Μετοχική Σύνθεση ---------- */
+function applyPersonDoc(t){
+  const full=g1(t,/Επώνυμο\s*\/\s*Επώνυμο\(β\)\s*\/\s*Όνομα[ \t]+([^\n]+)/);
+  const afm=g1(t,/ΑΦΜ[ \t]+(\d{9})/);
+  if(!full&&!afm)return [];
+  const parts=full.split(/\s+/);
+  const last=parts[0]||'', first=parts.slice(1).join(' ');
+  const doy=g1(t,/Αρμόδια Υπηρεσία[ \t]+([^\n]+)/);
+  const idno=g1(t,/Αρ\.\s*Τ?αυτότητας[ \t]+([Α-ΩA-Z]{1,3}\s?\d{5,7})/);
+  const a=splitAddr(t,'Διεύθυνση Κατοικίας');
+  const ctry=/ΕΛΛΗΝΙΚΗ/i.test(g1(t,/Υπηκοότητα[ \t]+([^\n]+)/))?'Ελλάδα':'';
+  /* Εντοπισμός υπάρχουσας εγγραφής με ίδιο ΑΦΜ, αλλιώς νέα */
   const c=document.getElementById('partnersContainer');
-  let card=c?c.children[idx-1]:null;
-  if(!card){addPartnerRow();card=c.lastElementChild;}
+  let card=null;
+  if(afm)card=[...c.querySelectorAll('.ptr-card')].find(x=>x.querySelector('.p-afm').value.trim()===afm);
+  if(!card)card=[...c.querySelectorAll('.ptr-card')].find(x=>!x.querySelector('.p-last').value.trim()&&!x.querySelector('.p-afm').value.trim());
+  if(!card){addPartnerRow({kind:'Φυσικό πρόσωπο'});card=c.lastElementChild;}
   const set=(cls,v)=>{if(!v)return false;const e=card.querySelector('.'+cls);if(!e)return false;e.value=v;return true;};
-  const found=[];
-  if(set('p-last',last))found.push('Επώνυμο: '+last);
-  if(set('p-first',first))found.push('Όνομα: '+first);
-  if(set('p-afm',afm))found.push('ΑΦΜ: '+afm);
-  if(set('p-addr',addr))found.push('Διεύθυνση: '+addr);
-  if(set('p-zip',zip))found.push('Τ.Κ.: '+zip);
-  genTab(3);
-  return found;
+  const out=[];
+  if(set('p-last',last))out.push('Επώνυμο: '+last);
+  if(set('p-first',first))out.push('Όνομα: '+first);
+  if(set('p-afm',afm))out.push('ΑΦΜ: '+afm);
+  if(set('p-doy',doy))out.push('ΔΟΥ: '+doy);
+  if(idno){card.querySelector('.p-idtype').value='Αριθμός Δελτίου Ταυτότητας';
+    if(set('p-idno',idno))out.push('Α.Δ.Τ.: '+idno);}
+  if(a){if(set('p-addr',a.addr))out.push('Διεύθυνση: '+a.addr);
+        if(set('p-zip',a.zip))out.push('Τ.Κ.: '+a.zip);}
+  if(ctry)card.querySelector('.p-ctry').value=ctry;
+  calcPartnerPct();genTab(3);
+  return out;
 }
 
 /* ---------- Στοιχεία επιχείρησης & ΚΑΔ ---------- */
-function applyBusinessDoc(txt){
-  const found=[];
-  const afm=grab(txt,RX_AFM);
-  const name=grab(txt,[/Επωνυμία\s*[:\-]?\s*([^\n]{3,80})/,/Επωνυμ[ίι]α\s+Επιχείρησης\s*[:\-]?\s*([^\n]{3,80})/]);
-  const zip=grab(txt,RX_ZIP);
-  const addr=grab(txt,[/Δ\/νση\s*Έδρας\s*[:\-]?\s*([^\n]{5,80})/,/Έδρα\s*[:\-]?\s*([^\n]{5,80})/,/Διεύθυνση\s*[:\-]?\s*([^\n]{5,80})/]);
-  const city=grab(txt,[/Πόλη\s*[:\-]?\s*([Α-ΩΪΫ][^\n]{2,30})/,/Δήμος\s*[:\-]?\s*([Α-ΩΪΫ][^\n]{2,30})/]);
-  const setG=(id,v,lbl)=>{if(!v)return;const e=document.getElementById(id);if(e&&!e.value){e.value=v;found.push(lbl+': '+v);}};
+function applyBusinessDoc(t){
+  const out=[];
+  const name=g1(t,/Επώνυμο\s*\/\s*Επώνυμο\(β\)\s*\/\s*Όνομα[ \t]+([^\n]+)/);
+  const afm=g1(t,/ΑΦΜ[ \t]+(\d{9})/);
+  const title=g1(t,/Τίτλος Επιχείρησης[ \t]+([^\n]+)/);
+  const doy=g1(t,/Αρμόδια Υπηρεσία[ \t]+([^\n]+)/);
+  const start=g1(t,/Ημ\/νία\s*Έναρξης[ \t]+(\d{2}\/\d{2}\/\d{4})/);
+  const a=splitAddr(t,'Δ\\/νση Άσκησης Δραστηριότητας');
+  const isSole=/Ατομικής Επιχείρησης/i.test(t);
+  const setG=(id,v,lbl)=>{if(!v)return;const e=document.getElementById(id);if(!e)return;if(!e.value){e.value=v;out.push(lbl+': '+v);}};
   setG('gen_beneficiary',name,'Επωνυμία');
-  /* Νομική μορφή: αναζήτηση στη λίστα */
-  const sel=document.getElementById('gen_legal');
-  if(sel){
-    const opt=[...sel.options].find(o=>o.value&&txt.toUpperCase().includes(o.value.toUpperCase().split('(')[0].trim().toUpperCase()));
-    if(opt&&!sel.value){sel.value=opt.value;checkLegalForm();found.push('Νομική μορφή: '+opt.value);}
+  if(isSole){
+    const sel=document.getElementById('gen_legal');
+    if(sel&&!sel.value){sel.value='Ατομική Επιχείρηση';checkLegalForm();out.push('Νομική μορφή: Ατομική Επιχείρηση');}
   }
-  /* Έδρα -> καρτέλα τόπων */
-  if(addr||zip){
+  if(afm)out.push('ΑΦΜ: '+afm);
+  if(doy)out.push('ΔΟΥ: '+doy);
+  if(start)out.push('Ημ/νία έναρξης: '+start);
+  /* Έδρα */
+  if(a){
     const sc=document.getElementById('sitesContainer');
-    if(sc&&!sc.children.length)addSiteRow({type:'Κεντρικό / Έδρα',title:'Έδρα επιχείρησης'});
+    if(sc&&!sc.children.length)addSiteRow({type:'Κεντρικό / Έδρα',cat:'Έδρα',title:title||name});
     const card=sc.children[0];
     if(card){
-      if(addr){card.querySelector('.s-addr').value=addr;found.push('Έδρα: '+addr);}
-      if(zip){card.querySelector('.s-zip').value=zip;found.push('Τ.Κ.: '+zip);}
-      if(city){card.querySelector('.s-city').value=city;found.push('Πόλη: '+city);}
+      if(!card.querySelector('.s-title').value)card.querySelector('.s-title').value=title||name;
+      card.querySelector('.s-addr').value=a.addr;
+      card.querySelector('.s-zip').value=a.zip;
+      if(a.city)card.querySelector('.s-city').value=a.city;
+      if(doy)card.querySelector('.s-doy').value=doy;
+      out.push('Έδρα: '+a.addr+', ΤΚ '+a.zip+(a.city?' '+a.city:''));
     }
   }
-  /* ΚΑΔ -> Φάση 2 */
-  const kads=grabAllKad(txt);
+  /* ΚΑΔ */
+  const kads=[];
+  t.split('\n').forEach(l=>{
+    const m=l.match(/\b(\d{8})\b/);
+    if(!m)return;
+    const isMain=/\bΚΥΡΙΑ\b/.test(l), isSec=/ΔΕΥΤΕΡΕΥΟΥΣΑ/.test(l);
+    if(!isMain&&!isSec)return;
+    const desc=l.replace(m[1],'').replace(/ΔΕΥΤΕΡΕΥΟΥΣΑ|ΚΥΡΙΑ/,'').replace(/\d{2}\/\d{2}\/\d{4}/,'').replace(/\s{2,}/g,' ').trim();
+    if(!kads.some(k=>k.code===m[1]))kads.push({code:m[1],desc:desc,role:isMain?'Κύριος':'Δευτερεύων'});
+  });
   if(kads.length){
     const kc=document.getElementById('kadContainer');
     if(kc){
       kc.innerHTML='';
-      kads.slice(0,20).forEach((k,i)=>{
+      kads.forEach(k=>{
         addKadRow();
         const r=kc.lastElementChild;
-        r.querySelector('.kad-code').value=k;
-        r.querySelector('.kad-role').value=(i===0)?'Κύριος':'Δευτερεύων';
+        r.querySelector('.kad-code').value=kadFmt(k.code);
+        const d=r.querySelector('.kad-desc');if(d)d.value=k.desc;
+        r.querySelector('.kad-role').value=k.role;
         colorKadRow(r);renderKadStatus(r);
       });
-      ensureOneMainKad();
-      found.push('ΚΑΔ: '+kads.slice(0,20).join(', '));
+      if(typeof ensureOneMainKad==='function')ensureOneMainKad();
+      out.push('ΚΑΔ ('+kads.length+'): '+kads.slice(0,6).map(k=>kadFmt(k.code)).join(', ')+(kads.length>6?' …':''));
     }
   }
-  if(afm)found.push('ΑΦΜ: '+afm);
-  return found;
+  genTab(1);
+  return out;
+}
+
+/* ---------- Έντυπο Ε3 ---------- */
+function applyE3Doc(t,pages){
+  const out=[];
+  const year=g1(t,/Φορολογικό έτος[ \t]+(\d{4})/)||g1(t,/\bΕ3\s+(\d{4})\b/);
+  /* Κωδικός 500 — ΠΙΝΑΚΑΣ Δ, γραμμή Δ1 */
+  let turnover=g1(t,/Πωλήσεις αγαθών και παροχή υπηρεσιών[^\n]*?\b500\s+([\d.]+,\d{2})/);
+  if(!turnover)turnover=g1(t,/\b500\s+([\d.]+,\d{2})/);
+  const eme=g1(t,/Αριθμός απασχολούμενων ατόμων[ \t]+025[ \t]+([\d.,]+)/);
+  const balance=g1(t,/Σύνολο Ενεργητικού[ \t]+([\d.]+,\d{2})/);
+  const kadMax=g1(t,/μεγαλύτερα ακαθάριστα έσοδα[ \t]+022[ \t]+(\d{8})/);
+  const kadMain=g1(t,/Κωδικός Αριθμός Κύριας Δραστηριότητας[ \t]+021[ \t]+(\d{8})/);
+  if(!turnover&&!eme&&!kadMax)return [];
+  if(year){
+    const body=document.getElementById('smeSelfBody');
+    const tr=body?[...body.querySelectorAll('tr')].find(r=>r.dataset.year===year):null;
+    if(tr){
+      if(eme){tr.querySelector('.s-eme').value=eme;out.push('ΕΜΕ '+year+': '+eme);}
+      if(turnover){tr.querySelector('.s-turnover').value=turnover;out.push('Κύκλος εργασιών '+year+' (κωδ. 500): '+turnover+' €');}
+      if(balance){tr.querySelector('.s-balance').value=balance;out.push('Σύνολο ενεργητικού '+year+': '+balance);}
+      if(typeof evaluateSme==='function')evaluateSme();
+    }else{
+      out.push('⚠ Το έτος '+year+' είναι εκτός της τριετίας της ενότητας ΜμΕ'+(turnover?(' — κύκλος εργασιών: '+turnover+' €'):''));
+    }
+  }
+  if(kadMax)out.push('ΚΑΔ μεγαλύτερων εσόδων: '+kadFmt(kadMax));
+  if(kadMain)out.push('ΚΑΔ κύριας δραστηριότητας: '+kadFmt(kadMain));
+  return out;
 }
 
 /* ---------- Μετοχική σύνθεση ---------- */
-function applySharesDoc(txt){
-  const found=[];
-  const lines=txt.split('\n');
-  const rows=[];
-  lines.forEach(l=>{
+function applySharesDoc(t){
+  const out=[],rows=[];
+  t.split('\n').forEach(l=>{
     const afm=(l.match(/\b(\d{9})\b/)||[])[1];
     const pct=(l.match(/(\d{1,3}(?:[.,]\d{1,4})?)\s*%/)||[])[1];
     if(!afm)return;
     let name=l.replace(/\b\d{9}\b/,'').replace(/\d{1,3}(?:[.,]\d{1,4})?\s*%/,'')
-             .replace(/[|\t]+/g,' ').replace(/\s{2,}/g,' ').trim();
-    name=name.replace(/^[\d\.\)\-\s]+/,'').slice(0,60);
-    rows.push({afm:afm,pct:pct||'',name:name});
+             .replace(/[|\t]+/g,' ').replace(/\s{2,}/g,' ').trim().replace(/^[\d.\)\-\s]+/,'');
+    rows.push({afm:afm,pct:pct||'',name:name.slice(0,60)});
   });
   if(!rows.length)return [];
   const c=document.getElementById('partnersContainer');
   if(c){
     c.innerHTML='';
     rows.forEach(r=>{
-      const parts=r.name.split(/\s+/);
-      addPartnerRow({kind:'Φυσικό πρόσωπο',last:parts[0]||r.name,first:parts.slice(1).join(' '),
-        afm:r.afm,pct:r.pct,role:'Εταίρος / Μέτοχος'});
+      const p=r.name.split(/\s+/);
+      addPartnerRow({kind:'Φυσικό πρόσωπο',last:p[0]||r.name,first:p.slice(1).join(' '),
+        afm:r.afm,pct:r.pct,role:'Εταίρος / Μέτοχος',ctry:'Ελλάδα'});
     });
     calcPartnerPct();
   }
-  rows.forEach(r=>found.push((r.name||'—')+' — ΑΦΜ '+r.afm+(r.pct?(' — '+r.pct+'%'):'')));
+  rows.forEach(r=>out.push((r.name||'—')+' — ΑΦΜ '+r.afm+(r.pct?(' — '+r.pct+'%'):'')));
   genTab(3);
-  return found;
+  return out;
 }
-
-/* ---------- Έντυπο Ε3 ---------- */
-function applyE3Doc(txt,year){
-  const found=[];
-  const turnover=grabMoney(txt,['500','ΣΥΝΟΛΟ ΕΣΟΔΩΝ ΑΠΟ ΠΩΛΗΣΕΙΣ','Κύκλος εργασιών']);
-  const eme=grab(txt,[/(?:ΕΜΕ|Ετήσιες Μονάδες Εργασίας|Μέσος όρος προσωπικού)\s*[:\-]?\s*([0-9]+(?:[.,][0-9]+)?)/i,
-                      /Απασχολούμενο προσωπικό\s*[:\-]?\s*([0-9]+(?:[.,][0-9]+)?)/i]);
-  const balance=grabMoney(txt,['ΣΥΝΟΛΟ ΕΝΕΡΓΗΤΙΚΟΥ','Σύνολο Ισολογισμού','ΣΥΝΟΛΟ ΙΣΟΛΟΓΙΣΜΟΥ']);
-  if(!turnover&&!eme&&!balance)return [];
-  /* Εντοπισμός της γραμμής του έτους στην ενότητα ΜμΕ */
-  const body=document.getElementById('smeSelfBody');
-  if(body){
-    const tr=[...body.querySelectorAll('tr')].find(r=>r.dataset.year==String(year));
-    if(tr){
-      if(eme){tr.querySelector('.s-eme').value=eme;found.push('ΕΜΕ '+year+': '+eme);}
-      if(turnover){tr.querySelector('.s-turnover').value=turnover;found.push('Κύκλος εργασιών '+year+': '+turnover);}
-      if(balance){tr.querySelector('.s-balance').value=balance;found.push('Σύνολο ισολογισμού '+year+': '+balance);}
-      if(typeof evaluateSme==='function')evaluateSme();
-    }else{
-      found.push('⚠ Το έτος '+year+' δεν αντιστοιχεί στα έτη της ενότητας ΜμΕ — συμπληρώστε χειροκίνητα.');
-    }
-  }
-  return found;
-}
-
 
 /* =================== ΠΡΟΣΟΜΟΙΩΣΗ ΟΠΣΚΕ (v46) =================== */
 /* Παράγει καρτέλες ίδιας μορφής με το ΟΠΣΚΕ, με τα δεδομένα του φακέλου
