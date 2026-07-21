@@ -522,6 +522,22 @@ header{padding-left:110px;padding-right:110px;}
 .pct-ok{background:#eafaf1;color:#1e7e46;border:1px solid #b7e4c7;}
 .pct-bad{background:#fdeaea;color:#b02a37;border:1px solid #f5c2c2;}
 .proc-row .proc-sec{padding:6px;border:1px solid var(--border-color);border-radius:4px;font-size:12px;}
+
+/* ===== v45 ===== */
+.att-block{background:#fff;border:1px solid var(--border-color);border-left:4px solid var(--secondary-blue);
+  border-radius:6px;padding:14px;margin-bottom:12px;}
+.att-block h4{margin:0 0 4px 0;color:var(--primary-blue);font-size:14.5px;}
+.att-hint{font-size:12px;color:#777;margin:0 0 10px 0;line-height:1.45;}
+.att-row{display:flex;gap:9px;align-items:center;margin-bottom:7px;flex-wrap:wrap;}
+.att-row .att-lbl{min-width:120px;font-size:12.5px;font-weight:bold;color:#555;}
+.att-file{flex:1;min-width:200px;padding:7px;border:1px dashed var(--border-color);border-radius:4px;font-size:12.5px;}
+.att-status{font-size:12px;font-weight:bold;min-width:150px;}
+.att-ok{color:var(--green);}
+.att-err{color:var(--red);}
+.att-work{color:var(--signal,#b58900);}
+#attLog{font-size:12.5px;}
+.att-found{background:#eafaf1;border:1px solid #b7e4c7;border-radius:5px;padding:10px 12px;color:#1e7e46;}
+.att-found ul{margin:6px 0 0 0;padding-left:20px;}
 </style>
 </head>
 <body>
@@ -595,6 +611,7 @@ header{padding-left:110px;padding-right:110px;}
       <button class="gen-tab active" data-g="1" onclick="genTab(1)">📋 Γενικά Στοιχεία</button>
       <button class="gen-tab" data-g="2" onclick="genTab(2)">📍 Έδρα &amp; Τόπος Υλοποίησης</button>
       <button class="gen-tab" data-g="3" onclick="genTab(3)">👥 Εταιρική / Μετοχική Σύνθεση</button>
+      <button class="gen-tab" data-g="4" onclick="genTab(4)">📎 Επισύναψη Δικαιολογητικών</button>
     </div>
     <div class="gen-pane active" id="genPane1">
     <div class="grid-3">
@@ -610,6 +627,12 @@ header{padding-left:110px;padding-right:110px;}
           <option value="">Επιλέξτε Καθεστώς</option><option value="Υπό Σύσταση / Ίδρυση">Υπό Σύσταση / Ίδρυση</option>
           <option value="Νεοσύστατη">Νεοσύστατη</option><option value="Υφιστάμενη">Υφιστάμενη</option>
         </select>
+      </div>
+      <div><label class="question-label">Νομική Μορφή</label>
+        <select id="gen_legal" class="form-control" onchange="checkLegalForm()">
+          <option value="">Επιλέξτε</option><option value="Ατομική Επιχείρηση">Ατομική Επιχείρηση</option><option value="Ομόρρυθμη Εταιρεία (Ο.Ε.)">Ομόρρυθμη Εταιρεία (Ο.Ε.)</option><option value="Ετερόρρυθμη Εταιρεία (Ε.Ε.)">Ετερόρρυθμη Εταιρεία (Ε.Ε.)</option><option value="Εταιρεία Περιορισμένης Ευθύνης (Ε.Π.Ε.)">Εταιρεία Περιορισμένης Ευθύνης (Ε.Π.Ε.)</option><option value="Μονοπρόσωπη Ε.Π.Ε. (Μ.Ε.Π.Ε.)">Μονοπρόσωπη Ε.Π.Ε. (Μ.Ε.Π.Ε.)</option><option value="Ανώνυμη Εταιρεία (Α.Ε.)">Ανώνυμη Εταιρεία (Α.Ε.)</option><option value="Μονοπρόσωπη Ανώνυμη Εταιρεία (Μ.Α.Ε.)">Μονοπρόσωπη Ανώνυμη Εταιρεία (Μ.Α.Ε.)</option><option value="Ιδιωτική Κεφαλαιουχική Εταιρεία (Ι.Κ.Ε.)">Ιδιωτική Κεφαλαιουχική Εταιρεία (Ι.Κ.Ε.)</option><option value="Μονοπρόσωπη Ι.Κ.Ε. (Μ.Ι.Κ.Ε.)">Μονοπρόσωπη Ι.Κ.Ε. (Μ.Ι.Κ.Ε.)</option><option value="Αστικός Συνεταιρισμός Περιορισμένης Ευθύνης">Αστικός Συνεταιρισμός Περιορισμένης Ευθύνης</option><option value="Αστικός Συνεταιρισμός Απεριόριστης Ευθύνης">Αστικός Συνεταιρισμός Απεριόριστης Ευθύνης</option><option value="Αστικός Συνεταιρισμός Κερδοσκοπικός">Αστικός Συνεταιρισμός Κερδοσκοπικός</option><option value="Κοινωνική Συνεταιριστική Επιχείρηση (ΚΟΙΝ.Σ.ΕΠ.) ν.4430/2016">Κοινωνική Συνεταιριστική Επιχείρηση (ΚΟΙΝ.Σ.ΕΠ.) ν.4430/2016</option><option value="Κοινωνικός Συνεταιρισμός Περιορισμένης Ευθύνης (ΚΟΙ.Σ.Π.Ε.)">Κοινωνικός Συνεταιρισμός Περιορισμένης Ευθύνης (ΚΟΙ.Σ.Π.Ε.)</option><option value="Ναυτιλιακή Εταιρεία Πλοίων Αναψυχής (Ν.Ε.Π.Α.)">Ναυτιλιακή Εταιρεία Πλοίων Αναψυχής (Ν.Ε.Π.Α.)</option><option value="Αγροτικός Συνεταιρισμός">Αγροτικός Συνεταιρισμός</option><option value="Αστική Μη Κερδοσκοπική Εταιρεία">Αστική Μη Κερδοσκοπική Εταιρεία</option><option value="Κοινοπραξία">Κοινοπραξία</option><option value="Δικηγορική Εταιρεία (ν.4194/2013)">Δικηγορική Εταιρεία (ν.4194/2013)</option><option value="Συμβολαιογραφική Εταιρεία (Π.Δ. 284/1993)">Συμβολαιογραφική Εταιρεία (Π.Δ. 284/1993)</option><option value="Αστική Εταιρεία Κερδοσκοπικού Χαρακτήρα">Αστική Εταιρεία Κερδοσκοπικού Χαρακτήρα</option><option value="Υπό Σύσταση">Υπό Σύσταση</option><option value="Άλλη μορφή">Άλλη μορφή</option>
+        </select>
+        <div id="legalMsg" style="font-size:11.5px;margin-top:4px;"></div>
       </div>
       <div><label class="question-label">Υπεύθυνος Επικοινωνίας</label><input type="text" id="gen_contact" class="form-control" placeholder="Ονοματεπώνυμο"></div>
       <div><label class="question-label">E-mail Πελάτη</label><input type="email" id="gen_email" class="form-control" placeholder="client@example.com"></div>
@@ -654,6 +677,47 @@ header{padding-left:110px;padding-right:110px;}
       <div id="partnersContainer"></div>
       <button class="btn-add" onclick="addPartnerRow()">+ Προσθήκη εταίρου / μετόχου</button>
       <div id="partnersSum" style="margin-top:10px;"></div>
+    </div>
+
+    <div class="gen-pane" id="genPane4">
+      <div class="sme-note" style="margin-bottom:14px;">
+        Ανεβάστε τα έγγραφα και το σύστημα <strong>διαβάζει το κείμενό τους</strong> και συμπληρώνει αυτόματα τα αντίστοιχα πεδία στις προηγούμενες καρτέλες.
+        Η ανάγνωση γίνεται <strong>τοπικά στον browser σας</strong>, χωρίς AI και χωρίς αποστολή του αρχείου πουθενά.
+        Ελέγχετε πάντα τα αποτελέσματα πριν προχωρήσετε.
+      </div>
+
+      <div class="att-block">
+        <h4>👤 Στοιχεία Φυσικού Προσώπου (εκτύπωση TAXIS)</h4>
+        <p class="att-hint">Ένα αρχείο ανά πρόσωπο. Συμπληρώνει επώνυμο, όνομα, ΑΦΜ, διεύθυνση και ΤΚ στη «Μετοχική Σύνθεση».</p>
+        <div id="attPersons"></div>
+        <button class="btn-add" onclick="addAttPerson()">+ Προσθήκη προσώπου</button>
+      </div>
+
+      <div class="att-block">
+        <h4>🏢 Στοιχεία Επιχείρησης &amp; ΚΑΔ (εκτύπωση TAXIS)</h4>
+        <p class="att-hint">Συμπληρώνει επωνυμία, ΑΦΜ, νομική μορφή, έδρα και τους κωδικούς δραστηριότητας.</p>
+        <div class="att-row">
+          <input type="file" class="att-file" accept=".pdf" data-kind="business" onchange="readAttachment(event,'business')">
+          <span class="att-status" id="att_st_business"></span>
+        </div>
+      </div>
+
+      <div class="att-block">
+        <h4>👥 Μετοχική Σύνθεση (εκτύπωση TAXIS)</h4>
+        <p class="att-hint">Συμπληρώνει τους εταίρους/μετόχους με ΑΦΜ και ποσοστά συμμετοχής.</p>
+        <div class="att-row">
+          <input type="file" class="att-file" accept=".pdf" data-kind="shares" onchange="readAttachment(event,'shares')">
+          <span class="att-status" id="att_st_shares"></span>
+        </div>
+      </div>
+
+      <div class="att-block">
+        <h4>📊 Έντυπα Ε3 — τελευταία 4 έτη</h4>
+        <p class="att-hint">Συμπληρώνει κύκλο εργασιών (κωδ. 500), ΕΜΕ και σύνολο ισολογισμού στην ενότητα «Ιδιότητα ΜμΕ» της Φάσης 2.</p>
+        <div id="attE3"></div>
+      </div>
+
+      <div id="attLog" style="margin-top:14px;"></div>
     </div>
 </div>
   </div>
@@ -1205,6 +1269,10 @@ header{padding-left:110px;padding-right:110px;}
             <label class="chip"><input type="checkbox" value="Νεοσύστατη"> Νεοσύστατη</label>
             <label class="chip"><input type="checkbox" value="Υφιστάμενη"> Υφιστάμενη</label>
           </div>
+        </div>
+        <div class="adm-row" style="align-items:flex-start;">
+          <span style="min-width:150px;font-size:12.5px;padding-top:6px;">Επιτρεπόμενες νομικές μορφές</span>
+          <div class="chip-group" id="admLegalChips" style="max-height:190px;overflow-y:auto;"><label class="chip"><input type="checkbox" value="Ατομική Επιχείρηση"> Ατομική Επιχείρηση</label><label class="chip"><input type="checkbox" value="Ομόρρυθμη Εταιρεία (Ο.Ε.)"> Ομόρρυθμη Εταιρεία (Ο.Ε.)</label><label class="chip"><input type="checkbox" value="Ετερόρρυθμη Εταιρεία (Ε.Ε.)"> Ετερόρρυθμη Εταιρεία (Ε.Ε.)</label><label class="chip"><input type="checkbox" value="Εταιρεία Περιορισμένης Ευθύνης (Ε.Π.Ε.)"> Εταιρεία Περιορισμένης Ευθύνης (Ε.Π.Ε.)</label><label class="chip"><input type="checkbox" value="Μονοπρόσωπη Ε.Π.Ε. (Μ.Ε.Π.Ε.)"> Μονοπρόσωπη Ε.Π.Ε. (Μ.Ε.Π.Ε.)</label><label class="chip"><input type="checkbox" value="Ανώνυμη Εταιρεία (Α.Ε.)"> Ανώνυμη Εταιρεία (Α.Ε.)</label><label class="chip"><input type="checkbox" value="Μονοπρόσωπη Ανώνυμη Εταιρεία (Μ.Α.Ε.)"> Μονοπρόσωπη Ανώνυμη Εταιρεία (Μ.Α.Ε.)</label><label class="chip"><input type="checkbox" value="Ιδιωτική Κεφαλαιουχική Εταιρεία (Ι.Κ.Ε.)"> Ιδιωτική Κεφαλαιουχική Εταιρεία (Ι.Κ.Ε.)</label><label class="chip"><input type="checkbox" value="Μονοπρόσωπη Ι.Κ.Ε. (Μ.Ι.Κ.Ε.)"> Μονοπρόσωπη Ι.Κ.Ε. (Μ.Ι.Κ.Ε.)</label><label class="chip"><input type="checkbox" value="Αστικός Συνεταιρισμός Περιορισμένης Ευθύνης"> Αστικός Συνεταιρισμός Περιορισμένης Ευθύνης</label><label class="chip"><input type="checkbox" value="Αστικός Συνεταιρισμός Απεριόριστης Ευθύνης"> Αστικός Συνεταιρισμός Απεριόριστης Ευθύνης</label><label class="chip"><input type="checkbox" value="Αστικός Συνεταιρισμός Κερδοσκοπικός"> Αστικός Συνεταιρισμός Κερδοσκοπικός</label><label class="chip"><input type="checkbox" value="Κοινωνική Συνεταιριστική Επιχείρηση (ΚΟΙΝ.Σ.ΕΠ.) ν.4430/2016"> Κοινωνική Συνεταιριστική Επιχείρηση (ΚΟΙΝ.Σ.ΕΠ.) ν.4430/2016</label><label class="chip"><input type="checkbox" value="Κοινωνικός Συνεταιρισμός Περιορισμένης Ευθύνης (ΚΟΙ.Σ.Π.Ε.)"> Κοινωνικός Συνεταιρισμός Περιορισμένης Ευθύνης (ΚΟΙ.Σ.Π.Ε.)</label><label class="chip"><input type="checkbox" value="Ναυτιλιακή Εταιρεία Πλοίων Αναψυχής (Ν.Ε.Π.Α.)"> Ναυτιλιακή Εταιρεία Πλοίων Αναψυχής (Ν.Ε.Π.Α.)</label><label class="chip"><input type="checkbox" value="Αγροτικός Συνεταιρισμός"> Αγροτικός Συνεταιρισμός</label><label class="chip"><input type="checkbox" value="Αστική Μη Κερδοσκοπική Εταιρεία"> Αστική Μη Κερδοσκοπική Εταιρεία</label><label class="chip"><input type="checkbox" value="Κοινοπραξία"> Κοινοπραξία</label><label class="chip"><input type="checkbox" value="Δικηγορική Εταιρεία (ν.4194/2013)"> Δικηγορική Εταιρεία (ν.4194/2013)</label><label class="chip"><input type="checkbox" value="Συμβολαιογραφική Εταιρεία (Π.Δ. 284/1993)"> Συμβολαιογραφική Εταιρεία (Π.Δ. 284/1993)</label><label class="chip"><input type="checkbox" value="Αστική Εταιρεία Κερδοσκοπικού Χαρακτήρα"> Αστική Εταιρεία Κερδοσκοπικού Χαρακτήρα</label><label class="chip"><input type="checkbox" value="Υπό Σύσταση"> Υπό Σύσταση</label><label class="chip"><input type="checkbox" value="Άλλη μορφή"> Άλλη μορφή</label></div>
         </div>
         <div class="adm-row" style="align-items:flex-start;">
           <span style="min-width:150px;font-size:12.5px;padding-top:6px;">Καθεστώς ενίσχυσης</span>
@@ -2765,7 +2833,7 @@ function collectData(){
     general:{}, phase1:{}, phase2_fields:{}, phase2_dyn:{elig:[],bp:[],score:[],docs:[],expenses:[]}, phase3_invoices:[]
   };
   /* --- ΓΕΝΙΚΑ --- */
-  ['gen_beneficiary','gen_projectCode','gen_program','gen_type','genActionType','genEvalType','gen_budget','gen_fee_total','gen_fee_submit','fee_pct_total','fee_pct_sub','gen_contact','gen_email','gen_phone'].forEach(id=>data.general[id]=document.getElementById(id).value);
+  ['gen_beneficiary','gen_projectCode','gen_program','gen_type','genActionType','genEvalType','gen_budget','gen_fee_total','gen_fee_submit','fee_pct_total','fee_pct_sub','gen_contact','gen_email','gen_phone','gen_legal'].forEach(id=>data.general[id]=document.getElementById(id).value);
   data.sites=(typeof getSites==='function')?getSites():[];
   data.partners=(typeof getPartners==='function')?getPartners():[];
   data.general.fee_manual={total:document.getElementById('gen_fee_total').dataset.manual||'0',submit:document.getElementById('gen_fee_submit').dataset.manual||'0'};
@@ -2870,7 +2938,8 @@ function applyData(data){
       document.getElementById('genActionType').value=g.genActionType||'';
       document.getElementById('genEvalType').value=g.genEvalType||'';
       document.getElementById('gen_budget').value=g.gen_budget||'';
-      ['gen_contact','gen_email','gen_phone'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=g[id]||'';});
+      ['gen_contact','gen_email','gen_phone','gen_legal'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=g[id]||'';});
+      if(typeof checkLegalForm==='function')checkLegalForm();
       {const sc=document.getElementById('sitesContainer');if(sc){sc.innerHTML='';(data.sites||[]).forEach(s=>addSiteRow(s));}}
       {const pc=document.getElementById('partnersContainer');if(pc){pc.innerHTML='';(data.partners||[]).forEach(x=>addPartnerRow(x));calcPartnerPct();}}
       document.getElementById('fee_pct_total').value=g.fee_pct_total||'3';
@@ -4492,9 +4561,27 @@ function applyPhase3Mode(){
    το πρότυπο του ΔΙΚΟΥ ΤΟΥ προγράμματος και όχι του προηγουμένου. */
 function syncProgramConfig(){
   if(typeof refreshAllKadStatus==='function')setTimeout(refreshAllKadStatus,40);
+  if(typeof checkLegalForm==='function')setTimeout(checkLegalForm,40);
   const cfg=currentProgramCfg();
   processChecks=(cfg.p3_process&&cfg.p3_process.length)?cfg.p3_process.slice():DEFAULT_PROCESS_CHECKS.map(x=>({k:x,sec:'invoice'}));
   if(typeof applyPhase3Mode==='function')applyPhase3Mode();
+}
+function checkLegalForm(){
+  const el=document.getElementById('gen_legal');
+  const msg=document.getElementById('legalMsg');
+  if(!el||!msg)return;
+  const cfg=(typeof currentProgramCfg==='function')?currentProgramCfg():{};
+  const allowed=cfg.legal_forms||[];
+  el.classList.remove('bg-green','bg-red');
+  if(!el.value||!allowed.length){msg.innerHTML='';return;}
+  if(allowed.includes(el.value)){
+    el.classList.add('bg-green');
+    msg.innerHTML='<span style="color:var(--green);font-weight:bold;">✓ Επιτρεπόμενη μορφή για το πρόγραμμα</span>';
+  }else{
+    el.classList.add('bg-red');
+    msg.innerHTML='<span style="color:var(--red);font-weight:bold;">✕ Δεν επιτρέπεται από το πρόγραμμα.</span> '+
+      '<span style="color:#777;">Επιτρέπονται: '+allowed.slice(0,6).join(', ')+(allowed.length>6?' …':'')+'</span>';
+  }
 }
 function reloadDocsForType(){
   const t=currentProgramCfg();
@@ -4740,7 +4827,7 @@ function resetForm(){
   document.getElementById('gen_fee_total').dataset.manual='0';
   document.getElementById('gen_fee_submit').dataset.manual='0';
   ['eligibilityContainer','bpContainer','scoringContainer','docsContainer','expensesContainer','kadContainer','expGroupsContainer','smeLinkedContainer','smeSelfBody','bp4DocsContainer','sitesContainer','partnersContainer'].forEach(id=>{const c=document.getElementById(id);if(c)c.innerHTML='';});
-  initPhoneForm();initPhase3();initIndirect();initContacts();refreshExpGroupOptions();initSme();syncBp4();initBulkBars();handlePhase3Gate();applyPhase3Mode();renderLifeline();if(document.getElementById('ind_active'))document.getElementById('ind_active').checked=false;calcIndirect();
+  initPhoneForm();initPhase3();initIndirect();initContacts();refreshExpGroupOptions();initSme();initAttachments();syncBp4();initBulkBars();handlePhase3Gate();applyPhase3Mode();renderLifeline();if(document.getElementById('ind_active'))document.getElementById('ind_active').checked=false;calcIndirect();
   if(typeof refreshProgramDropdown==='function')refreshProgramDropdown();
   calcFees();evaluateProgress(0);calculateTotalScore();updateDynamicHeaders();
 }
@@ -5556,6 +5643,7 @@ function admLoadIntoForm(name){
   admBuildP3All();
   chipSet('admMetaTypeChips',t.meta_types||[]);
   chipSet('admRegimeChips',t.regimes||[]);
+  chipSet('admLegalChips',t.legal_forms||[]);
   ['admDmBudMin','admDmBudMax','admDmAidMin','admDmAidMax','admGakBudMin','admGakBudMax','admGakAidMin','admGakAidMax']
     .forEach(id=>{const e=document.getElementById(id);if(e)e.value=(t.limits&&t.limits[id])||'';});
   admToggleRegime();admFillDocTypes();admFillExpRegimes();
@@ -5589,6 +5677,7 @@ function admCollect(){
     exp_by_regime:(function(){admStoreExpRegimes();return JSON.parse(JSON.stringify(_expReg));})(),
     docs_by_type:(function(){admStoreDocTypes();const o={};chipVals('admMetaTypeChips').forEach(t=>{if(_docTypes[t])o[t]=_docTypes[t];});return o;})(),
     regimes:chipVals('admRegimeChips'),
+    legal_forms:chipVals('admLegalChips'),
     limits:(function(){const o={};['admDmBudMin','admDmBudMax','admDmAidMin','admDmAidMax','admGakBudMin','admGakBudMax','admGakAidMin','admGakAidMax'].forEach(id=>{const e=document.getElementById(id);if(e)o[id]=e.value.trim();});return o;})(),
     meta_action:document.getElementById('admMetaAction').value,
     meta_eval:document.getElementById('admMetaEval').value,
@@ -5673,7 +5762,7 @@ function admStatus(m){document.getElementById('admStatus').innerText=m;}
 /* =================== ΚΑΡΤΕΛΕΣ ΓΕΝΙΚΩΝ ΣΤΟΙΧΕΙΩΝ (v44) =================== */
 function genTab(n){
   document.querySelectorAll('.gen-tab').forEach(b=>b.classList.toggle('active',b.dataset.g==String(n)));
-  [1,2,3].forEach(i=>{const p=document.getElementById('genPane'+i);if(p)p.classList.toggle('active',i===n);});
+  [1,2,3,4].forEach(i=>{const p=document.getElementById('genPane'+i);if(p)p.classList.toggle('active',i===n);});
 }
 const COUNTRIES=['Ελλάδα','Κύπρος','Γερμανία','Ιταλία','Γαλλία','Ισπανία','Βουλγαρία','Ρουμανία','Ηνωμένο Βασίλειο','ΗΠΑ','Άλλη'];
 function ctryOpts(sel){return COUNTRIES.map(c=>'<option value="'+c+'"'+((sel||'Ελλάδα')===c?' selected':'')+'>'+c+'</option>').join('');}
@@ -5784,6 +5873,242 @@ function getPartners(){
       role:g('p-role'),phone:g('p-phone'),mail:g('p-mail'),ctry:g('p-ctry'),
       addr:g('p-addr'),zip:g('p-zip'),legal:g('p-legal'),mgr:g('p-mgr'),exec:g('p-exec')};
   }).filter(x=>x.last||x.afm);
+}
+
+
+/* =================== ΕΠΙΣΥΝΑΨΗ & ΑΝΑΓΝΩΣΗ ΔΙΚΑΙΟΛΟΓΗΤΙΚΩΝ (v45) =================== */
+/* Η ανάγνωση γίνεται τοπικά με αναγνώριση μοτίβων — χωρίς AI, χωρίς αποστολή αρχείου. */
+
+function e3Years(){
+  const y=new Date().getFullYear();
+  return [y-1,y-2,y-3,y-4];
+}
+function initAttachments(){
+  const pc=document.getElementById('attPersons');
+  if(pc&&!pc.children.length)addAttPerson();
+  const ec=document.getElementById('attE3');
+  if(ec&&!ec.children.length){
+    ec.innerHTML='';
+    e3Years().forEach(y=>{
+      ec.insertAdjacentHTML('beforeend',
+        '<div class="att-row"><span class="att-lbl">Έντυπο Ε3 · '+y+'</span>'+
+        '<input type="file" class="att-file" accept=".pdf" onchange="readAttachment(event,\'e3\','+y+')">'+
+        '<span class="att-status" id="att_st_e3_'+y+'"></span></div>');
+    });
+  }
+}
+function addAttPerson(){
+  const c=document.getElementById('attPersons');if(!c)return;
+  const n=c.children.length+1;
+  c.insertAdjacentHTML('beforeend',
+    '<div class="att-row"><span class="att-lbl">Πρόσωπο '+n+'</span>'+
+    '<input type="file" class="att-file" accept=".pdf" onchange="readAttachment(event,\'person\','+n+')">'+
+    '<span class="att-status" id="att_st_person_'+n+'"></span>'+
+    '<button class="btn-remove" onclick="this.parentElement.remove()">×</button></div>');
+}
+
+/* ---------- Εξαγωγή κειμένου από PDF ---------- */
+async function pdfText(file){
+  const lib=await siLoadPdfJs();
+  const pdf=await lib.getDocument({data:await file.arrayBuffer()}).promise;
+  let out='';
+  for(let i=1;i<=pdf.numPages;i++){
+    const tc=await (await pdf.getPage(i)).getTextContent();
+    const rows={};
+    tc.items.forEach(it=>{const y=Math.round(it.transform[5]);(rows[y]=rows[y]||[]).push(it.str);});
+    Object.keys(rows).map(Number).sort((a,b)=>b-a).forEach(y=>{
+      const l=rows[y].join(' ').replace(/\s+/g,' ').trim();
+      if(l)out+=l+'\n';
+    });
+    out+='\n';
+  }
+  return out;
+}
+
+/* ---------- Βοηθητικά μοτίβων ---------- */
+function grab(txt,patterns){
+  for(const re of patterns){
+    const m=txt.match(re);
+    if(m&&m[1])return m[1].trim().replace(/\s{2,}/g,' ');
+  }
+  return '';
+}
+const RX_AFM=[/Α\.?Φ\.?Μ\.?\s*[:\-]?\s*(\d{9})/i,/ΑΦΜ\s*(\d{9})/i,/\bVAT\s*[:\-]?\s*(?:EL)?(\d{9})/i];
+const RX_ZIP=[/Τ\.?Κ\.?\s*[:\-]?\s*(\d{5})/i,/Ταχ\.?\s*Κώδικας\s*[:\-]?\s*(\d{5})/i,/\b(\d{5})\s*[-–]\s*[Α-Ω]/];
+function grabAllKad(txt){
+  const out=[];
+  const re=/\b(\d{2}\.\d{2}(?:\.\d{2}){0,2})\b/g;
+  let m;
+  while((m=re.exec(txt))){if(!out.includes(m[1]))out.push(m[1]);}
+  return out;
+}
+function grabMoney(txt,codes){
+  for(const c of codes){
+    const re=new RegExp('(?:^|[^0-9])'+c+'\\s*[:\\-\\|]?\\s*([0-9][0-9\\.\\,]{2,})','m');
+    const m=txt.match(re);
+    if(m&&m[1])return m[1].trim();
+  }
+  return '';
+}
+
+/* ---------- Κύρια ρουτίνα ---------- */
+async function readAttachment(ev,kind,idx){
+  const f=ev.target.files[0];if(!f)return;
+  const stId=(kind==='e3')?('att_st_e3_'+idx):(kind==='person'?('att_st_person_'+idx):('att_st_'+kind));
+  const st=document.getElementById(stId);
+  const setSt=(cls,txt)=>{if(st){st.className='att-status '+cls;st.textContent=txt;}};
+  setSt('att-work','Ανάγνωση…');
+  try{
+    const txt=await pdfText(f);
+    if(!txt.trim()){setSt('att-err','⚠ Χωρίς εξαγώγιμο κείμενο (σαρωμένο PDF)');return;}
+    let found=[];
+    if(kind==='person')found=applyPersonDoc(txt,idx);
+    else if(kind==='business')found=applyBusinessDoc(txt);
+    else if(kind==='shares')found=applySharesDoc(txt);
+    else if(kind==='e3')found=applyE3Doc(txt,idx);
+    if(!found.length){setSt('att-err','⚠ Δεν αναγνωρίστηκαν στοιχεία');logAtt(f.name,[],true);return;}
+    setSt('att-ok','✔ '+found.length+' πεδία');
+    logAtt(f.name,found);
+    scheduleAutoSave();
+  }catch(e){console.error(e);setSt('att-err','⚠ '+String(e.message).slice(0,60));}
+  ev.target.value='';
+}
+function logAtt(name,found,fail){
+  const box=document.getElementById('attLog');if(!box)return;
+  const d=document.createElement('div');
+  d.className='att-found';
+  if(fail){
+    d.style.background='#fdeaea';d.style.borderColor='#f5c2c2';d.style.color='#b02a37';
+    d.innerHTML='<strong>'+name+'</strong> — δεν αναγνωρίστηκαν στοιχεία. Ελέγξτε ότι το PDF δεν είναι σαρωμένο ή συμπληρώστε χειροκίνητα.';
+  }else{
+    d.innerHTML='<strong>✔ '+name+'</strong> — συμπληρώθηκαν:<ul>'+found.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
+  }
+  box.insertBefore(d,box.firstChild);
+  while(box.children.length>6)box.removeChild(box.lastChild);
+}
+
+/* ---------- Φυσικό πρόσωπο -> Μετοχική Σύνθεση ---------- */
+function applyPersonDoc(txt,idx){
+  const afm=grab(txt,RX_AFM);
+  const last=grab(txt,[/Επών[υι]μο[ \t]*[:\-]?[ \t]*([Α-ΩΪΫA-Z][^\n]{1,40})/,/Επωνυμία[ \t]*[:\-]?[ \t]*([^\n]{3,60})/]);
+  const first=grab(txt,[/(?:^|\n)[ \t]*Όνομα[ \t]*[:\-]?[ \t]*([Α-ΩΪΫA-Z][^\n]{1,30})/,/(?:^|\n)[ \t]*Ονομα[ \t]*[:\-]?[ \t]*([Α-Ω][^\n]{1,30})/]);
+  const zip=grab(txt,RX_ZIP);
+  const addr=grab(txt,[/Δ\/νση\s*[:\-]?\s*([^\n]{5,70})/,/Διεύθυνση\s*[:\-]?\s*([^\n]{5,70})/,/Οδός\s*[:\-]?\s*([^\n]{3,60})/]);
+  if(!afm&&!last)return [];
+  const c=document.getElementById('partnersContainer');
+  let card=c?c.children[idx-1]:null;
+  if(!card){addPartnerRow();card=c.lastElementChild;}
+  const set=(cls,v)=>{if(!v)return false;const e=card.querySelector('.'+cls);if(!e)return false;e.value=v;return true;};
+  const found=[];
+  if(set('p-last',last))found.push('Επώνυμο: '+last);
+  if(set('p-first',first))found.push('Όνομα: '+first);
+  if(set('p-afm',afm))found.push('ΑΦΜ: '+afm);
+  if(set('p-addr',addr))found.push('Διεύθυνση: '+addr);
+  if(set('p-zip',zip))found.push('Τ.Κ.: '+zip);
+  genTab(3);
+  return found;
+}
+
+/* ---------- Στοιχεία επιχείρησης & ΚΑΔ ---------- */
+function applyBusinessDoc(txt){
+  const found=[];
+  const afm=grab(txt,RX_AFM);
+  const name=grab(txt,[/Επωνυμία\s*[:\-]?\s*([^\n]{3,80})/,/Επωνυμ[ίι]α\s+Επιχείρησης\s*[:\-]?\s*([^\n]{3,80})/]);
+  const zip=grab(txt,RX_ZIP);
+  const addr=grab(txt,[/Δ\/νση\s*Έδρας\s*[:\-]?\s*([^\n]{5,80})/,/Έδρα\s*[:\-]?\s*([^\n]{5,80})/,/Διεύθυνση\s*[:\-]?\s*([^\n]{5,80})/]);
+  const city=grab(txt,[/Πόλη\s*[:\-]?\s*([Α-ΩΪΫ][^\n]{2,30})/,/Δήμος\s*[:\-]?\s*([Α-ΩΪΫ][^\n]{2,30})/]);
+  const setG=(id,v,lbl)=>{if(!v)return;const e=document.getElementById(id);if(e&&!e.value){e.value=v;found.push(lbl+': '+v);}};
+  setG('gen_beneficiary',name,'Επωνυμία');
+  /* Νομική μορφή: αναζήτηση στη λίστα */
+  const sel=document.getElementById('gen_legal');
+  if(sel){
+    const opt=[...sel.options].find(o=>o.value&&txt.toUpperCase().includes(o.value.toUpperCase().split('(')[0].trim().toUpperCase()));
+    if(opt&&!sel.value){sel.value=opt.value;checkLegalForm();found.push('Νομική μορφή: '+opt.value);}
+  }
+  /* Έδρα -> καρτέλα τόπων */
+  if(addr||zip){
+    const sc=document.getElementById('sitesContainer');
+    if(sc&&!sc.children.length)addSiteRow({type:'Κεντρικό / Έδρα',title:'Έδρα επιχείρησης'});
+    const card=sc.children[0];
+    if(card){
+      if(addr){card.querySelector('.s-addr').value=addr;found.push('Έδρα: '+addr);}
+      if(zip){card.querySelector('.s-zip').value=zip;found.push('Τ.Κ.: '+zip);}
+      if(city){card.querySelector('.s-city').value=city;found.push('Πόλη: '+city);}
+    }
+  }
+  /* ΚΑΔ -> Φάση 2 */
+  const kads=grabAllKad(txt);
+  if(kads.length){
+    const kc=document.getElementById('kadContainer');
+    if(kc){
+      kc.innerHTML='';
+      kads.slice(0,20).forEach((k,i)=>{
+        addKadRow();
+        const r=kc.lastElementChild;
+        r.querySelector('.kad-code').value=k;
+        r.querySelector('.kad-role').value=(i===0)?'Κύριος':'Δευτερεύων';
+        colorKadRow(r);renderKadStatus(r);
+      });
+      ensureOneMainKad();
+      found.push('ΚΑΔ: '+kads.slice(0,20).join(', '));
+    }
+  }
+  if(afm)found.push('ΑΦΜ: '+afm);
+  return found;
+}
+
+/* ---------- Μετοχική σύνθεση ---------- */
+function applySharesDoc(txt){
+  const found=[];
+  const lines=txt.split('\n');
+  const rows=[];
+  lines.forEach(l=>{
+    const afm=(l.match(/\b(\d{9})\b/)||[])[1];
+    const pct=(l.match(/(\d{1,3}(?:[.,]\d{1,4})?)\s*%/)||[])[1];
+    if(!afm)return;
+    let name=l.replace(/\b\d{9}\b/,'').replace(/\d{1,3}(?:[.,]\d{1,4})?\s*%/,'')
+             .replace(/[|\t]+/g,' ').replace(/\s{2,}/g,' ').trim();
+    name=name.replace(/^[\d\.\)\-\s]+/,'').slice(0,60);
+    rows.push({afm:afm,pct:pct||'',name:name});
+  });
+  if(!rows.length)return [];
+  const c=document.getElementById('partnersContainer');
+  if(c){
+    c.innerHTML='';
+    rows.forEach(r=>{
+      const parts=r.name.split(/\s+/);
+      addPartnerRow({kind:'Φυσικό πρόσωπο',last:parts[0]||r.name,first:parts.slice(1).join(' '),
+        afm:r.afm,pct:r.pct,role:'Εταίρος / Μέτοχος'});
+    });
+    calcPartnerPct();
+  }
+  rows.forEach(r=>found.push((r.name||'—')+' — ΑΦΜ '+r.afm+(r.pct?(' — '+r.pct+'%'):'')));
+  genTab(3);
+  return found;
+}
+
+/* ---------- Έντυπο Ε3 ---------- */
+function applyE3Doc(txt,year){
+  const found=[];
+  const turnover=grabMoney(txt,['500','ΣΥΝΟΛΟ ΕΣΟΔΩΝ ΑΠΟ ΠΩΛΗΣΕΙΣ','Κύκλος εργασιών']);
+  const eme=grab(txt,[/(?:ΕΜΕ|Ετήσιες Μονάδες Εργασίας|Μέσος όρος προσωπικού)\s*[:\-]?\s*([0-9]+(?:[.,][0-9]+)?)/i,
+                      /Απασχολούμενο προσωπικό\s*[:\-]?\s*([0-9]+(?:[.,][0-9]+)?)/i]);
+  const balance=grabMoney(txt,['ΣΥΝΟΛΟ ΕΝΕΡΓΗΤΙΚΟΥ','Σύνολο Ισολογισμού','ΣΥΝΟΛΟ ΙΣΟΛΟΓΙΣΜΟΥ']);
+  if(!turnover&&!eme&&!balance)return [];
+  /* Εντοπισμός της γραμμής του έτους στην ενότητα ΜμΕ */
+  const body=document.getElementById('smeSelfBody');
+  if(body){
+    const tr=[...body.querySelectorAll('tr')].find(r=>r.dataset.year==String(year));
+    if(tr){
+      if(eme){tr.querySelector('.s-eme').value=eme;found.push('ΕΜΕ '+year+': '+eme);}
+      if(turnover){tr.querySelector('.s-turnover').value=turnover;found.push('Κύκλος εργασιών '+year+': '+turnover);}
+      if(balance){tr.querySelector('.s-balance').value=balance;found.push('Σύνολο ισολογισμού '+year+': '+balance);}
+      if(typeof evaluateSme==='function')evaluateSme();
+    }else{
+      found.push('⚠ Το έτος '+year+' δεν αντιστοιχεί στα έτη της ενότητας ΜμΕ — συμπληρώστε χειροκίνητα.');
+    }
+  }
+  return found;
 }
 
 /* =================== ΑΜΟΙΒΕΣ (v5) =================== */
@@ -6341,6 +6666,7 @@ window.onload=function(){
   initIndirect();
   initContacts();
   initSme();
+  initAttachments();
   initBulkBars();
   renderLifeline();
   calcFees();
