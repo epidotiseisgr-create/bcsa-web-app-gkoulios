@@ -717,6 +717,12 @@ header{padding-left:110px;padding-right:110px;}
         <div id="attE3"></div>
       </div>
 
+      <div class="att-block" style="border-left-color:#6366c9;">
+        <h4>🖥️ Προσομοίωση ΟΠΣΚΕ</h4>
+        <p class="att-hint">Ανοίγει νέα καρτέλα με τις οθόνες του ΟΠΣΚΕ, συμπληρωμένες με τα στοιχεία του φακέλου. Τοποθετήστε τη δίπλα στο πραγματικό σύστημα και αντιγράψτε πεδίο-πεδίο με ένα κλικ.</p>
+        <button class="btn btn-blue" onclick="exportOpske()">🖥️ Άνοιγμα προσομοίωσης ΟΠΣΚΕ</button>
+      </div>
+
       <div id="attLog" style="margin-top:14px;"></div>
     </div>
 </div>
@@ -5789,6 +5795,14 @@ function addSiteRow(d){
       '<div class="fld"><label>Χώρα</label><select class="s-ctry">'+ctryOpts(d.ctry)+'</select></div>'+
       fld('Τηλέφωνο','s-phone','',d.phone,'tel')+
       fld('E-mail','s-mail','',d.mail,'email')+
+      fld('Κωδικός εγκατάστασης','s-code','προαιρετικό',d.code)+
+      '<div class="fld"><label>Κατηγορία Εγκατάστασης</label><select class="s-cat">'+
+        ['','Έδρα','Υποκατάστημα','Εγκατάσταση υλοποίησης','Αποθήκη','Γραφείο'].map(o=>'<option'+(d.cat===o?' selected':'')+'>'+o+'</option>').join('')+
+      '</select></div>'+
+      fld('ΔΟΥ','s-doy','',d.doy)+
+      fld('Περιφέρεια','s-reg','',d.reg)+
+      fld('Δήμος','s-mun','',d.mun)+
+      fld('Περιγραφή','s-desc','',d.desc)+
     '</div>';
   c.appendChild(el);renumberSites();
 }
@@ -5800,7 +5814,10 @@ function getSites(){
     type:el.querySelector('.s-type').value,title:el.querySelector('.s-title').value.trim(),
     addr:el.querySelector('.s-addr').value.trim(),zip:el.querySelector('.s-zip').value.trim(),
     city:el.querySelector('.s-city').value.trim(),ctry:el.querySelector('.s-ctry').value,
-    phone:el.querySelector('.s-phone').value.trim(),mail:el.querySelector('.s-mail').value.trim()
+    phone:el.querySelector('.s-phone').value.trim(),mail:el.querySelector('.s-mail').value.trim(),
+    code:(el.querySelector('.s-code')||{}).value||'',cat:(el.querySelector('.s-cat')||{}).value||'',
+    doy:(el.querySelector('.s-doy')||{}).value||'',reg:(el.querySelector('.s-reg')||{}).value||'',
+    mun:(el.querySelector('.s-mun')||{}).value||'',desc:(el.querySelector('.s-desc')||{}).value||''
   })).filter(x=>x.title||x.addr);
 }
 
@@ -5833,11 +5850,16 @@ function addPartnerRow(d){
       '<div class="fld"><label>Χώρα</label><select class="p-ctry">'+ctryOpts(d.ctry)+'</select></div>'+
       fld('Διεύθυνση','p-addr','',d.addr)+
       fld('Ταχ. Κώδικας','p-zip','',d.zip)+
+      fld('ΔΟΥ','p-doy','',d.doy)+
+      fld('TIN (αλλοδαπής)','p-tin','',d.tin)+
+      '<div class="fld"><label>Περιφέρεια</label><input type="text" class="p-reg" value="'+String(d.reg||'').replace(/"/g,'&quot;')+'"></div>'+
+      '<div class="fld"><label>Δήμος</label><input type="text" class="p-mun" value="'+String(d.mun||'').replace(/"/g,'&quot;')+'"></div>'+
     '</div>'+
     '<div class="role-chips">'+
       '<label><input type="checkbox" class="p-legal" '+(d.legal?'checked':'')+'> Νόμιμος Εκπρόσωπος</label>'+
       '<label><input type="checkbox" class="p-mgr" '+(d.mgr?'checked':'')+'> Διαχειριστής</label>'+
       '<label><input type="checkbox" class="p-exec" '+(d.exec?'checked':'')+'> Διευθυντικό Στέλεχος</label>'+
+      '<label><input type="checkbox" class="p-abroad" '+(d.abroad?'checked':'')+'> Μέτοχος εκτός Ελλάδας</label>'+
     '</div>';
   c.appendChild(el);
   el.querySelector('.p-pct').addEventListener('input',calcPartnerPct);
@@ -5871,7 +5893,8 @@ function getPartners(){
     return {kind:g('p-kind'),last:g('p-last'),first:g('p-first'),afm:g('p-afm'),
       idtype:g('p-idtype'),idno:g('p-idno'),idctry:g('p-idctry'),pct:g('p-pct'),
       role:g('p-role'),phone:g('p-phone'),mail:g('p-mail'),ctry:g('p-ctry'),
-      addr:g('p-addr'),zip:g('p-zip'),legal:g('p-legal'),mgr:g('p-mgr'),exec:g('p-exec')};
+      addr:g('p-addr'),zip:g('p-zip'),doy:g('p-doy'),tin:g('p-tin'),reg:g('p-reg'),mun:g('p-mun'),
+      legal:g('p-legal'),mgr:g('p-mgr'),exec:g('p-exec'),abroad:g('p-abroad')};
   }).filter(x=>x.last||x.afm);
 }
 
@@ -6109,6 +6132,170 @@ function applyE3Doc(txt,year){
     }
   }
   return found;
+}
+
+
+/* =================== ΠΡΟΣΟΜΟΙΩΣΗ ΟΠΣΚΕ (v46) =================== */
+/* Παράγει καρτέλες ίδιας μορφής με το ΟΠΣΚΕ, με τα δεδομένα του φακέλου
+   και κουμπί αντιγραφής σε κάθε πεδίο, για γρήγορη μεταφορά. */
+function opskeEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');}
+function opskeField(label,val,opts){
+  opts=opts||{};
+  const req=opts.req?'<span class="req">*</span>':(opts.req2?'<span class="req2">**</span>':'');
+  const dis=opts.dis?' dis':'';
+  const v=opskeEsc(val);
+  const hint=opts.hint?'<div class="hint">'+opskeEsc(opts.hint)+'</div>':'';
+  if(opts.check){
+    return '<div class="f"><label class="chk"><input type="checkbox" '+(val?'checked':'')+' disabled> '+opskeEsc(label)+'</label></div>';
+  }
+  return '<div class="f"><label>'+opskeEsc(label)+req+'</label>'+
+    '<div class="ipwrap"><input class="ip'+dis+'" value="'+v+'" readonly>'+
+    (v&&!opts.dis?'<button class="cp" onclick="cp(this)" title="Αντιγραφή">⧉</button>':'')+
+    '</div>'+hint+'</div>';
+}
+function opskeCard(title,leftHtml,rightHtml){
+  return '<section class="card"><header>'+opskeEsc(title)+'<span class="x">×</span></header>'+
+    '<div class="body"><div class="col">'+leftHtml+'</div><div class="col">'+(rightHtml||'')+'</div></div>'+
+    '<footer><button class="save" disabled>Αποθήκευση</button></footer></section>';
+}
+function exportOpske(){
+  const g=id=>{const e=document.getElementById(id);return e?e.value.trim():'';};
+  const ben=g('gen_beneficiary')||'[Δικαιούχος]';
+  const sites=(typeof getSites==='function')?getSites():[];
+  const partners=(typeof getPartners==='function')?getPartners():[];
+  const kads=(typeof getKadSummary==='function')?getKadSummary():[];
+  let body='';
+
+  /* --- ΝΟΜΙΜΟΙ ΕΚΠΡΟΣΩΠΟΙ --- */
+  const legals=partners.filter(p=>p.legal);
+  legals.forEach(p=>{
+    body+=opskeCard('Προβολή Στοιχείων/Προσθήκη Νόμιμου Εκπρόσωπου',
+      opskeField('Δικαιούχοι',ben,{dis:1})+
+      opskeField('Επώνυμο',p.last,{req:1,hint:'Απομένουν 300 χαρακτήρες'})+
+      opskeField('Όνομα',p.first,{req:1,hint:'Απομένουν 300 χαρακτήρες'})+
+      opskeField('ΑΦΜ',p.afm,{req2:1,hint:'Απομένουν 9 χαρακτήρες'})+
+      opskeField('Tax Identification Number (TIN)',p.tin,{req2:1,hint:'Απομένουν 20 χαρακτήρες'})+
+      opskeField('Τηλέφωνο',p.phone,{req:1,hint:'Απομένουν 10 χαρακτήρες'})+
+      opskeField('Ηλεκτρονική Διεύθυνση (Email)',p.mail,{req:1,hint:'Απομένουν 300 χαρακτήρες'})+
+      opskeField('Θέση στον Φορέα',p.role,{hint:'Απομένουν 300 χαρακτήρες'}),
+      opskeField('Χώρα',p.ctry||'Ελλάδα',{req:1})+
+      opskeField('Περιφέρεια',p.reg,{dis:1})+
+      opskeField('Περιφερειακή Ενότητα','',{dis:1})+
+      opskeField('Δήμος',p.mun,{dis:1})+
+      opskeField('Δημοτική Ενότητα','',{dis:1})+
+      opskeField('Δημοτική/Τοπική Κοινότητα','',{dis:1})+
+      opskeField('Διεύθυνση',p.addr,{req:1,hint:'Απομένουν 300 χαρακτήρες'})+
+      opskeField('Ταχυδρομικός Κώδικας',p.zip,{req:1,hint:'Απομένουν 5 χαρακτήρες'})
+    );
+  });
+
+  /* --- ΜΕΤΟΧΟΙ --- */
+  partners.forEach(p=>{
+    body+=opskeCard('Προβολή Στοιχείων/Προσθήκη Μετόχων',
+      opskeField('Δικαιούχοι',ben,{dis:1})+
+      opskeField('Είδος Προσώπου (Μετόχου)',p.kind,{req:1})+
+      opskeField('Μέτοχος Εκτός Ελλάδας',p.abroad,{check:1})+
+      opskeField('ΑΦΜ',p.afm,{req2:1,hint:'Απομένουν 9 χαρακτήρες'})+
+      opskeField('Tax Identification Number (TIN)',p.tin,{req2:1,hint:'Απομένουν 20 χαρακτήρες'})+
+      opskeField('Τύπος Ταυτοποίησης Εγγράφου',p.idtype)+
+      opskeField('Αριθμός Εγγράφου',p.idno,{hint:'Απομένουν 300 χαρακτήρες'})+
+      opskeField('ΔΟΥ',p.doy)+
+      opskeField('Ποσοστό Συμμετοχής (%)',p.pct||'0,00',{req:1})+
+      opskeField('Ονοματεπώνυμο ή Επωνυμία',((p.last||'')+' '+(p.first||'')).trim(),{req:1,hint:'Απομένουν 300 χαρακτήρες'})+
+      opskeField('Θέση Εταίρου / Μετόχου στον Φορέα',p.role,{hint:'Απομένουν 300 χαρακτήρες'}),
+      opskeField('Χώρα',p.ctry||'Ελλάδα',{req:1})+
+      opskeField('Περιφέρεια',p.reg,{dis:1})+
+      opskeField('Περιφερειακή Ενότητα','',{dis:1})+
+      opskeField('Δήμος',p.mun,{dis:1})+
+      opskeField('Δημοτική Ενότητα','',{dis:1})+
+      opskeField('Δημοτική/Τοπική Κοινότητα','',{dis:1})+
+      opskeField('Διεύθυνση',p.addr,{req:1,hint:'Απομένουν 300 χαρακτήρες'})+
+      opskeField('Ταχυδρομικός Κώδικας',p.zip,{hint:'Απομένουν 5 χαρακτήρες'})+
+      opskeField('Τηλ. Επικοινωνίας',p.phone,{hint:'Απομένουν 10 χαρακτήρες'})+
+      opskeField('Ηλεκτρονική Διεύθυνση (Email)',p.mail,{hint:'Απομένουν 300 χαρακτήρες'})
+    );
+  });
+
+  /* --- ΕΓΚΑΤΑΣΤΑΣΕΙΣ --- */
+  sites.forEach(s=>{
+    body+=opskeCard('Προβολή Στοιχείων/Προσθήκη Εγκατάστασης',
+      opskeField('Δικαιούχοι',ben,{dis:1})+
+      opskeField('Κωδικός',s.code,{hint:'Απομένουν 50 χαρακτήρες'})+
+      opskeField('Περιγραφή',s.desc,{hint:'Απομένουν 512 χαρακτήρες'})+
+      opskeField('Τίτλος',s.title,{req:1,hint:'Απομένουν 512 χαρακτήρες'})+
+      opskeField('Κατηγορία Εγκατάστασης',s.cat||s.type,{req:1})+
+      opskeField('ΔΟΥ',s.doy)+
+      opskeField('Ηλεκτρονική Διεύθυνση (Email)',s.mail,{req:1,hint:'Απομένουν 300 χαρακτήρες'})+
+      opskeField('Αριθμός Τηλεφώνου',s.phone,{req:1,hint:'Απομένουν 10 χαρακτήρες'}),
+      opskeField('Χώρα',s.ctry||'Ελλάδα',{req:1})+
+      opskeField('Κατηγορία Περιφέρειας','',{dis:1})+
+      opskeField('Περιφέρεια',s.reg,{dis:1})+
+      opskeField('Περιφερειακή Ενότητα','',{dis:1})+
+      opskeField('Δήμος',s.mun,{dis:1})+
+      opskeField('Δημοτική Ενότητα','',{dis:1})+
+      opskeField('Δημοτική/Τοπική Κοινότητα','',{dis:1})+
+      opskeField('Διεύθυνση',s.addr,{hint:'Απομένουν 300 χαρακτήρες'})+
+      opskeField('Ταχυδρομικός Κώδικας',s.zip,{hint:'Απομένουν 5 χαρακτήρες'})
+    );
+  });
+
+  /* --- ΚΑΔ ΕΓΚΑΤΑΣΤΑΣΗΣ --- */
+  const mainSite=(sites[0]&&(sites[0].title||sites[0].code))||'';
+  kads.forEach(k=>{
+    body+=opskeCard('ΚΑΔ Εγκατάστασης',
+      opskeField('Δικαιούχοι',ben,{dis:1})+
+      opskeField('Εγκατάσταση',mainSite,{req:1})+
+      opskeField('Περιγραφή ΚΑΔ',k.desc,{dis:1})+
+      opskeField('Ημερομηνία Προσθήκης','')+
+      opskeField('Ενεργός ΚΑΔ',true,{check:1}),
+      opskeField('Κωδικός ΚΑΔ',k.code,{req:1})+
+      opskeField('Κωδικός Nace','',{dis:1})+
+      opskeField('Είδος ΚΑΔ',k.role==='Κύριος'?'Κύριος':'Δευτερεύων',{req:1})
+    );
+  });
+
+  if(!body){alert('Δεν υπάρχουν καταχωρημένα στοιχεία. Συμπληρώστε πρώτα εγκαταστάσεις, μετόχους ή ΚΑΔ.');return;}
+
+  const doc='<!DOCTYPE html><html lang="el"><head><meta charset="UTF-8">'+
+  '<title>Προσομοίωση ΟΠΣΚΕ — '+opskeEsc(ben)+'</title><style>'+
+  'body{margin:0;background:#eef0f5;font-family:system-ui,Segoe UI,Roboto,sans-serif;font-size:13px;color:#333;}'+
+  '.top{background:#fff;border-bottom:2px solid #6366c9;padding:12px 18px;position:sticky;top:0;z-index:10;'+
+  'display:flex;gap:14px;align-items:center;flex-wrap:wrap;}'+
+  '.top h1{margin:0;font-size:16px;color:#4a4fb5;}'+
+  '.top .sub{color:#777;font-size:12px;}'+
+  '.top .tip{margin-left:auto;font-size:12px;color:#555;background:#f4f4fb;border:1px solid #d9d9ef;border-radius:4px;padding:6px 10px;}'+
+  '.wrap{padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(520px,1fr));gap:14px;align-items:start;}'+
+  '.card{background:#fff;border:1px solid #dcdce6;border-radius:4px;overflow:hidden;}'+
+  '.card header{background:#fff;border-bottom:1px solid #eee;padding:11px 14px;font-weight:600;color:#4a4fb5;font-size:14px;display:flex;}'+
+  '.card header .x{margin-left:auto;color:#999;}'+
+  '.card .body{display:grid;grid-template-columns:1fr 1fr;gap:0 22px;padding:14px;}'+
+  '.card footer{padding:10px 14px;text-align:right;border-top:1px solid #f0f0f0;}'+
+  '.save{background:#6366c9;color:#fff;border:none;border-radius:4px;padding:7px 18px;font-size:13px;opacity:.6;}'+
+  '.f{margin-bottom:11px;}'+
+  '.f label{display:block;font-size:12px;color:#555;margin-bottom:3px;}'+
+  '.req{color:#d33;margin-left:3px;}.req2{color:#2a9d4a;margin-left:3px;}'+
+  '.ipwrap{display:flex;gap:4px;}'+
+  '.ip{flex:1;padding:7px 9px;border:1px solid #cfcfdc;border-radius:3px;font-size:13px;background:#fff;color:#111;font-family:inherit;}'+
+  '.ip.dis{background:#f0f0f4;color:#999;}'+
+  '.ip:focus{outline:2px solid #6366c9;outline-offset:-1px;}'+
+  '.cp{background:#f4f4fb;border:1px solid #d9d9ef;border-radius:3px;color:#4a4fb5;cursor:pointer;padding:0 9px;font-size:13px;}'+
+  '.cp:hover{background:#6366c9;color:#fff;}.cp.done{background:#2a9d4a;color:#fff;border-color:#2a9d4a;}'+
+  '.hint{font-size:10.5px;color:#8a8ab0;margin-top:2px;}'+
+  '.chk{display:flex;align-items:center;gap:7px;font-size:12.5px;color:#333;margin-top:20px;}'+
+  '@media print{.top,.cp,.save{display:none;}.wrap{display:block;}.card{page-break-inside:avoid;margin-bottom:12px;}}'+
+  '</style></head><body>'+
+  '<div class="top"><h1>Προσομοίωση ΟΠΣΚΕ</h1>'+
+  '<span class="sub">'+opskeEsc(ben)+'</span>'+
+  '<span class="tip">Τοποθετήστε αυτό το παράθυρο δίπλα στο ΟΠΣΚΕ. Πατήστε <strong>⧉</strong> σε κάθε πεδίο και επικολλήστε με Ctrl+V.</span></div>'+
+  '<div class="wrap">'+body+'</div>'+
+  '<script>function cp(b){var i=b.previousElementSibling;i.select();i.setSelectionRange(0,99999);'+
+  'try{navigator.clipboard.writeText(i.value);}catch(e){document.execCommand("copy");}'+
+  'b.textContent="✓";b.classList.add("done");setTimeout(function(){b.textContent="⧉";b.classList.remove("done");},1200);}<\/script>'+
+  '</body></html>';
+
+  const w=window.open('','_blank');
+  if(!w){alert('Ο browser απέκλεισε το νέο παράθυρο. Επιτρέψτε τα αναδυόμενα παράθυρα για αυτή τη σελίδα.');return;}
+  w.document.write(doc);w.document.close();
 }
 
 /* =================== ΑΜΟΙΒΕΣ (v5) =================== */
