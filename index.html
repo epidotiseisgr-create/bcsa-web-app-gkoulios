@@ -495,6 +495,33 @@ header{padding-left:110px;padding-right:110px;}
 /* ===== v43 ===== */
 .grp-sum tr.ungrouped td{background:#fff8e6;color:#8a6d00;font-weight:bold;}
 .kad-near{border-left-color:#b02a37 !important;background:#fff6f6 !important;color:#8a2b26 !important;}
+
+/* ===== v44 ===== */
+.gen-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;border-bottom:2px solid var(--border-color);}
+.gen-tab{background:none;border:none;border-bottom:3px solid transparent;padding:9px 16px;
+  font-size:13.5px;font-weight:bold;color:#777;cursor:pointer;margin-bottom:-2px;font-family:inherit;}
+.gen-tab:hover{color:var(--primary-blue);}
+.gen-tab.active{color:var(--primary-blue);border-bottom-color:var(--primary-blue);}
+.gen-pane{display:none;}
+.gen-pane.active{display:block;}
+.site-card,.ptr-card{background:#fff;border:1px solid var(--border-color);border-radius:6px;padding:12px;margin-bottom:10px;}
+.site-card{border-left:4px solid var(--secondary-blue);}
+.ptr-card{border-left:4px solid var(--purple);}
+.card-hd{display:flex;gap:8px;align-items:center;margin-bottom:9px;flex-wrap:wrap;}
+.card-hd .num{background:var(--light-blue);color:var(--primary-blue);border-radius:50%;
+  width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;flex-shrink:0;}
+.fld-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:9px;}
+.fld{display:flex;flex-direction:column;gap:3px;}
+.fld label{font-size:11px;color:#777;font-weight:bold;}
+.fld input,.fld select{padding:7px;border:1px solid var(--border-color);border-radius:4px;font-size:13px;font-family:inherit;}
+.role-chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:9px;padding-top:9px;border-top:1px dashed #e2e2e2;}
+.role-chips label{display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;
+  background:#f6f3fa;border:1px solid #e0d5ef;border-radius:14px;padding:4px 11px;color:#4b2e6b;font-weight:bold;}
+.role-chips input{width:15px;height:15px;cursor:pointer;}
+.pct-sum{font-size:13px;font-weight:bold;padding:9px 12px;border-radius:5px;}
+.pct-ok{background:#eafaf1;color:#1e7e46;border:1px solid #b7e4c7;}
+.pct-bad{background:#fdeaea;color:#b02a37;border:1px solid #f5c2c2;}
+.proc-row .proc-sec{padding:6px;border:1px solid var(--border-color);border-radius:4px;font-size:12px;}
 </style>
 </head>
 <body>
@@ -564,6 +591,12 @@ header{padding-left:110px;padding-right:110px;}
     <h3>ΓΕΝΙΚΑ ΣΤΟΙΧΕΙΑ ΠΕΛΑΤΗ &amp; ΕΡΓΟΥ (ΚΟΙΝΑ ΓΙΑ ΟΛΕΣ ΤΙΣ ΦΑΣΕΙΣ)</h3>
     <div class="gen-lock-msg" id="genLockMsg">🔒 Επιλέξτε ή δημιουργήστε πελάτη από τη λίστα «Φάκελοι Πελατών» για να συμπληρώσετε τα στοιχεία.</div>
     <div id="genFields">
+    <div class="gen-tabs">
+      <button class="gen-tab active" data-g="1" onclick="genTab(1)">📋 Γενικά Στοιχεία</button>
+      <button class="gen-tab" data-g="2" onclick="genTab(2)">📍 Έδρα &amp; Τόπος Υλοποίησης</button>
+      <button class="gen-tab" data-g="3" onclick="genTab(3)">👥 Εταιρική / Μετοχική Σύνθεση</button>
+    </div>
+    <div class="gen-pane active" id="genPane1">
     <div class="grid-3">
       <div><label class="question-label">Επωνυμία Δικαιούχου / Πελάτη</label><input type="text" id="gen_beneficiary" class="form-control" placeholder="Εισάγετε Επωνυμία"></div>
       <div><label class="question-label">Κωδικός Έργου (ΟΠΣ/ΟΠΣΚΕ)</label><input type="text" id="gen_projectCode" class="form-control" placeholder="Εισάγετε Κωδικό Έργου"></div>
@@ -609,6 +642,20 @@ header{padding-left:110px;padding-right:110px;}
       </div>
     </div>
   </div>
+
+    <div class="gen-pane" id="genPane2">
+      <p style="font-size:12.5px;color:#666;margin:0 0 10px 0;">Καταχωρήστε την έδρα και όλους τους τόπους υλοποίησης της επένδυσης.</p>
+      <div id="sitesContainer"></div>
+      <button class="btn-add" onclick="addSiteRow()">+ Προσθήκη τόπου</button>
+    </div>
+
+    <div class="gen-pane" id="genPane3">
+      <p style="font-size:12.5px;color:#666;margin:0 0 10px 0;">Καταχωρήστε τους εταίρους/μετόχους. Σημειώστε ποιος είναι νόμιμος εκπρόσωπος, διαχειριστής ή διευθυντικό στέλεχος.</p>
+      <div id="partnersContainer"></div>
+      <button class="btn-add" onclick="addPartnerRow()">+ Προσθήκη εταίρου / μετόχου</button>
+      <div id="partnersSum" style="margin-top:10px;"></div>
+    </div>
+</div>
   </div>
 
   <!-- TAB BAR -->
@@ -1199,13 +1246,7 @@ header{padding-left:110px;padding-right:110px;}
           <span style="min-width:150px;font-size:12.5px;">Τρόπος αξιολόγησης</span>
           <select id="admMetaEval" class="grow"><option value="">— κανένας —</option><option>FIFO</option><option>Συγκριτική Αξιολόγηση</option></select>
         </div>
-        <div class="adm-row">
-          <span style="min-width:150px;font-size:12.5px;">Π/Υ επενδυτικού σχεδίου</span>
-          <input type="text" id="admMetaBudMin" style="width:150px;" placeholder="από (€)">
-          <input type="text" id="admMetaBudMax" style="width:150px;" placeholder="έως (€)">
-          <span style="min-width:120px;font-size:12.5px;">Ένταση ενίσχυσης</span>
-          <input type="text" id="admMetaAid" style="width:100px;" placeholder="π.χ. 65 %">
-        </div>
+        
         <div class="adm-row">
           <span style="min-width:150px;font-size:12.5px;">Ομάδες δαπάνης που περιλαμβάνουν αμοιβή συμβούλου</span>
           <input type="text" id="admMetaConsult" class="grow" placeholder="π.χ. Συμβουλευτικές υπηρεσίες (χωρίστε με κόμμα)">
@@ -1291,8 +1332,12 @@ header{padding-left:110px;padding-right:110px;}
 
     <div class="adm-sec" id="admSecP3Proc"><h4 onclick="admToggle(this)"><span>ΦΑΣΗ 5 · Έλεγχοι διαδικασίας (εμφανίζονται στην αναφορά ελλείψεων)</span><span>▾</span></h4>
       <div class="adm-body">
-        <p class="adm-hint">Αυτά τα σημεία θεωρούνται «διαδικασίες» και διαχωρίζονται στην αναφορά. Μπορείτε να προσθέσετε ή να διαγράψετε.</p>
-        <div id="admP3Proc"></div><button class="adm-addbtn" onclick="admAddLine('admP3Proc')">+ Προσθήκη ελέγχου</button>
+        <p class="adm-hint">Τα σημεία αυτά χαρακτηρίζονται ως «ελεγκτικές διαδικασίες» και εμφανίζονται χωριστά στην αναφορά ελλείψεων, με το σήμα ⚙. Επιλέξτε σε ποια ενότητα του checklist ανήκει το καθένα, ώστε να σταλεί στον σωστό παραλήπτη.</p>
+        <div class="adm-row" style="font-size:11.5px;color:#777;font-weight:bold;">
+          <span style="width:170px;">Ενότητα / Παραλήπτης</span><span class="grow">Περιγραφή ελέγχου</span>
+        </div>
+        <div id="admP3Proc"></div>
+        <button class="adm-addbtn" onclick="admAddProcLine()">+ Προσθήκη ελέγχου</button>
         <button class="adm-addbtn" style="margin-left:8px;background:#eee;color:#555;border-style:solid;" onclick="admResetProc()">↻ Επαναφορά προεπιλογών</button>
       </div></div>
 
@@ -2497,8 +2542,12 @@ function recipientFor(text,section,dapani,exoflisi){
   return 'beneficiary';
 }
 /* Ερωτήσεις που αποτελούν ελεγκτική διαδικασία */
+function procTexts(){
+  if(typeof processChecks==='undefined')return [];
+  return processChecks.map(p=>typeof p==='string'?p:(p.k||''));
+}
 function isProcessItem(text){
-  return (typeof processChecks!=='undefined')&&processChecks.some(p=>text.includes(p)||p.includes(text));
+  return procTexts().some(p=>p&&(text.includes(p)||p.includes(text)));
 }
 function bulkSet(index,val){
   const card=document.getElementById('checklist_card_'+index);if(!card)return;
@@ -2717,6 +2766,8 @@ function collectData(){
   };
   /* --- ΓΕΝΙΚΑ --- */
   ['gen_beneficiary','gen_projectCode','gen_program','gen_type','genActionType','genEvalType','gen_budget','gen_fee_total','gen_fee_submit','fee_pct_total','fee_pct_sub','gen_contact','gen_email','gen_phone'].forEach(id=>data.general[id]=document.getElementById(id).value);
+  data.sites=(typeof getSites==='function')?getSites():[];
+  data.partners=(typeof getPartners==='function')?getPartners():[];
   data.general.fee_manual={total:document.getElementById('gen_fee_total').dataset.manual||'0',submit:document.getElementById('gen_fee_submit').dataset.manual||'0'};
   data.phase2_dyn.kad=getKadSummary();
   data.keyMarks=(typeof getKeyMarks==='function')?getKeyMarks():null;
@@ -2820,6 +2871,8 @@ function applyData(data){
       document.getElementById('genEvalType').value=g.genEvalType||'';
       document.getElementById('gen_budget').value=g.gen_budget||'';
       ['gen_contact','gen_email','gen_phone'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=g[id]||'';});
+      {const sc=document.getElementById('sitesContainer');if(sc){sc.innerHTML='';(data.sites||[]).forEach(s=>addSiteRow(s));}}
+      {const pc=document.getElementById('partnersContainer');if(pc){pc.innerHTML='';(data.partners||[]).forEach(x=>addPartnerRow(x));calcPartnerPct();}}
       document.getElementById('fee_pct_total').value=g.fee_pct_total||'3';
       document.getElementById('fee_pct_sub').value=g.fee_pct_sub||'13';
       document.getElementById('gen_fee_total').value=g.gen_fee_total||'';
@@ -4440,7 +4493,7 @@ function applyPhase3Mode(){
 function syncProgramConfig(){
   if(typeof refreshAllKadStatus==='function')setTimeout(refreshAllKadStatus,40);
   const cfg=currentProgramCfg();
-  processChecks=(cfg.p3_process&&cfg.p3_process.length)?cfg.p3_process.slice():DEFAULT_PROCESS_CHECKS.slice();
+  processChecks=(cfg.p3_process&&cfg.p3_process.length)?cfg.p3_process.slice():DEFAULT_PROCESS_CHECKS.map(x=>({k:x,sec:'invoice'}));
   if(typeof applyPhase3Mode==='function')applyPhase3Mode();
 }
 function reloadDocsForType(){
@@ -4678,6 +4731,7 @@ function clientsSave(){
   catch(e){alert('Δεν ήταν δυνατή η αποθήκευση — ο αποθηκευτικός χώρος του browser γέμισε. Κατεβάστε εφεδρικό αντίγραφο και διαγράψτε παλαιούς φακέλους.');return false;}
 }
 function resetForm(){
+  if(typeof genTab==='function')genTab(1);
   document.querySelectorAll('#tab_1 input, #tab_2 input, #tab_5 input').forEach(el=>{if(el.type!=='file')el.value='';});
   document.querySelectorAll('#tab_2 select, #tab_5 select').forEach(el=>{el.value='';if(el.classList.contains('bg-neutral')||el.classList.contains('form-control'))colorStandard(el);});
   ['gen_beneficiary','gen_projectCode','gen_program','gen_type','genActionType','genEvalType','gen_budget','gen_fee_total','gen_fee_submit','gen_contact','gen_email','gen_phone'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
@@ -4685,7 +4739,7 @@ function resetForm(){
   document.getElementById('fee_pct_sub').value='13';
   document.getElementById('gen_fee_total').dataset.manual='0';
   document.getElementById('gen_fee_submit').dataset.manual='0';
-  ['eligibilityContainer','bpContainer','scoringContainer','docsContainer','expensesContainer','kadContainer','expGroupsContainer','smeLinkedContainer','smeSelfBody','bp4DocsContainer'].forEach(id=>{const c=document.getElementById(id);if(c)c.innerHTML='';});
+  ['eligibilityContainer','bpContainer','scoringContainer','docsContainer','expensesContainer','kadContainer','expGroupsContainer','smeLinkedContainer','smeSelfBody','bp4DocsContainer','sitesContainer','partnersContainer'].forEach(id=>{const c=document.getElementById(id);if(c)c.innerHTML='';});
   initPhoneForm();initPhase3();initIndirect();initContacts();refreshExpGroupOptions();initSme();syncBp4();initBulkBars();handlePhase3Gate();applyPhase3Mode();renderLifeline();if(document.getElementById('ind_active'))document.getElementById('ind_active').checked=false;calcIndirect();
   if(typeof refreshProgramDropdown==='function')refreshProgramDropdown();
   calcFees();evaluateProgress(0);calculateTotalScore();updateDynamicHeaders();
@@ -5455,8 +5509,40 @@ function admBuildP3All(){
     d.querySelector('.p3count').textContent='('+n+')';
   });
 }
+const PROC_SECTIONS=[
+  {key:'invoice',lbl:'Τιμολόγιο → Δικαιούχος'},
+  {key:'accountant',lbl:'Λογιστής'},
+  {key:'bank',lbl:'Τράπεζα / Προμηθευτής'},
+  {key:'leasing',lbl:'Leasing → Προμηθευτής'},
+  {key:'expense',lbl:'Ανά δαπάνη'}
+];
+function admProcLineHtml(txt,sec){
+  return '<div class="adm-row proc-row">'+
+    '<select class="proc-sec" style="width:170px;">'+
+      PROC_SECTIONS.map(s=>'<option value="'+s.key+'"'+(sec===s.key?' selected':'')+'>'+s.lbl+'</option>').join('')+
+    '</select>'+
+    '<input type="text" class="grow adm-line" value="'+String(txt||'').replace(/"/g,'&quot;')+'" placeholder="Περιγραφή ελεγκτικής διαδικασίας">'+
+    '<button class="adm-xbtn" onclick="this.parentElement.remove()">×</button></div>';
+}
+function admAddProcLine(){
+  document.getElementById('admP3Proc').insertAdjacentHTML('beforeend',admProcLineHtml('','invoice'));
+}
+function admFillProc(list){
+  const c=document.getElementById('admP3Proc');if(!c)return;
+  c.innerHTML='';
+  (list||[]).forEach(v=>{
+    if(typeof v==='string')c.insertAdjacentHTML('beforeend',admProcLineHtml(v,'invoice'));
+    else c.insertAdjacentHTML('beforeend',admProcLineHtml(v.k||v.text||'',v.sec||'invoice'));
+  });
+}
+function admReadProc(){
+  return [...document.querySelectorAll('#admP3Proc .proc-row')].map(r=>({
+    k:r.querySelector('.adm-line').value.trim(),
+    sec:r.querySelector('.proc-sec').value
+  })).filter(o=>o.k);
+}
 function admResetProc(){
-  admFillLines('admP3Proc',DEFAULT_PROCESS_CHECKS,'Έλεγχος διαδικασίας');
+  admFillProc(DEFAULT_PROCESS_CHECKS.map(x=>({k:x,sec:'invoice'})));
   admStatus('Επαναφέρθηκαν οι προεπιλεγμένοι έλεγχοι διαδικασίας.');
 }
 function admLoadIntoForm(name){
@@ -5475,9 +5561,6 @@ function admLoadIntoForm(name){
   admToggleRegime();admFillDocTypes();admFillExpRegimes();
   document.getElementById('admMetaAction').value=t.meta_action||'';
   document.getElementById('admMetaEval').value=t.meta_eval||'';
-  document.getElementById('admMetaBudMin').value=t.meta_bud_min||'';
-  document.getElementById('admMetaBudMax').value=t.meta_bud_max||'';
-  document.getElementById('admMetaAid').value=t.meta_aid||'';
   document.getElementById('admMetaConsult').value=(t.consult_groups||[]).join(', ');
   document.getElementById('admMetaIndirect').checked=!!t.meta_indirect;
   document.getElementById('admMetaIndirectPct').value=t.meta_indirect_pct||'7';
@@ -5492,7 +5575,7 @@ function admLoadIntoForm(name){
   admFillLines('admP3S1',t.p3_stage1,'Δικαιολογητικό 1ης δόσης');
   admFillLines('admP3S2',t.p3_stage2,'Δικαιολογητικό 2ης δόσης');
   admFillLines('admP3F',t.p3_final,'Δικαιολογητικό τελικής δόσης');
-  admFillLines('admP3Proc',(t.p3_process&&t.p3_process.length)?t.p3_process:DEFAULT_PROCESS_CHECKS,'Έλεγχος διαδικασίας');
+  admFillProc((t.p3_process&&t.p3_process.length)?t.p3_process:DEFAULT_PROCESS_CHECKS.map(x=>({k:x,sec:'invoice'})));
   {const xc=document.getElementById('admExp');if(xc){xc.innerHTML='';(t.p2_exp||[]).forEach(o=>xc.insertAdjacentHTML('beforeend',admExpHtml(o)));}}
 }
 function admSelectProgram(){const n=document.getElementById('admProgList').value;admCurrent=n;admLoadIntoForm(n);}
@@ -5509,9 +5592,6 @@ function admCollect(){
     limits:(function(){const o={};['admDmBudMin','admDmBudMax','admDmAidMin','admDmAidMax','admGakBudMin','admGakBudMax','admGakAidMin','admGakAidMax'].forEach(id=>{const e=document.getElementById(id);if(e)o[id]=e.value.trim();});return o;})(),
     meta_action:document.getElementById('admMetaAction').value,
     meta_eval:document.getElementById('admMetaEval').value,
-    meta_bud_min:document.getElementById('admMetaBudMin').value.trim(),
-    meta_bud_max:document.getElementById('admMetaBudMax').value.trim(),
-    meta_aid:document.getElementById('admMetaAid').value.trim(),
     consult_groups:document.getElementById('admMetaConsult').value.split(',').map(s=>s.trim()).filter(Boolean),
     meta_indirect:document.getElementById('admMetaIndirect').checked,
     meta_indirect_pct:document.getElementById('admMetaIndirectPct').value.trim(),
@@ -5527,7 +5607,7 @@ function admCollect(){
     p3_stage1:admReadLines('admP3S1'),
     p3_stage2:admReadLines('admP3S2'),
     p3_final:admReadLines('admP3F'),
-    p3_process:admReadLines('admP3Proc'),
+    p3_process:admReadProc(),
     p3_off:JSON.parse(JSON.stringify(_p3Off||{})),
     p3_full:(function(){admStoreP3Full();const o={};Object.keys(_p3Full).forEach(k=>{const v=_p3Full[k];if(v&&Object.keys(v).some(x=>v[x]&&v[x].length))o[k]=v;});return o;})(),
     p3_expense_docs:(function(){admStoreExpDocs();const o={};Object.keys(_admExpDocs).forEach(k=>{const v=_admExpDocs[k];if(v&&v.length)o[k]=v;});return o;})(),
@@ -5588,6 +5668,123 @@ function admImportJson(ev){
   r.readAsText(f);
 }
 function admStatus(m){document.getElementById('admStatus').innerText=m;}
+
+
+/* =================== ΚΑΡΤΕΛΕΣ ΓΕΝΙΚΩΝ ΣΤΟΙΧΕΙΩΝ (v44) =================== */
+function genTab(n){
+  document.querySelectorAll('.gen-tab').forEach(b=>b.classList.toggle('active',b.dataset.g==String(n)));
+  [1,2,3].forEach(i=>{const p=document.getElementById('genPane'+i);if(p)p.classList.toggle('active',i===n);});
+}
+const COUNTRIES=['Ελλάδα','Κύπρος','Γερμανία','Ιταλία','Γαλλία','Ισπανία','Βουλγαρία','Ρουμανία','Ηνωμένο Βασίλειο','ΗΠΑ','Άλλη'];
+function ctryOpts(sel){return COUNTRIES.map(c=>'<option value="'+c+'"'+((sel||'Ελλάδα')===c?' selected':'')+'>'+c+'</option>').join('');}
+function fld(lbl,cls,ph,val,type){
+  return '<div class="fld"><label>'+lbl+'</label><input type="'+(type||'text')+'" class="'+cls+'" placeholder="'+(ph||'')+'" value="'+String(val||'').replace(/"/g,'&quot;')+'"></div>';
+}
+
+/* ---------- Έδρα & τόποι υλοποίησης ---------- */
+function addSiteRow(d){
+  d=d||{};
+  const c=document.getElementById('sitesContainer');if(!c)return;
+  const n=c.children.length+1;
+  const el=document.createElement('div');el.className='site-card';
+  el.innerHTML='<div class="card-hd"><span class="num">'+n+'</span>'+
+    '<select class="s-type" style="flex:1;min-width:150px;padding:7px;border:1px solid var(--border-color);border-radius:4px;">'+
+      ['Κεντρικό / Έδρα','Υποκατάστημα','Τόπος υλοποίησης','Αποθήκη'].map(o=>'<option'+(d.type===o?' selected':'')+'>'+o+'</option>').join('')+
+    '</select>'+
+    '<input type="text" class="s-title" placeholder="Τίτλος / περιγραφή" value="'+String(d.title||'').replace(/"/g,'&quot;')+'" style="flex:2;min-width:160px;padding:7px;border:1px solid var(--border-color);border-radius:4px;">'+
+    '<button class="btn-remove" onclick="this.closest(\'.site-card\').remove();renumberSites();scheduleAutoSave();">×</button></div>'+
+    '<div class="fld-grid">'+
+      fld('Διεύθυνση','s-addr','Οδός & αριθμός',d.addr)+
+      fld('Ταχ. Κώδικας','s-zip','π.χ. 15234',d.zip)+
+      fld('Πόλη','s-city','',d.city)+
+      '<div class="fld"><label>Χώρα</label><select class="s-ctry">'+ctryOpts(d.ctry)+'</select></div>'+
+      fld('Τηλέφωνο','s-phone','',d.phone,'tel')+
+      fld('E-mail','s-mail','',d.mail,'email')+
+    '</div>';
+  c.appendChild(el);renumberSites();
+}
+function renumberSites(){
+  document.querySelectorAll('#sitesContainer .site-card').forEach((el,i)=>{el.querySelector('.num').textContent=i+1;});
+}
+function getSites(){
+  return [...document.querySelectorAll('#sitesContainer .site-card')].map(el=>({
+    type:el.querySelector('.s-type').value,title:el.querySelector('.s-title').value.trim(),
+    addr:el.querySelector('.s-addr').value.trim(),zip:el.querySelector('.s-zip').value.trim(),
+    city:el.querySelector('.s-city').value.trim(),ctry:el.querySelector('.s-ctry').value,
+    phone:el.querySelector('.s-phone').value.trim(),mail:el.querySelector('.s-mail').value.trim()
+  })).filter(x=>x.title||x.addr);
+}
+
+/* ---------- Εταιρική / μετοχική σύνθεση ---------- */
+function addPartnerRow(d){
+  d=d||{};
+  const c=document.getElementById('partnersContainer');if(!c)return;
+  const n=c.children.length+1;
+  const el=document.createElement('div');el.className='ptr-card';
+  const isLegal=(d.kind==='Νομικό πρόσωπο');
+  el.innerHTML='<div class="card-hd"><span class="num">'+n+'</span>'+
+    '<select class="p-kind" onchange="togglePartnerKind(this)" style="min-width:165px;padding:7px;border:1px solid var(--border-color);border-radius:4px;">'+
+      ['Φυσικό πρόσωπο','Νομικό πρόσωπο'].map(o=>'<option'+(d.kind===o?' selected':'')+'>'+o+'</option>').join('')+
+    '</select>'+
+    '<span style="flex:1;"></span>'+
+    '<button class="btn-remove" onclick="this.closest(\'.ptr-card\').remove();renumberPartners();calcPartnerPct();scheduleAutoSave();">×</button></div>'+
+    '<div class="fld-grid">'+
+      fld('Επώνυμο / Επωνυμία','p-last','',d.last)+
+      '<div class="fld p-first-wrap"><label>Όνομα</label><input type="text" class="p-first" placeholder="" value="'+String(d.first||'').replace(/"/g,'&quot;')+'"></div>'+
+      fld('ΑΦΜ','p-afm','',d.afm)+
+      '<div class="fld"><label>Τύπος ταυτοποίησης</label><select class="p-idtype">'+
+        ['Αριθμός Δελτίου Ταυτότητας','Διαβατήριο','Άδεια Παραμονής','ΓΕΜΗ (νομικό πρόσωπο)'].map(o=>'<option'+(d.idtype===o?' selected':'')+'>'+o+'</option>').join('')+
+      '</select></div>'+
+      fld('Αριθμός εγγράφου','p-idno','',d.idno)+
+      '<div class="fld"><label>Χώρα έκδοσης</label><select class="p-idctry">'+ctryOpts(d.idctry)+'</select></div>'+
+      fld('Ποσοστό συμμετοχής (%)','p-pct','π.χ. 50',d.pct)+
+      fld('Θέση στον φορέα','p-role','π.χ. Εταίρος',d.role)+
+      fld('Τηλέφωνο','p-phone','',d.phone,'tel')+
+      fld('E-mail','p-mail','',d.mail,'email')+
+      '<div class="fld"><label>Χώρα</label><select class="p-ctry">'+ctryOpts(d.ctry)+'</select></div>'+
+      fld('Διεύθυνση','p-addr','',d.addr)+
+      fld('Ταχ. Κώδικας','p-zip','',d.zip)+
+    '</div>'+
+    '<div class="role-chips">'+
+      '<label><input type="checkbox" class="p-legal" '+(d.legal?'checked':'')+'> Νόμιμος Εκπρόσωπος</label>'+
+      '<label><input type="checkbox" class="p-mgr" '+(d.mgr?'checked':'')+'> Διαχειριστής</label>'+
+      '<label><input type="checkbox" class="p-exec" '+(d.exec?'checked':'')+'> Διευθυντικό Στέλεχος</label>'+
+    '</div>';
+  c.appendChild(el);
+  el.querySelector('.p-pct').addEventListener('input',calcPartnerPct);
+  togglePartnerKind(el.querySelector('.p-kind'));
+  renumberPartners();calcPartnerPct();
+}
+function togglePartnerKind(sel){
+  const card=sel.closest('.ptr-card');if(!card)return;
+  const legal=(sel.value==='Νομικό πρόσωπο');
+  const fw=card.querySelector('.p-first-wrap');
+  if(fw)fw.style.display=legal?'none':'flex';
+  const lastLbl=card.querySelector('.fld label');
+  if(lastLbl)lastLbl.textContent=legal?'Επωνυμία':'Επώνυμο / Επωνυμία';
+}
+function renumberPartners(){
+  document.querySelectorAll('#partnersContainer .ptr-card').forEach((el,i)=>{el.querySelector('.num').textContent=i+1;});
+}
+function calcPartnerPct(){
+  let s=0;
+  document.querySelectorAll('#partnersContainer .p-pct').forEach(i=>s+=parseGreekNumber(i.value));
+  const box=document.getElementById('partnersSum');if(!box)return;
+  if(!document.querySelectorAll('#partnersContainer .ptr-card').length){box.innerHTML='';return;}
+  const ok=Math.abs(s-100)<0.01;
+  box.innerHTML='<div class="pct-sum '+(ok?'pct-ok':'pct-bad')+'">'+(ok?'✓':'⚠')+
+    ' Σύνολο ποσοστών συμμετοχής: <strong>'+s.toLocaleString('el-GR',{maximumFractionDigits:2})+'%</strong>'+
+    (ok?'':' — πρέπει να αθροίζει 100%')+'</div>';
+}
+function getPartners(){
+  return [...document.querySelectorAll('#partnersContainer .ptr-card')].map(el=>{
+    const g=c=>{const e=el.querySelector('.'+c);return e?(e.type==='checkbox'?e.checked:e.value.trim()):'';};
+    return {kind:g('p-kind'),last:g('p-last'),first:g('p-first'),afm:g('p-afm'),
+      idtype:g('p-idtype'),idno:g('p-idno'),idctry:g('p-idctry'),pct:g('p-pct'),
+      role:g('p-role'),phone:g('p-phone'),mail:g('p-mail'),ctry:g('p-ctry'),
+      addr:g('p-addr'),zip:g('p-zip'),legal:g('p-legal'),mgr:g('p-mgr'),exec:g('p-exec')};
+  }).filter(x=>x.last||x.afm);
+}
 
 /* =================== ΑΜΟΙΒΕΣ (v5) =================== */
 function markManual(el){el.dataset.manual='1';}
